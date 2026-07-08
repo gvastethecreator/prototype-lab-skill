@@ -1,91 +1,61 @@
 ---
 name: prototype-lab
-description: "Browser/UI prototype lab. Use when creating or improving standalone prototypes under prototypes/, visual direction options, controls/debug panels, or visual QA."
+description: "Browser/UI prototype lab. Use when creating or improving standalone prototypes under prototypes/ with chronological folders, local runtime files, metadata, README, shell structure, and proof."
 ---
 
 # Prototype Lab
 
-Build polished browser prototypes inside `prototypes/` without scattering one-off UI experiments.
+Build organized standalone browser prototypes inside `prototypes/`.
+
+## Purpose
+
+Use this skill to keep prototype work discoverable, self-contained, and easy to review. It does not prescribe visual style. Let the prototype choose whatever look, interaction feel, and presentation best fit the user's request.
 
 ## Process
 
 1. Confirm lab fit.
-   - Use this for browser/UI prototypes that belong in `prototypes/months/<YYYY-MM>/<NNN>-<prototype-slug>/`.
+   - Use this for browser/UI prototypes that belong in `prototypes/<YYYY>/<MM>/<NNN>-<prototype-slug>/`.
    - If the request is a quick terminal logic/state experiment, use `prototype` instead.
-   - Done when the prototype question, month, number, slug, category metadata, and expected user path are explicit.
+   - Done when the prototype question, expected user path, year, month, number, slug, category, and status are explicit.
 
-2. Load the local contract.
-   - Read `AGENTS.MD`, `prototypes/README.md`, and `assets/prototype-shell/README.md` before editing.
-   - Done when the folder shape, metadata file, standalone shell, run command, and proof location are known.
+2. Create the prototype folder.
+   - Use the canonical folder shape below.
+   - Keep `prototypes/` root reserved for year folders only.
+   - Copy `assets/prototype-shell/` into the new prototype folder, then replace placeholder content.
+   - Keep proof artifacts inside the prototype's local `proof/` folder.
 
-3. Select the visual direction.
-   - If the user supplied a screenshot/mock or already picked a direction, build from that target.
-   - If visual quality matters, read `references/taste-calibration.md` and lock the prototype read plus dials for the canvas.
-   - If no direction exists, read `references/product-design-loop.md` and run the three-option Product Design loop before building.
-   - Done when there is one selected build target, or an explicit decision to keep multiple views.
-
-4. Build as a standalone prototype.
-   - Copy `assets/prototype-shell/` into the prototype folder, then replace placeholder content.
+3. Keep the runtime standalone.
    - Keep all runtime files local to that prototype: `index.html`, `styles.css`, `app.js`, `metadata.json`, `README.md`, and optional local `assets/`.
-   - Do not depend on `prototypes/_shared`, sibling prototype code, shared components, global CSS, or shared runtime helpers. Category is metadata, not a folder boundary.
-   - Keep the required shell minimal: one full-width top toolbar, one full-screen prototype stage, and one right drawer for controls/info when needed. The drawer is hidden by default.
-   - Put view navigation in the top toolbar when the prototype has multiple views. Do not add a left navigation rail.
-   - Build ultra-wide/desktop first across `1920x1080` and `1200x820`, then prove tablet `834x1112` and mobile `390x844` sanity. Shell fills `100dvh`, body/page do not scroll, and the primary path fits the stage without requiring page scroll.
-   - Use `improve-ui` for semantics, focus, hit areas, wrapping, motion, responsiveness, and browser proof.
-   - Keep taste calibration scoped to the prototype canvas unless the request is shell work.
-   - Done when every visible control/view has real behavior or is clearly marked as a noninteractive test case.
+   - Hard ban: do not depend on `prototypes/_shared`, `prototypes/_references`, `prototypes/output`, sibling prototype code, shared components, global CSS, shared runtime helpers, server routes, APIs, or imports outside the prototype folder.
+   - Open the prototype directly from `index.html` unless the experiment truly needs HTTP.
+   - If HTTP is needed, use a temporary static server from outside `prototypes/`; do not add server, package, API, or navigator files under `prototypes/`.
 
-5. Prove the user path.
-   - Run the smallest useful logic/static check for non-trivial behavior.
-   - Manually exercise core views, controls, reset/back paths, overflow scrolling, ultra-wide, desktop, tablet, and a mobile sanity layout.
-   - Run the lab audit with screenshots; for focused work, use the narrowest `--filter=<YYYY-MM>/<NNN>-<slug>` that still proves the changed path. Use legacy `--filter=<category>/<slug>` only while migrating old prototypes.
-   - For complex or stateful prototypes, read `references/quality-bar.md` and satisfy its proof checklist.
-   - Done when screenshots/artifacts are saved under `prototypes/output/` and the prototype `README.md` records the proof.
+4. Preserve only the required shell structure.
+   - Top toolbar: full-width, used for view navigation and important controls.
+   - Stage: full-screen remaining area for the prototype itself.
+   - Right panel: optional floating panel for controls or information, hidden by default.
+   - Design freely inside that structure. The starter CSS is a convenience, not a style contract.
+   - Do not add extra permanent navigation/control regions unless the prototype is explicitly testing them.
 
-## Baseline Rules
+5. Record and prove.
+   - Fill out `metadata.json` and the prototype `README.md`.
+   - Exercise the expected user path, views, controls, reset/back paths, and relevant states.
+   - Run the smallest useful static, logic, or browser check available in the target repo.
+   - Save screenshots or review artifacts under `proof/`, and point `metadata.json` plus `README.md` to them.
+   - For complex, stateful, async, or multi-view prototypes, read `references/quality-bar.md` before handoff.
 
-- Dark only: neutral black/gray shell; color belongs to prototype content, text, icons, or state, not broad chrome.
-- Full-screen first: target `1920x1080` ultra-wide and `1200x820` desktop first, then tablet `834x1112` and mobile `390x844`. `html`/`body` stay `overflow: hidden`; only the right drawer and intentional inner panes scroll.
-- Primary path fit: the main canvas/demo state must fit the stage at ultra-wide, desktop, and tablet sizes. Move controls/details into the right drawer before making the stage taller than the viewport.
-- Top toolbar only: toolbar is full-width and holds title, key status, navigation pills, and essential commands. Keep it `40px`-`48px`; allow a second compact row only on narrow mobile.
-- Right drawer: optional, collapsed by default, opens from the right, width `320px`-`380px` on desktop and `min(92vw, 380px)` on small screens. Put controls, debug, notes, and state there.
-- No default left rail, no bottom status bar, no fake metadata strips. Status can live as one compact toolbar chip or inside the drawer.
-- Compact type: labels/kickers `9px`-`10px`, body/control text `11px`-`12px`, drawer headings `11px`-`13px`, canvas/demo titles only as large as the prototype needs. Avoid hero-scale type inside tool chrome.
-- Clear hierarchy: prototype title, active view, stage, drawer controls, and transient status each need distinct placement/weight; do not repeat the same heading treatment everywhere.
-- Minimal shell: structural panels, buttons, and controls use readable neutral borders near `10%` opacity. Avoid nested panels unless the prototype itself requires them.
-- Icons: Tabler-style icons are allowed for real actions/status. Prefer a local/inline subset and accessible names for icon-only controls.
-- Scroll areas: custom scrollbars should match shell tokens, remain visible, and preserve native scrolling. The right drawer may scroll; the page should not.
-- Motion: small, purposeful, interruptible feedback only. Avoid broad travel on high-frequency controls.
-- Avoid glow, glassmorphism, loud gradients, generic SaaS decoration, oversized radii, and decoration that does not explain the prototype.
-- Radii: prefer `0`, `2px`, `4px`, or `6px`.
-- Prototype canvas may be expressive when the question is visual direction, brand feel, game feel, or interaction craft. The shell stays quiet and minimal.
-- Avoid reflexive prototype slop: three-card SaaS sections, nested panels, fake metadata strips, nonfunctional debug controls, and motion that does not test the hypothesis.
-
-## Code Rules
-
-- Keep each prototype self-contained. Do not share components or helpers between prototypes.
-- Prefer plain HTML/CSS/JS for small prototypes. Use TSX/framework code only when the question needs app runtime or framework behavior.
-- Keep selected view/variation URL-backed when sharing, refresh, or direct comparison matters.
-- Surface runtime state in the right drawer, toolbar status chip, or prototype canvas.
-- Add no dependency unless the prototype cannot answer its question without it.
-- Keep code readable enough to absorb or delete later.
-
-## Run Contract
-
-Use the shared navigator:
-
-```bash
-cd prototypes
-bun run dev
-```
-
-Prototype URL:
+## Canonical Folder Shape
 
 ```text
-http://127.0.0.1:51237/p/<YYYY-MM>/<NNN>-<prototype-slug>/
+prototypes/<YYYY>/<MM>/<NNN>-<prototype-slug>/
+  metadata.json
+  README.md
+  index.html
+  styles.css
+  app.js
+  assets/
+  proof/
 ```
-
-Do not create a separate server unless the user explicitly asks or the experiment requires a different runtime.
 
 ## Prototype README
 
@@ -96,9 +66,9 @@ Every prototype folder keeps a short `README.md`:
 
 question: What are we trying to learn?
 status: active | answered | stale
-run: cd prototypes && bun run dev
-url: http://127.0.0.1:51237/p/<YYYY-MM>/<NNN>-<prototype-slug>/
-proof: prototypes/output/playwright/<file>.png
+run: open index.html in a browser
+path: prototypes/<YYYY>/<MM>/<NNN>-<prototype-slug>/index.html
+proof: proof/<file>.png
 
 views:
 - view-id: purpose
@@ -106,8 +76,6 @@ views:
 notes:
 - Decision, risk, or next step.
 ```
-
-For visual-direction prototypes, include the selected design read and dials in `notes`.
 
 When answered, fold the result into production or mark/delete the prototype. Do not leave stale experiments looking finished.
 
@@ -117,7 +85,7 @@ Every prototype folder keeps `metadata.json`. Category, model, tags, and details
 
 ```json
 {
-  "id": "2026-07/001-prototype-name",
+  "id": "2026/07/001-prototype-name",
   "month": "2026-07",
   "number": 1,
   "slug": "prototype-name",
@@ -134,23 +102,7 @@ Every prototype folder keeps `metadata.json`. Category, model, tags, and details
 }
 ```
 
-Canonical folder shape:
-
-```text
-prototypes/months/<YYYY-MM>/<NNN>-<prototype-slug>/
-  metadata.json
-  README.md
-  index.html
-  styles.css
-  app.js
-  assets/
-```
-
-Legacy `prototypes/categories/<domain>/<prototype-slug>/` paths are readable by the browser only for migration. Do not create new prototypes there.
-
 ## Reference Files
 
-- `references/product-design-loop.md`: read when no visual direction has been selected.
-- `references/taste-calibration.md`: read when visual quality, redesign, brand feel, or polished interaction matters.
-- `references/quality-bar.md`: read for complex, stateful, async, multi-view, or polish-sensitive prototypes.
 - `assets/prototype-shell/`: copy for every new browser/UI prototype.
+- `references/quality-bar.md`: read before handoff for complex, stateful, async, or multi-view prototypes.

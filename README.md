@@ -2,9 +2,9 @@
 
 ![Prototype Lab banner](./assets/readme-banner.png)
 
-Codex skill pack for polished, standalone browser/UI prototypes with metadata and screenshot-backed proof.
+Codex skill pack for organized, standalone browser/UI prototypes with metadata and screenshot-backed proof.
 
-Prototype Lab gives Codex a repeatable contract for prototype work: chronological folders, local runtime files, a compact full-screen shell, right-side controls, and visual QA before handoff. It is meant for teams that use prototypes as working evidence, not loose mockups.
+Prototype Lab gives Codex a repeatable organization contract for prototype work: chronological folders, local runtime files, a structural full-screen shell, top-toolbar navigation and controls, a collapsible right-side panel, and local proof before handoff. It is meant for teams that use prototypes as working evidence, not loose mockups.
 
 ## Quick Start
 
@@ -23,24 +23,23 @@ Use prototype-lab to create a standalone browser prototype for a prototype brows
 The skill directs new prototypes into this shape:
 
 ```text
-prototypes/months/<YYYY-MM>/<NNN>-<prototype-slug>/
+prototypes/<YYYY>/<MM>/<NNN>-<prototype-slug>/
   metadata.json
   README.md
   index.html
   styles.css
   app.js
   assets/
+  proof/
 ```
 
 Category, model, tags, status, details, views, and proof live in `metadata.json`. Each prototype keeps its runtime local; it should not depend on shared components or sibling prototype code.
 
 ## What's Included
 
-- [`SKILL.md`](./SKILLS/prototype-lab/SKILL.md): the full Codex process and rules.
+- [`SKILL.md`](./SKILLS/prototype-lab/SKILL.md): the full Codex structure and handoff contract.
 - [`assets/prototype-shell/`](./SKILLS/prototype-lab/assets/prototype-shell): standalone shell starter files.
-- [`references/quality-bar.md`](./SKILLS/prototype-lab/references/quality-bar.md): review checklist for serious prototypes.
-- [`references/taste-calibration.md`](./SKILLS/prototype-lab/references/taste-calibration.md): visual direction and anti-slop guidance.
-- [`references/product-design-loop.md`](./SKILLS/prototype-lab/references/product-design-loop.md): three-option direction loop when the brief is unclear.
+- [`references/quality-bar.md`](./SKILLS/prototype-lab/references/quality-bar.md): structure, behavior, and proof checklist.
 
 ## Validate
 
@@ -55,8 +54,8 @@ The validator checks required files, frontmatter, JSON metadata, public-doc word
 Preview skill pack.
 
 - The skill and shell template are included.
-- Prototype browser/server tooling is expected to live in the target project.
-- Legacy `prototypes/categories/...` paths are documented only as migration input.
+- No prototype browser/server tooling is required.
+- The target project's `prototypes/` root should contain only year folders.
 
 ## License
 

@@ -14,9 +14,7 @@ const requiredFiles = [
   "SKILLS/prototype-lab/assets/prototype-shell/index.html",
   "SKILLS/prototype-lab/assets/prototype-shell/styles.css",
   "SKILLS/prototype-lab/assets/prototype-shell/app.js",
-  "SKILLS/prototype-lab/references/product-design-loop.md",
   "SKILLS/prototype-lab/references/quality-bar.md",
-  "SKILLS/prototype-lab/references/taste-calibration.md",
   "assets/readme-banner.png",
 ];
 
@@ -79,8 +77,8 @@ async function checkSkillFrontmatter() {
   if (!/^description:\s*".+"/m.test(frontmatter)) {
     errors.push("SKILL.md frontmatter needs a quoted description");
   }
-  if (!content.includes("prototypes/months/<YYYY-MM>/<NNN>-<prototype-slug>/")) {
-    errors.push("SKILL.md missing canonical monthly layout contract");
+  if (!content.includes("prototypes/<YYYY>/<MM>/<NNN>-<prototype-slug>/")) {
+    errors.push("SKILL.md missing canonical chronological layout contract");
   }
   if (!content.includes("metadata.json")) {
     errors.push("SKILL.md missing metadata contract");
