@@ -3,21 +3,18 @@ const views = [
     id: "overview",
     title: "Overview",
     description: "Summarize the main prototype question and current baseline.",
-    note: "Document the main assumption a reviewer should test first.",
     items: ["Goal", "Primary path", "Known risk"],
   },
   {
     id: "variation-a",
     title: "Variation A",
     description: "Use this slot for the first meaningful alternate state or layout.",
-    note: "Explain why this option should be compared with the baseline.",
     items: ["Different hierarchy", "Different control emphasis", "Tradeoff"],
   },
   {
     id: "edge-cases",
     title: "Edge Cases",
     description: "Stress empty, long, loading, error, and dense states here.",
-    note: "List the edge state that would most affect the product decision.",
     items: ["Empty", "Long content", "Error"],
   },
 ];
@@ -28,9 +25,9 @@ const stage = document.querySelector("#stage");
 const activeKicker = document.querySelector("#active-kicker");
 const activeTitle = document.querySelector("#active-title");
 const activeDescription = document.querySelector("#active-description");
-const activeNotes = document.querySelector("#active-notes");
 const demoGrid = document.querySelector("#demo-grid");
-const notesControl = document.querySelector("#notes-control");
+const densityControl = document.querySelector("#density-control");
+const debugControl = document.querySelector("#debug-control");
 const stateReadout = document.querySelector("#state-readout");
 const statusChip = document.querySelector("#status-chip");
 const drawerButton = document.querySelector("[data-action='drawer']");
@@ -38,7 +35,8 @@ const drawer = document.querySelector("#prototype-drawer");
 
 const state = {
   viewId: new URLSearchParams(location.search).get("view") || views[0].id,
-  notesVisible: false,
+  density: 1,
+  debug: false,
   drawerOpen: false,
 };
 
@@ -78,8 +76,6 @@ function renderStage() {
   activeKicker.textContent = activeView.id;
   activeTitle.textContent = activeView.title;
   activeDescription.textContent = activeView.description;
-  activeNotes.textContent = activeView.note;
-  activeNotes.hidden = !state.notesVisible;
   demoGrid.replaceChildren(
     ...activeView.items.map((item) => {
       const cell = document.createElement("article");
@@ -104,11 +100,15 @@ function fitStatus() {
 }
 
 function renderControls() {
-  notesControl.checked = state.notesVisible;
+  document.documentElement.dataset.density = String(state.density);
+  document.documentElement.dataset.debug = String(state.debug);
+  densityControl.value = String(state.density);
+  debugControl.checked = state.debug;
   const snapshot = {
     view: state.viewId,
     drawer: state.drawerOpen ? "open" : "closed",
-    notes: state.notesVisible ? "visible" : "hidden",
+    density: state.density,
+    debug: state.debug,
     viewport: `${innerWidth}x${innerHeight}`,
     fit: fitStatus(),
   };
@@ -123,13 +123,19 @@ function render(shouldFocus = false) {
   if (shouldFocus) stage.focus({ preventScroll: true });
 }
 
-notesControl.addEventListener("change", (event) => {
-  state.notesVisible = event.currentTarget.checked;
-  render();
+densityControl.addEventListener("input", (event) => {
+  state.density = Number(event.currentTarget.value);
+  renderControls();
+});
+
+debugControl.addEventListener("change", (event) => {
+  state.debug = event.currentTarget.checked;
+  renderControls();
 });
 
 document.querySelector("[data-action='reset']").addEventListener("click", () => {
-  state.notesVisible = false;
+  state.density = 1;
+  state.debug = false;
   setView(views[0].id, true);
 });
 

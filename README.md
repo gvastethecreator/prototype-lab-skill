@@ -2,9 +2,9 @@
 
 ![Prototype Lab banner](./assets/readme-banner.png)
 
-Codex skill pack for organized, standalone browser/UI prototypes with metadata and screenshot-backed proof.
+Codex skill pack for organized, standalone browser/UI prototypes with metadata, compact interaction shells, and screenshot-backed proof.
 
-Prototype Lab gives Codex a repeatable organization contract for prototype work: chronological folders, local runtime files, a structural full-screen shell, top-toolbar navigation and controls, a collapsible right-side panel, and local proof before handoff. It is meant for teams that use prototypes as working evidence, not loose mockups.
+Prototype Lab gives Codex a repeatable organization contract for prototype work: chronological folders, local runtime files, a structural full-screen shell, top-toolbar navigation and controls, a collapsible right-side panel, product-design iteration notes, and local proof before handoff. It is meant for teams that use prototypes as working evidence, not loose mockups.
 
 ## Quick Start
 
@@ -39,7 +39,9 @@ Category, model, tags, status, details, views, and proof live in `metadata.json`
 
 - [`SKILL.md`](./SKILLS/prototype-lab/SKILL.md): the full Codex structure and handoff contract.
 - [`assets/prototype-shell/`](./SKILLS/prototype-lab/assets/prototype-shell): standalone shell starter files.
-- [`references/quality-bar.md`](./SKILLS/prototype-lab/references/quality-bar.md): structure, behavior, and proof checklist.
+- [`references/quality-bar.md`](./SKILLS/prototype-lab/references/quality-bar.md): structure, behavior, viewport, and proof checklist.
+- [`references/product-design-loop.md`](./SKILLS/prototype-lab/references/product-design-loop.md): product-thinking loop for prototype intent, user flows, and feedback states.
+- [`references/taste-calibration.md`](./SKILLS/prototype-lab/references/taste-calibration.md): compact visual calibration, density, hierarchy, and interaction polish.
 
 ## Validate
 
@@ -53,7 +55,7 @@ The validator checks required files, frontmatter, JSON metadata, public-doc word
 
 Preview skill pack.
 
-- The skill and shell template are included.
+- The skill, shell template, and design/proof references are included.
 - No prototype browser/server tooling is required.
 - The target project's `prototypes/` root should contain only year folders.
 

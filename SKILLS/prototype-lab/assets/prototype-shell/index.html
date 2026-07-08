@@ -66,7 +66,6 @@
           <p class="plab-kicker" id="active-kicker">View</p>
           <h2 id="active-title">Overview</h2>
           <p id="active-description">Replace this shell with the prototype goal and primary interaction.</p>
-          <p class="plab-notes" id="active-notes" hidden>Use this optional area for reviewer notes, assumptions, or test details.</p>
           <div class="demo-grid" id="demo-grid"></div>
         </section>
       </main>
@@ -87,8 +86,12 @@
 
         <section class="plab-drawer-section">
           <label class="plab-control-row">
-            <span>Show notes</span>
-            <input id="notes-control" type="checkbox" />
+            <span>Density</span>
+            <input id="density-control" type="range" min="0" max="2" step="1" value="1" />
+          </label>
+          <label class="plab-control-row">
+            <span>Debug overlay</span>
+            <input id="debug-control" type="checkbox" />
           </label>
         </section>
 

@@ -14,7 +14,9 @@ const requiredFiles = [
   "SKILLS/prototype-lab/assets/prototype-shell/index.html",
   "SKILLS/prototype-lab/assets/prototype-shell/styles.css",
   "SKILLS/prototype-lab/assets/prototype-shell/app.js",
+  "SKILLS/prototype-lab/references/product-design-loop.md",
   "SKILLS/prototype-lab/references/quality-bar.md",
+  "SKILLS/prototype-lab/references/taste-calibration.md",
   "assets/readme-banner.png",
 ];
 
