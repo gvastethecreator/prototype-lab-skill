@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Prototype Shell</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <svg class="icon-sprite" aria-hidden="true" focusable="false">
+      <symbol id="ti-refresh" viewBox="0 0 24 24">
+        <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" />
+        <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" />
+      </symbol>
+      <symbol id="ti-clipboard" viewBox="0 0 24 24">
+        <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" />
+        <path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" />
+      </symbol>
+      <symbol id="ti-panel" viewBox="0 0 24 24">
+        <path d="M4 4h16v16h-16z" />
+        <path d="M15 4v16" />
+      </symbol>
+      <symbol id="ti-sliders" viewBox="0 0 24 24">
+        <path d="M4 21v-7" />
+        <path d="M4 10v-7" />
+        <path d="M12 21v-9" />
+        <path d="M12 8v-5" />
+        <path d="M20 21v-5" />
+        <path d="M20 12v-9" />
+        <path d="M1 14h6" />
+        <path d="M9 8h6" />
+        <path d="M17 16h6" />
+      </symbol>
+      <symbol id="ti-x" viewBox="0 0 24 24">
+        <path d="M18 6l-12 12" />
+        <path d="M6 6l12 12" />
+      </symbol>
+    </svg>
+
+    <div class="plab-shell" data-drawer="closed">
+      <header class="plab-topbar">
+        <div class="plab-title-wrap">
+          <p class="plab-kicker">Prototype</p>
+          <h1 class="plab-title" id="prototype-title">Prototype Shell</h1>
+        </div>
+        <nav class="plab-nav" id="view-nav" aria-label="Prototype views"></nav>
+        <div class="plab-actions" aria-label="Prototype actions">
+          <span class="plab-status" id="status-chip">Ready</span>
+          <button class="plab-button" type="button" data-action="reset" title="Reset">
+            <svg class="plab-icon" aria-hidden="true" focusable="false"><use href="#ti-refresh" /></svg>
+            <span>Reset</span>
+          </button>
+          <button class="plab-button" type="button" data-action="snapshot" title="Copy state">
+            <svg class="plab-icon" aria-hidden="true" focusable="false"><use href="#ti-clipboard" /></svg>
+            <span>Copy</span>
+          </button>
+          <button class="plab-button" type="button" data-action="drawer" aria-expanded="false" aria-controls="prototype-drawer" title="Controls">
+            <svg class="plab-icon" aria-hidden="true" focusable="false"><use href="#ti-panel" /></svg>
+            <span>Panel</span>
+          </button>
+        </div>
+      </header>
+
+      <main class="plab-stage" id="stage" tabindex="-1">
+        <section class="plab-content" aria-live="polite">
+          <p class="plab-kicker" id="active-kicker">View</p>
+          <h2 id="active-title">Overview</h2>
+          <p id="active-description">Replace this shell with the prototype goal and primary interaction.</p>
+          <div class="demo-grid" id="demo-grid"></div>
+        </section>
+      </main>
+
+      <button class="plab-backdrop" type="button" data-action="drawer-close" tabindex="-1" aria-hidden="true"></button>
+
+      <aside class="plab-drawer" id="prototype-drawer" aria-label="Prototype controls" aria-hidden="true">
+        <div class="plab-drawer-head">
+          <p class="plab-panel-title">
+            <svg class="plab-icon" aria-hidden="true" focusable="false"><use href="#ti-sliders" /></svg>
+            <span>Controls</span>
+          </p>
+          <button class="plab-icon-button" type="button" data-action="drawer-close" title="Close panel">
+            <svg class="plab-icon" aria-hidden="true" focusable="false"><use href="#ti-x" /></svg>
+            <span class="sr-only">Close panel</span>
+          </button>
+        </div>
+
+        <section class="plab-drawer-section">
+          <label class="plab-control-row">
+            <span>Density</span>
+            <input id="density-control" type="range" min="0" max="2" step="1" value="1" />
+          </label>
+          <label class="plab-control-row">
+            <span>Debug overlay</span>
+            <input id="debug-control" type="checkbox" />
+          </label>
+        </section>
+
+        <section class="plab-drawer-section">
+          <p class="plab-panel-title">State</p>
+          <pre class="plab-state-readout" id="state-readout">{}</pre>
+        </section>
+      </aside>
+    </div>
+
+    <script defer src="./app.js"></script>
+  </body>
+</html>

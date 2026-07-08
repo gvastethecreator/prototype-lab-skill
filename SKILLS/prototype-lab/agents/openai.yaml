@@ -1,0 +1,4 @@
+interface:
+  display_name: "Prototype Lab"
+  short_description: "Build polished standalone browser prototypes."
+  default_prompt: "Create or improve a standalone browser/UI prototype using monthly folders, metadata, a compact top toolbar, a hidden right controls panel, and visual QA."

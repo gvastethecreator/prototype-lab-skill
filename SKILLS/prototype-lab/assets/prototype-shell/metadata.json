@@ -1,0 +1,16 @@
+{
+  "id": "2026-07/001-prototype-name",
+  "month": "2026-07",
+  "number": 1,
+  "slug": "prototype-name",
+  "title": "Prototype Name",
+  "category": "workflow-tools",
+  "status": "active",
+  "date": "2026-07-08",
+  "model": "GPT-5",
+  "tags": ["browser-ui"],
+  "question": "What are we trying to learn?",
+  "details": "What changed, why it exists, and what should be reviewed.",
+  "views": ["overview"],
+  "proof": []
+}
