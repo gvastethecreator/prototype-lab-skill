@@ -131,6 +131,14 @@ async function checkMetadataJson() {
     for (const key of ["inputScope", "receivedOtherVariants", "editedFinalPrototype"]) {
       if (!(key in run)) errors.push(`metadata.json agentRun missing ${key}: ${run.variantId ?? "unknown"}`);
     }
+    if (!("fallbackReason" in run)) {
+      errors.push(`metadata.json agentRun missing fallbackReason: ${run.variantId ?? "unknown"}`);
+    }
+  }
+  for (const variant of parsed.variants ?? []) {
+    if (!("fallbackReason" in variant)) {
+      errors.push(`metadata.json variant missing fallbackReason: ${variant.id ?? "unknown"}`);
+    }
   }
 }
 

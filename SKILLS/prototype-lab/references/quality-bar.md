@@ -8,8 +8,8 @@ Use this after the core prototype works when it is complex, stateful, async, mul
 - UX: navigation, controls, state, errors, empty/loading states, and reset/back paths are visible without explanation.
 - Interface: dark standalone shell, restrained contrast, very compact type, functional icons, no glow/glass, no decorative noise, no oversized radii.
 - Taste: prototype read and dials are explicit when visual quality matters; the canvas has a coherent visual language without generic SaaS/card/glow defaults.
-- Comparison integrity: multi-variant labs keep one shared prompt, locked comparison dimension, clear criteria, honest attribution, worker receipts or explicit fallback, and consistent frames or states for every variant.
-- Provenance integrity: prompts, skills, agent mode/tool, models, token counts, tool calls, input scope, cross-variant leakage check, scratch output paths, and limitations are present when relevant; unknown values are labelled instead of guessed.
+- Comparison integrity: multi-variant labs keep one shared prompt, clear comparison criteria, actual/planned/simulated attribution, and consistent frames or states for every variant.
+- Provenance integrity: prompts, skills, agent mode/tool, models, token counts, tool calls, scratch output paths, and limitations are present when relevant; unknown values are labelled instead of guessed.
 - Accessibility: semantic controls, labels, visible focus, keyboard path, accessible names for icon-only actions, and no overlapping hit areas.
 - Required viewport fit: at `1920x1080`, `1200x820`, and `834x1112`, the shell fills the viewport with compact chrome, body/page do not scroll, and the primary canvas/demo state is fully inspectable without vertical or horizontal content scroll.
 - Responsiveness: ultra-wide remains bounded and readable, desktop shell comes first, tablet compression stays intentional, mobile stacks panels with intentional text wrapping.
@@ -20,9 +20,11 @@ Use this after the core prototype works when it is complex, stateful, async, mul
 - Switch every internal view.
 - For comparison labs, switch compare/focus views, select every variant, refresh one non-default `view`/`variant` URL, and confirm source labels match the real execution.
 - If the lab includes pairwise, blind, rankings, iterations, or archive modes, verify left/right URL params, reveal/reset behavior, ordered notes, iteration links, and hidden archived variants.
-- Open the drawer and inspect provenance: prompt, skills, agent mode/tool, model/settings, tokens, tool calls, input scope, leakage check, limitations, and active variant attribution.
-- For isolated variant runs, confirm each requested variant has a worker receipt path or an explicit `single-agent-fallback`/`unavailable` entry.
-- For comparison integrity, confirm workers did not receive other variants as input, prompt drift appears only when prompt variation is the declared experiment, and independent attribution is not claimed without captured execution.
+- Open the drawer and inspect provenance: prompt, skills, agent mode/tool, model/settings, tokens, tool calls, limitations, and active variant attribution.
+- For isolated variant runs, confirm each requested variant has a worker result path or an explicit `single-agent-fallback`/`unavailable` entry.
+- Confirm fallback entries include an exact `fallbackReason`; vague notes like "not needed" or "simpler this way" do not pass.
+- Confirm the delivered variant count matches the requested count unless the README records a user-approved reduction or hard blocker.
+- Confirm every variant labelled independent has a worker receipt and `crossVariantLeakage: false`.
 - Change every control.
 - Reset state and recover from invalid/empty input where present.
 - Copy/snapshot state if the prototype exposes it.
@@ -49,7 +51,6 @@ Required for UI changes:
 - tablet screenshot
 - mobile sanity screenshot when layout changes affect stacking
 - comparison labs: one compare-view proof plus focused proof or notes for every variant
-- comparison integrity: note worker receipt paths or fallback labels for every requested variant
 - prototype landing: one proof screenshot showing scaled cards and one note that direct links work
 - note of any visual or interaction gap that remains
 - selected design read and dials for visual-direction prototypes
