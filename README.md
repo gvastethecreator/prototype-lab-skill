@@ -49,7 +49,7 @@ prototypes/<YYYY>/<MM>/<NNN>-<prototype-slug>/
 
 Category, model, tags, status, details, views, and proof live in `metadata.json`. Each prototype keeps its runtime local; it should not depend on shared components or sibling prototype code.
 
-When a workspace has several prototypes and no index, the skill can create `prototypes/index.html` as a static evidence browser with scaled iframe previews, compact metadata cards, search, and direct open links. The landing is navigation only; prototypes do not import from it.
+When a workspace has several prototypes and no index, the skill can create `prototypes/index.html` as a static evidence browser with scaled iframe previews, compact metadata cards, search, and direct open links. The landing is navigation only; prototypes do not import from it. The browser page does not scan folders at runtime; run `npm run build:index` to generate `prototypes/prototype-index-data.js` from `prototypes/**/metadata.json`.
 
 Comparison prototypes also record provenance: shared or variant prompts, skills consulted, model/settings when known, agent mode/tool, input scope, leakage check, scratch output path, token usage when visible, tool calls when visible, and limitations. Unknown usage is written as `unknown` or `not captured`; it is never invented.
 
@@ -58,6 +58,7 @@ Comparison prototypes also record provenance: shared or variant prompts, skills 
 - [`SKILL.md`](./SKILLS/prototype-lab/SKILL.md): the full Codex structure and handoff contract.
 - [`assets/prototype-shell/`](./SKILLS/prototype-lab/assets/prototype-shell): standalone shell starter files.
 - [`assets/prototype-index/`](./SKILLS/prototype-lab/assets/prototype-index): optional static prototype browser with scaled iframe cards.
+- [`scripts/build-prototype-index.mjs`](./scripts/build-prototype-index.mjs): metadata scanner that regenerates the static prototype index data file.
 - [`references/quality-bar.md`](./SKILLS/prototype-lab/references/quality-bar.md): structure, behavior, viewport, and proof checklist.
 - [`references/product-design-loop.md`](./SKILLS/prototype-lab/references/product-design-loop.md): product-thinking loop for prototype intent, user flows, and feedback states.
 - [`references/taste-calibration.md`](./SKILLS/prototype-lab/references/taste-calibration.md): compact visual calibration, density, hierarchy, and interaction polish.
@@ -67,6 +68,7 @@ Comparison prototypes also record provenance: shared or variant prompts, skills 
 ## Validate
 
 ```bash
+npm run build:index
 npm run validate
 ```
 

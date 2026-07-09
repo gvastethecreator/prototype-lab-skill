@@ -1,27 +1,15 @@
-const prototypes = [
-  {
-    id: "2026/07/001-prototype-name",
-    title: "Prototype Name",
-    path: "./2026/07/001-prototype-name/index.html",
-    question: "What are we trying to learn?",
-    category: "workflow-tools",
-    status: "active",
-    date: "2026-07-09",
-    tags: ["browser-ui"],
-    model: "GPT-5",
-    modelExact: "GPT-5, runtime default",
-    skills: ["prototype-lab"],
-    agent: "single-agent-fallback",
-    proof: 0,
-  },
-];
+const indexData = window.PROTOTYPE_INDEX_DATA || { prototypes: [], comparisonHubs: [] };
+const prototypes = Array.isArray(indexData.prototypes) ? indexData.prototypes : [];
+const comparisonHubs = Array.isArray(indexData.comparisonHubs) ? indexData.comparisonHubs : [];
+let activeHub = comparisonHubs[0] || null;
 
-const comparisonHubPath = "";
 const grid = document.querySelector("#prototype-grid");
 const count = document.querySelector("#result-count");
 const search = document.querySelector("#search-input");
 const groupSelect = document.querySelector("#group-select");
 const template = document.querySelector("#prototype-card-template");
+const compareControls = document.querySelector(".compare-controls");
+const hubSelect = document.querySelector("#hub-select");
 const compareLeft = document.querySelector("#compare-left");
 const compareRight = document.querySelector("#compare-right");
 const compareOpen = document.querySelector("#compare-open");
@@ -43,9 +31,7 @@ function searchableText(prototype) {
     prototype.agent,
     ...(prototype.skills || []),
     ...(prototype.tags || []),
-  ]
-    .join(" ")
-    .toLowerCase();
+  ].join(" ").toLowerCase();
 }
 
 function prototypeDate(prototype) {
@@ -115,12 +101,43 @@ function groupedPrototypes(items) {
 }
 
 function setupComparePicker() {
-  const controls = document.querySelector(".compare-controls");
-  if (!controls || !compareLeft || !compareRight || !compareOpen || !comparisonHubPath || prototypes.length < 2) {
-    controls?.setAttribute("hidden", "");
+  if (!compareLeft || !compareRight || !compareOpen) return;
+  if (!comparisonHubs.length) {
+    compareControls?.setAttribute("hidden", "");
     return;
   }
-  const options = prototypes.map((prototype) => {
+  compareControls?.removeAttribute("hidden");
+  if (hubSelect) {
+    hubSelect.replaceChildren(
+      ...comparisonHubs.map((hub) => {
+        const option = document.createElement("option");
+        option.value = hub.id;
+        option.textContent = hub.title;
+        return option;
+      }),
+    );
+    hubSelect.value = activeHub.id;
+    hubSelect.addEventListener("change", () => {
+      activeHub = comparisonHubs.find((hub) => hub.id === hubSelect.value) || comparisonHubs[0];
+      populateCompareOptions();
+      syncCompareLink();
+    });
+  }
+  populateCompareOptions();
+  syncCompareLink();
+  compareLeft.addEventListener("change", () => syncCompareLink("left"));
+  compareRight.addEventListener("change", () => syncCompareLink("right"));
+}
+
+function hubPrototypes() {
+  const ids = new Set(activeHub?.variantIds || []);
+  const scoped = prototypes.filter((prototype) => ids.has(prototype.id));
+  return scoped.length ? scoped : prototypes.filter((prototype) => !prototype.isComparisonHub);
+}
+
+function populateCompareOptions() {
+  const scoped = hubPrototypes();
+  const options = scoped.map((prototype) => {
     const option = document.createElement("option");
     option.value = prototype.id;
     option.textContent = prototype.title;
@@ -128,18 +145,17 @@ function setupComparePicker() {
   });
   compareLeft.replaceChildren(...options.map((option) => option.cloneNode(true)));
   compareRight.replaceChildren(...options.map((option) => option.cloneNode(true)));
-  compareLeft.value = prototypes[0].id;
-  compareRight.value = prototypes[1]?.id || prototypes[0].id;
-  syncCompareLink();
-  compareLeft.addEventListener("change", () => syncCompareLink("left"));
-  compareRight.addEventListener("change", () => syncCompareLink("right"));
+  compareLeft.value = scoped[0]?.id || "";
+  compareRight.value = scoped[1]?.id || scoped[0]?.id || "";
 }
 
 function syncCompareLink(changedSide = "right") {
-  let left = compareLeft.value || prototypes[0]?.id || "";
-  let right = compareRight.value || prototypes[1]?.id || left;
-  if (left === right && prototypes.length > 1) {
-    const alternate = prototypes.find((prototype) => prototype.id !== left)?.id || right;
+  const scoped = hubPrototypes();
+  if (!activeHub || !scoped.length) return;
+  let left = scoped.some((prototype) => prototype.id === compareLeft.value) ? compareLeft.value : scoped[0].id;
+  let right = scoped.some((prototype) => prototype.id === compareRight.value) ? compareRight.value : scoped[1]?.id || left;
+  if (left === right && scoped.length > 1) {
+    const alternate = scoped.find((prototype) => prototype.id !== left)?.id || right;
     if (changedSide === "left") {
       right = alternate;
       compareRight.value = right;
@@ -148,7 +164,9 @@ function syncCompareLink(changedSide = "right") {
       compareLeft.value = left;
     }
   }
-  compareOpen.href = pathWithParams(comparisonHubPath, { view: "compare", left, right });
+  compareLeft.value = left;
+  compareRight.value = right;
+  compareOpen.href = pathWithParams(activeHub.path, { view: activeHub.defaultView || "compare", left, right });
   compareOpen.title = `Compare ${prototypeById(left).title} with ${prototypeById(right).title}`;
 }
 
@@ -185,6 +203,7 @@ function renderGroup(group) {
 
 function renderCard(prototype) {
   const node = template.content.firstElementChild.cloneNode(true);
+  node.dataset.tone = prototype.id.includes("ruthless") ? "warm" : "cool";
   const link = node.querySelector(".preview-link");
   const iframe = node.querySelector("iframe");
   link.href = prototype.path;
@@ -248,7 +267,7 @@ function renderEmptyState(query) {
 function updatePreviewScales() {
   document.querySelectorAll(".preview-frame").forEach((frame) => {
     const width = frame.clientWidth;
-    const scale = Math.max(0.16, Math.min(0.5, width / 1200));
+    const scale = Math.max(0.16, Math.min(0.55, width / 1200));
     frame.style.setProperty("--preview-scale", String(scale));
   });
 }

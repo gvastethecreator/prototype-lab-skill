@@ -83,7 +83,7 @@ body {
   display: flex;
   align-items: center;
   gap: 5px;
-  flex: 0 1 430px;
+  flex: 0 1 640px;
   min-width: 0;
   border-radius: 12px;
   background: #080a0d;
@@ -103,13 +103,17 @@ body {
 .compare-field > span {
   display: grid;
   place-items: center;
-  width: 20px;
+  min-width: 20px;
   height: 20px;
   border-radius: 999px;
   background: #242832;
   color: #e8e8e2;
   font-size: 10px;
   font-weight: 800;
+}
+
+.hub-compare-field {
+  flex: 1.08 1 0;
 }
 
 .compare-versus {

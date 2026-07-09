@@ -57,6 +57,7 @@ Build polished browser prototypes inside `prototypes/` without scattering one-of
    - Confirm every requested variant has either an isolated worker result or an explicit fallback/unavailable entry in `metadata.json` and the drawer provenance. A missing variant is a blocker, not a note.
    - If a prototype landing exists or was created, open it, confirm each card iframe loads the correct prototype at scale, and confirm the card link opens the prototype directly.
    - If a prototype landing exists or was created, confirm the index uses solid minimal badges for model, skills, agents, status, and proof; hides dead preview controls with an embed mode; uses subtle surface color instead of nested border boxes; and exposes a comparison dropdown when a comparison hub is available.
+   - If the workspace index uses generated data, regenerate it from `prototypes/**/metadata.json` after adding or changing prototypes. Prefer `node scripts/build-prototype-index.mjs` when available. A static `file://` browser cannot enumerate folders by itself, so the generated `prototypes/prototype-index-data.js` is the source of truth for the landing.
    - Run `node scripts/validate-prototype-standalone.mjs` so shared runtime references fail before browser QA.
    - Use local browser proof for the prototype folder. If a browser API requires HTTP, run a temporary external static server from outside `prototypes/`; do not add server files to `prototypes/`.
    - For complex or stateful prototypes, read `references/quality-bar.md` and satisfy its proof checklist.
@@ -229,6 +230,7 @@ prototypes/
   index.html                 # optional landing only
   prototype-index.css        # optional landing only
   prototype-index.js         # optional landing only
+  prototype-index-data.js    # generated landing data from metadata
   <YYYY>/<MM>/<NNN>-<prototype-slug>/
     metadata.json
     README.md
@@ -248,6 +250,7 @@ When the workspace has multiple prototypes and no existing index, create a simpl
 The landing should:
 
 - show cards for recent or relevant prototypes
+- derive cards from `prototypes/**/metadata.json` through a generated data file when a generator exists; do not hand-maintain a JS array when folder metadata can be scanned
 - render each prototype at scale using an iframe preview
 - include title, question, category, status, tags, exact model/skill/agent/proof badges, date, path, and proof count
 - require a `date` field for every index entry and group cards by day/week/month/year from a top-toolbar selector
@@ -260,9 +263,10 @@ The landing should:
 - use one rounded main grid surface with a subtle shadow, keep prototype card surfaces neutral gray, and reserve saturated color for badges/status instead of border-heavy nested containers
 - desaturated emoji-style icons are allowed in badges and footer metadata when they improve scanning without becoming decoration
 - expose a compact A/B left-right comparison dropdown when a comparison hub is present and more than one prototype can be compared; prevent accidental same-vs-same pairs where possible
+- expose a comparison-hub dropdown when multiple hubs exist, and populate the A/B selectors only with prototypes declared by the selected hub's metadata
 - behave like an evidence browser, not a portfolio gallery: previews do the visual work, cards provide only the metadata needed to decide what to open
 - stay static and local; no server, package, or shared runtime dependency
-- be updated when a new comparison lab or prototype is added
+- be regenerated when a new comparison lab or prototype is added
 
 If the workspace already has an index, follow that local pattern instead of replacing it.
 

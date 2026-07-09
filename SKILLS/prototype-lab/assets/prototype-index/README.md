@@ -7,12 +7,13 @@ Expected destination:
 ```text
 prototypes/
   index.html
+  prototype-index-data.js
   prototype-index.css
   prototype-index.js
   <YYYY>/<MM>/<NNN>-<prototype-slug>/index.html
 ```
 
-Update the `prototypes` array in `prototype-index.js` with each prototype's path and metadata. Keep this landing as navigation only; prototypes must not import its CSS, JavaScript, or data.
+Generate `prototype-index-data.js` from `prototypes/**/metadata.json` whenever possible. In this skill pack, `node scripts/build-prototype-index.mjs` writes that data file for the local workspace. A static `file://` page cannot enumerate folders by itself, so the generated data file is the bridge between correct folders and the browser index. Keep this landing as navigation only; prototypes must not import its CSS, JavaScript, or data.
 
 Use iframe previews for quick visual scanning, direct links for opening full prototypes, and compact cards for title, question, status, category, tags, model/skill/agent/proof badges, and proof count.
 
@@ -35,7 +36,7 @@ When cards embed prototypes:
 - sort groups newest-first, and sort prototypes inside each group newest-first by date plus prototype sequence when available
 - keep the browsing format as a card grid: groups are vertical sections, and each group renders its cards in rows and columns
 
-When many prototypes or variants exist, set `comparisonHubPath` in `prototype-index.js` and let the dropdowns choose the left/right prototypes to compare. The dropdowns should be labelled as a compact A/B pair, avoid selecting the same prototype on both sides by accident, and deep-link to `?view=compare&left=<id>&right=<id>`. The hub must understand those params before exposing the picker.
+When many prototypes or variants exist, expose a hub selector plus compact A/B dropdowns. The selected hub's metadata should declare the variant ids, and the A/B fields should only offer those variants. Avoid selecting the same prototype on both sides by accident, and deep-link to the hub with `?view=<defaultView>&left=<id>&right=<id>`. The hub must understand those params before exposing the picker.
 
 Design read:
 
