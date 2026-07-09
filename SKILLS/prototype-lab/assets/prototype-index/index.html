@@ -14,6 +14,27 @@
           <h1>Prototype Index</h1>
         </div>
         <div class="index-actions">
+          <div class="compare-controls" aria-label="Prototype comparison picker">
+            <label class="compare-field">
+              <span>A</span>
+              <select id="compare-left" aria-label="Left prototype"></select>
+            </label>
+            <span class="compare-versus">vs</span>
+            <label class="compare-field">
+              <span>B</span>
+              <select id="compare-right" aria-label="Right prototype"></select>
+            </label>
+            <a class="hub-open" id="compare-open" href="#">Open</a>
+          </div>
+          <label class="group-field">
+            <span>Group</span>
+            <select id="group-select" aria-label="Group prototypes by date">
+              <option value="day">Day</option>
+              <option value="week">Week</option>
+              <option value="month">Month</option>
+              <option value="year">Year</option>
+            </select>
+          </label>
           <label class="index-search">
             <span>Search</span>
             <input id="search-input" type="search" placeholder="title, tag, model, skill" />
@@ -27,7 +48,7 @@
 
     <template id="prototype-card-template">
       <article class="prototype-card">
-        <a class="preview-link" target="_blank" rel="noreferrer">
+        <a class="preview-link">
           <span class="preview-frame">
             <iframe title="" loading="lazy"></iframe>
           </span>
@@ -41,27 +62,10 @@
             <span class="status-pill"></span>
           </div>
           <p class="card-question"></p>
-          <dl class="card-meta">
-            <div>
-              <dt>Model</dt>
-              <dd class="card-model"></dd>
-            </div>
-            <div>
-              <dt>Skills</dt>
-              <dd class="card-skills"></dd>
-            </div>
-            <div>
-              <dt>Agent</dt>
-              <dd class="card-agent"></dd>
-            </div>
-            <div>
-              <dt>Proof</dt>
-              <dd class="card-proof"></dd>
-            </div>
-          </dl>
+          <div class="card-meta" aria-label="Prototype metadata"></div>
           <div class="tag-row"></div>
-          <div class="card-actions">
-            <a class="open-link" target="_blank" rel="noreferrer">Open prototype</a>
+          <div class="card-foot">
+            <span class="card-date"></span>
             <span class="card-path"></span>
           </div>
         </div>

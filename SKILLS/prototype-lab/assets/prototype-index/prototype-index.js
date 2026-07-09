@@ -6,17 +6,32 @@ const prototypes = [
     question: "What are we trying to learn?",
     category: "workflow-tools",
     status: "active",
+    date: "2026-07-09",
     tags: ["browser-ui"],
     model: "GPT-5",
+    modelExact: "GPT-5, runtime default",
     skills: ["prototype-lab"],
+    agent: "single-agent-fallback",
     proof: 0,
   },
 ];
 
+const comparisonHubPath = "";
 const grid = document.querySelector("#prototype-grid");
 const count = document.querySelector("#result-count");
 const search = document.querySelector("#search-input");
+const groupSelect = document.querySelector("#group-select");
 const template = document.querySelector("#prototype-card-template");
+const compareLeft = document.querySelector("#compare-left");
+const compareRight = document.querySelector("#compare-right");
+const compareOpen = document.querySelector("#compare-open");
+
+function pathWithParams(path, params) {
+  const [base, query = ""] = path.split("?");
+  const searchParams = new URLSearchParams(query);
+  Object.entries(params).forEach(([key, value]) => searchParams.set(key, value));
+  return `${base}?${searchParams.toString()}`;
+}
 
 function searchableText(prototype) {
   return [
@@ -25,6 +40,7 @@ function searchableText(prototype) {
     prototype.category,
     prototype.status,
     prototype.model,
+    prototype.agent,
     ...(prototype.skills || []),
     ...(prototype.tags || []),
   ]
@@ -32,22 +48,147 @@ function searchableText(prototype) {
     .toLowerCase();
 }
 
+function prototypeDate(prototype) {
+  if (!prototype.date) return null;
+  const [year, month, day] = prototype.date.split("-").map(Number);
+  if (!year || !month || !day) return null;
+  return new Date(year, month - 1, day);
+}
+
+function prototypeSequence(prototype) {
+  const match = prototype.id.match(/\/(\d+)-[^/]+$/);
+  return match ? Number(match[1]) : 0;
+}
+
+function compareNewestFirst(a, b) {
+  const aDate = prototypeDate(a)?.getTime() || 0;
+  const bDate = prototypeDate(b)?.getTime() || 0;
+  return bDate - aDate || prototypeSequence(b) - prototypeSequence(a) || a.title.localeCompare(b.title);
+}
+
+function formatDate(date, options) {
+  return new Intl.DateTimeFormat("en", options).format(date);
+}
+
+function startOfWeek(date) {
+  const start = new Date(date);
+  const dayOffset = (start.getDay() + 6) % 7;
+  start.setDate(start.getDate() - dayOffset);
+  return start;
+}
+
+function localDateKey(date) {
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, "0"),
+    String(date.getDate()).padStart(2, "0"),
+  ].join("-");
+}
+
+function groupInfo(prototype, mode) {
+  const date = prototypeDate(prototype);
+  if (!date) return { key: "unknown", label: "Date unknown" };
+  if (mode === "year") {
+    return { key: String(date.getFullYear()), label: String(date.getFullYear()) };
+  }
+  if (mode === "month") {
+    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+    return { key, label: formatDate(date, { month: "long", year: "numeric" }) };
+  }
+  if (mode === "week") {
+    const start = startOfWeek(date);
+    const key = localDateKey(start);
+    return { key, label: `Week of ${formatDate(start, { month: "long", day: "numeric", year: "numeric" })}` };
+  }
+  return { key: prototype.date, label: formatDate(date, { month: "long", day: "numeric", year: "numeric" }) };
+}
+
+function groupedPrototypes(items) {
+  const mode = groupSelect?.value || "day";
+  const groups = new Map();
+  items.forEach((prototype) => {
+    const info = groupInfo(prototype, mode);
+    if (!groups.has(info.key)) groups.set(info.key, { ...info, items: [] });
+    groups.get(info.key).items.push(prototype);
+  });
+  return [...groups.values()];
+}
+
+function setupComparePicker() {
+  const controls = document.querySelector(".compare-controls");
+  if (!controls || !compareLeft || !compareRight || !compareOpen || !comparisonHubPath || prototypes.length < 2) {
+    controls?.setAttribute("hidden", "");
+    return;
+  }
+  const options = prototypes.map((prototype) => {
+    const option = document.createElement("option");
+    option.value = prototype.id;
+    option.textContent = prototype.title;
+    return option;
+  });
+  compareLeft.replaceChildren(...options.map((option) => option.cloneNode(true)));
+  compareRight.replaceChildren(...options.map((option) => option.cloneNode(true)));
+  compareLeft.value = prototypes[0].id;
+  compareRight.value = prototypes[1]?.id || prototypes[0].id;
+  syncCompareLink();
+  compareLeft.addEventListener("change", () => syncCompareLink("left"));
+  compareRight.addEventListener("change", () => syncCompareLink("right"));
+}
+
+function syncCompareLink(changedSide = "right") {
+  let left = compareLeft.value || prototypes[0]?.id || "";
+  let right = compareRight.value || prototypes[1]?.id || left;
+  if (left === right && prototypes.length > 1) {
+    const alternate = prototypes.find((prototype) => prototype.id !== left)?.id || right;
+    if (changedSide === "left") {
+      right = alternate;
+      compareRight.value = right;
+    } else {
+      left = alternate;
+      compareLeft.value = left;
+    }
+  }
+  compareOpen.href = pathWithParams(comparisonHubPath, { view: "compare", left, right });
+  compareOpen.title = `Compare ${prototypeById(left).title} with ${prototypeById(right).title}`;
+}
+
+function prototypeById(id) {
+  return prototypes.find((prototype) => prototype.id === id) || prototypes[0] || {};
+}
+
 function render() {
   const query = search.value.trim().toLowerCase();
-  const filtered = prototypes.filter((prototype) => !query || searchableText(prototype).includes(query));
-  grid.replaceChildren(...(filtered.length ? filtered.map(renderCard) : [renderEmptyState(query)]));
+  const filtered = prototypes
+    .filter((prototype) => !query || searchableText(prototype).includes(query))
+    .sort(compareNewestFirst);
+  grid.replaceChildren(...(filtered.length ? groupedPrototypes(filtered).map(renderGroup) : [renderEmptyState(query)]));
   count.textContent = `${filtered.length} prototype${filtered.length === 1 ? "" : "s"}`;
   requestAnimationFrame(updatePreviewScales);
+}
+
+function renderGroup(group) {
+  const section = document.createElement("section");
+  section.className = "prototype-group";
+  const head = document.createElement("header");
+  head.className = "group-head";
+  const title = document.createElement("h2");
+  title.textContent = group.label;
+  const total = document.createElement("span");
+  total.textContent = `${group.items.length} prototype${group.items.length === 1 ? "" : "s"}`;
+  const cards = document.createElement("div");
+  cards.className = "group-grid";
+  cards.replaceChildren(...group.items.map(renderCard));
+  head.append(title, total);
+  section.append(head, cards);
+  return section;
 }
 
 function renderCard(prototype) {
   const node = template.content.firstElementChild.cloneNode(true);
   const link = node.querySelector(".preview-link");
   const iframe = node.querySelector("iframe");
-  const open = node.querySelector(".open-link");
   link.href = prototype.path;
-  open.href = prototype.path;
-  iframe.src = prototype.path;
+  iframe.src = pathWithParams(prototype.path, { embed: "1" });
   iframe.title = `${prototype.title} preview`;
   node.querySelector(".card-category").textContent = prototype.category || "uncategorized";
   node.querySelector("h2").textContent = prototype.title;
@@ -55,9 +196,8 @@ function renderCard(prototype) {
   status.textContent = prototype.status || "unknown";
   status.dataset.status = prototype.status || "unknown";
   node.querySelector(".card-question").textContent = prototype.question || "No question recorded.";
-  node.querySelector(".card-model").textContent = prototype.model || "unknown";
-  node.querySelector(".card-skills").textContent = (prototype.skills || ["unknown"]).join(", ");
-  node.querySelector(".card-proof").textContent = String(prototype.proof ?? "unknown");
+  node.querySelector(".card-meta").replaceChildren(...metadataBadges(prototype));
+  node.querySelector(".card-date").textContent = prototype.date || "date unknown";
   node.querySelector(".card-path").textContent = prototype.path;
   node.querySelector(".tag-row").replaceChildren(
     ...(prototype.tags || []).map((tag) => {
@@ -66,6 +206,29 @@ function renderCard(prototype) {
       return pill;
     }),
   );
+  return node;
+}
+
+function metadataBadges(prototype) {
+  const skills = prototype.skills?.length ? prototype.skills : ["unknown skill"];
+  return [
+    badge(prototype.modelExact || prototype.model || "unknown model", "model", "🤖"),
+    ...skills.map((skill) => badge(skill, "skill", "✦")),
+    badge(prototype.agent || "unknown agent", "agent", "🧭"),
+    badge(`${prototype.proof ?? "unknown"} proof`, "proof", "✓"),
+  ];
+}
+
+function badge(label, kind, icon) {
+  const node = document.createElement("span");
+  node.className = "meta-badge";
+  node.dataset.kind = kind;
+  const iconNode = document.createElement("span");
+  iconNode.className = "badge-icon";
+  iconNode.textContent = icon;
+  const text = document.createElement("span");
+  text.textContent = label;
+  node.append(iconNode, text);
   return node;
 }
 
@@ -91,5 +254,7 @@ function updatePreviewScales() {
 }
 
 search.addEventListener("input", render);
+groupSelect?.addEventListener("change", render);
 addEventListener("resize", updatePreviewScales, { passive: true });
+setupComparePicker();
 render();

@@ -4,9 +4,9 @@ Use this when one request asks for multiple prototypes, models, skills, prompts,
 
 ## Default Shape
 
-Build one chronological prototype folder with multiple variants inside it.
+Build one standalone prototype folder per requested variant when the comparison is about skills, models, agents, execution modes, or independent prototype quality. Add one comparison hub folder that links to or embeds those standalone prototypes and records the shared prompt, criteria, provenance, and proof.
 
-Use separate sibling folders only when the user explicitly needs isolated runnable artifacts, different dependencies, or different app runtimes. If separate folders are required, create a small hub prototype that links to them and records the shared prompt, criteria, and proof.
+Use one chronological prototype folder with multiple internal variants only when the user explicitly asks for internal visual options/states rather than separately runnable prototype executions.
 
 ## Shared Brief
 
@@ -49,6 +49,14 @@ Each variant needs:
 
 Do not claim a result came from another model, skill, agent, or execution mode unless it actually did.
 
+Receipt UI:
+
+- Show worker receipts as compact cards in the Info/Provenance drawer.
+- The receipt card header shows variant id plus status.
+- The body shows agent mode, agent tool, input scope, scratch output, and fallback reason in labelled cells.
+- The footer uses chips for isolation checks: isolated input, saw/no other variants, edited/no final files, fallback/no fallback, leakage/no leakage.
+- Do not collapse worker receipts into one long sentence; reviewers should audit independence in one glance.
+
 ## Isolated Variant Generation
 
 Use a coordinator/worker pattern:
@@ -88,11 +96,11 @@ When variants use different models:
 Use these views by default:
 
 - `overview`: shared prompt, comparison criteria, and variant ledger summary.
-- `compare`: all variants together at the same scale. Use consistent frames, device sizes, state labels, and controls.
+- `compare`: all variants together only when they remain legible. When there are many variants, add left/right selectors and compare two at a time using `?view=compare&left=<variant-id>&right=<variant-id>`.
 - `focus`: one selected variant at larger scale with source, hypothesis, tradeoff, and local controls.
 - `stress` or `states`: optional view for empty, error, loading, long-content, and responsive stress cases.
 
-Keep `?view=<id>&variant=<id>` URL-backed. Toolbar navigation switches views; the drawer can hold variant selectors and execution notes.
+Keep `?view=<id>&variant=<id>` URL-backed. For pairwise comparison, also keep `left` and `right` URL-backed. Toolbar navigation switches views; the drawer can hold variant selectors and execution notes.
 
 ## Comparison Methods
 
@@ -118,6 +126,7 @@ The drawer must include a provenance section for:
 - token counts when captured
 - tool calls when captured
 - limitations, unavailable sources, or simulated/planned attribution
+- structured worker receipt cards for each isolated or fallback variant
 
 ## Scaled Review
 
@@ -125,9 +134,14 @@ For side-by-side views:
 
 - Use the same frame size/aspect for every variant.
 - Keep labels and primary states legible at the comparison scale.
+- Use saturated solid badges for exact model, skill, agent, status, and proof/source labels; avoid bordered metadata boxes inside bordered cards.
+- Use small desaturated emoji-style icons when they improve scan speed for model, skill, agent, date, path, or proof.
+- Keep every comparison card structurally identical: same preview area, same compact header, same badge rail, same notes/action row. Variable metadata should truncate or wrap inside stable zones, not reshape the grid.
+- Surface date and path as compact metadata. Do not replace useful provenance with a redundant open link.
 - Prefer one meaningful screen per variant over tiny full-app screenshots.
 - Use focus mode for details that cannot survive scaling.
 - For mobile prototypes, use repeated mobile frames in compare view and a larger selected mobile frame in focus view.
+- Load embedded standalone prototypes in preview mode, such as `?embed=1`, so reset/info/debug controls from the standalone shell do not clutter the review frame.
 
 ## Proof
 
@@ -155,8 +169,15 @@ If the workspace has no prototype landing and the user needs to browse multiple 
 The landing is for navigation only:
 
 - render each prototype in a scaled iframe card
-- show title, question, status, category, tags, model/skill summary, and proof count
+- show title, question, status, category, tags, exact model/skill/agent/proof badges, date, path, and proof count
+- group cards by day/week/month/year from the top toolbar and keep newest groups above older groups
+- preserve the gallery grid inside each group; grouping should add section headers, not turn cards into a vertical list
+- open previews in the same window by default so reviewers can navigate with browser back/forward
 - link directly to the prototype folder's `index.html`
+- deep-link to the comparison hub with left/right dropdowns when a hub exists
+- use a rounded main grid surface and subtle card surfaces instead of containers inside containers
+- keep dropdowns compact and labelled as A/B selectors; avoid same-vs-same pairs unless the reviewer explicitly needs that stress case
+- hide nonessential or dead prototype controls in iframe previews through embed mode
 - avoid shared code imported by prototypes
 - follow any existing workspace index if one already exists
 
@@ -166,7 +187,12 @@ Request: "Create a mobile Winamp-style music player prototype, four versions, ea
 
 Recommended shape:
 
-- one folder: `prototypes/<YYYY>/<MM>/<NNN>-mobile-winamp-comparison/`
+- standalone variant folders:
+  - `prototypes/<YYYY>/<MM>/<NNN>-mobile-winamp-skill-a/`
+  - `prototypes/<YYYY>/<MM>/<NNN+1>-mobile-winamp-skill-b/`
+  - `prototypes/<YYYY>/<MM>/<NNN+2>-mobile-winamp-model-a/`
+  - `prototypes/<YYYY>/<MM>/<NNN+3>-mobile-winamp-model-b/`
+- one hub folder: `prototypes/<YYYY>/<MM>/<NNN+4>-mobile-winamp-comparison/`
 - shared prompt: mobile Winamp-style music player
 - variants: `skill-a`, `skill-b`, `model-a`, `model-b`
 - worker plan: four isolated workers when available, one per variant

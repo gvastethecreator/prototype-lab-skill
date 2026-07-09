@@ -597,6 +597,90 @@ button {
   overflow-wrap: anywhere;
 }
 
+.agent-receipt {
+  display: grid;
+  gap: 8px;
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(215, 215, 210, 0.09), transparent 44%),
+    #050505;
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+  padding: 9px;
+}
+
+.agent-receipt-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+
+.agent-receipt-head span {
+  overflow: hidden;
+  color: #e1e1dc;
+  font-size: 12px;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.agent-receipt-head strong,
+.agent-receipt-checks span {
+  border-radius: 999px;
+  background: #1f2f24;
+  color: #9fe7b8;
+  font-family: "Cascadia Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+  font-weight: 750;
+  line-height: 1;
+  padding: 4px 6px;
+  text-transform: uppercase;
+}
+
+.agent-receipt-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.agent-receipt-grid div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.045);
+  padding: 7px;
+}
+
+.agent-receipt-grid span {
+  color: var(--text-dim);
+  font-size: 9px;
+  font-weight: 750;
+  text-transform: uppercase;
+}
+
+.agent-receipt-grid strong {
+  overflow: hidden;
+  color: var(--text);
+  font-family: "Cascadia Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.agent-receipt-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.agent-receipt-checks span {
+  background: #222633;
+  color: #d7d9ff;
+}
+
 .plab-backdrop {
   position: fixed;
   inset: var(--topbar-h) 0 0;
@@ -706,6 +790,24 @@ button {
   background-size: 24px 24px;
 }
 
+html[data-embed="true"] {
+  --topbar-h: 34px;
+  --stage-pad: 6px;
+}
+
+html[data-embed="true"] .plab-actions {
+  display: none;
+}
+
+html[data-embed="true"] .plab-topbar {
+  grid-template-columns: minmax(0, 240px) minmax(0, 1fr);
+  border-bottom: 0;
+}
+
+html[data-embed="true"] .plab-content {
+  border: 0;
+}
+
 @media (max-width: 834px) {
   :root {
     --topbar-h: 76px;
@@ -734,6 +836,20 @@ button {
 
   .plab-content {
     padding: 10px;
+  }
+
+  html[data-embed="true"] {
+    --topbar-h: 34px;
+    --stage-pad: 6px;
+  }
+
+  html[data-embed="true"] .plab-topbar {
+    grid-template-rows: 34px;
+  }
+
+  html[data-embed="true"] .plab-nav {
+    grid-column: auto;
+    order: initial;
   }
 }
 

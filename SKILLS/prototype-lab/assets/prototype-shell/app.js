@@ -5,6 +5,19 @@ const comparisonBrief = {
   frame: "Responsive prototype canvas",
 };
 
+const prototypeInfo = {
+  id: "2026/07/001-prototype-name",
+  date: "2026-07-09",
+  status: "active",
+  mode: "comparison",
+  path: "prototypes/2026/07/001-prototype-name/index.html",
+  metadataPath: "prototypes/2026/07/001-prototype-name/metadata.json",
+  readmePath: "prototypes/2026/07/001-prototype-name/README.md",
+  exactModel: "GPT-5, runtime default",
+  modelSettings: "not captured",
+  proof: ["proof/desktop-1200x820.png"],
+};
+
 const provenance = {
   prompts: [
     {
@@ -14,7 +27,7 @@ const provenance = {
     },
   ],
   skills: ["prototype-lab"],
-  models: ["GPT-5"],
+  models: [prototypeInfo.exactModel],
   integrity: {
     requestedVariants: 4,
     deliveredVariants: 4,
@@ -158,13 +171,22 @@ const drawerButton = document.querySelector("[data-action='drawer']");
 const drawer = document.querySelector("#prototype-drawer");
 
 const params = new URLSearchParams(location.search);
+const isEmbed = params.get("embed") === "1";
 const state = {
   viewId: params.get("view") || views[0].id,
   variantId: params.get("variant") || variants[0].id,
   density: 1,
   debug: false,
-  drawerOpen: false,
+  drawerOpen: params.get("info") === "1" || params.get("drawer") === "1",
 };
+
+if (isEmbed) {
+  document.documentElement.dataset.embed = "true";
+}
+
+shell.dataset.drawer = state.drawerOpen ? "open" : "closed";
+drawerButton.setAttribute("aria-expanded", String(state.drawerOpen));
+drawer.setAttribute("aria-hidden", String(!state.drawerOpen));
 
 function activeView() {
   return views.find((view) => view.id === state.viewId) || views[0];
@@ -289,6 +311,10 @@ function renderFocus() {
   notes.append(
     labelBlock("Source", variant.source),
     labelBlock("Attribution", variant.status),
+    labelBlock("Prototype ID", prototypeInfo.id),
+    labelBlock("Date", prototypeInfo.date),
+    labelBlock("Path", prototypeInfo.path),
+    labelBlock("Exact Model", prototypeInfo.exactModel),
     labelBlock("Agent", `${variant.agentMode} / ${variant.agentTool}`),
     labelBlock("Output", variant.outputPath),
     labelBlock("Fallback", variant.fallbackReason),
@@ -453,15 +479,16 @@ function renderVariantPicker() {
 function renderProvenance() {
   const active = activeVariant();
   const rows = [
+    ["ID", prototypeInfo.id],
+    ["Date", prototypeInfo.date],
+    ["Status", `${prototypeInfo.status} / ${prototypeInfo.mode}`],
+    ["Path", prototypeInfo.path],
+    ["Metadata", prototypeInfo.metadataPath],
+    ["README", prototypeInfo.readmePath],
     ["Prompt", provenance.prompts.map((prompt) => `${prompt.id}: ${prompt.text}`).join(" | ")],
     ["Skills", provenance.skills.join(", ")],
-    ["Models", provenance.models.join(", ")],
-    [
-      "Agent Runs",
-      provenance.agentRuns
-        .map((run) => `${run.variantId}: ${run.agentMode} via ${run.agentTool}`)
-        .join(" | "),
-    ],
+    ["Exact Model", provenance.models.join(", ")],
+    ["Model Settings", prototypeInfo.modelSettings],
     [
       "Integrity",
       `${provenance.integrity.deliveredVariants}/${provenance.integrity.requestedVariants} variants, leakage ${provenance.integrity.crossVariantLeakage}`,
@@ -471,10 +498,65 @@ function renderProvenance() {
       `in ${provenance.tokenUsage.input} / out ${provenance.tokenUsage.output} / total ${provenance.tokenUsage.total}`,
     ],
     ["Tool Calls", provenance.toolCalls.join(", ")],
+    ["Proof", prototypeInfo.proof.join(", ") || "not captured"],
     ["Active Variant", `${active.title}: ${active.status}, ${active.source}`],
     ["Limitations", provenance.limitations.join(" | ") || "none"],
   ];
-  provenancePanel.replaceChildren(...rows.map(([label, value]) => labelBlock(label, value)));
+  const receiptTitle = document.createElement("p");
+  receiptTitle.className = "plab-panel-title";
+  receiptTitle.textContent = "Worker Receipts";
+  provenancePanel.replaceChildren(
+    ...rows.map(([label, value]) => labelBlock(label, value)),
+    receiptTitle,
+    ...provenance.agentRuns.map(renderAgentReceipt),
+  );
+}
+
+function renderAgentReceipt(run) {
+  const card = document.createElement("section");
+  card.className = "agent-receipt";
+  const head = document.createElement("div");
+  head.className = "agent-receipt-head";
+  const title = document.createElement("span");
+  title.textContent = run.variantId;
+  const status = document.createElement("strong");
+  status.textContent = run.status || "unknown";
+  head.append(title, status);
+
+  const grid = document.createElement("div");
+  grid.className = "agent-receipt-grid";
+  [
+    ["Mode", run.agentMode],
+    ["Tool", run.agentTool],
+    ["Scope", run.inputScope],
+    ["Output", run.outputPath],
+    ["Fallback", run.fallbackReason],
+  ].forEach(([label, value]) => grid.append(receiptCell(label, value)));
+
+  const checks = document.createElement("div");
+  checks.className = "agent-receipt-checks";
+  [
+    run.receivedOtherVariants ? "saw other variants" : "isolated input",
+    run.editedFinalPrototype ? "edited final files" : "no final-file edits",
+    run.fallbackReason && run.fallbackReason !== "not captured" ? `fallback: ${run.fallbackReason}` : "no fallback",
+  ].forEach((label) => {
+    const chip = document.createElement("span");
+    chip.textContent = label;
+    checks.append(chip);
+  });
+
+  card.append(head, grid, checks);
+  return card;
+}
+
+function receiptCell(label, value) {
+  const cell = document.createElement("div");
+  const title = document.createElement("span");
+  title.textContent = label;
+  const detail = document.createElement("strong");
+  detail.textContent = value;
+  cell.append(title, detail);
+  return cell;
 }
 
 function renderControls() {

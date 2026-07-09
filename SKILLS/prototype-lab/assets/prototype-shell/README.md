@@ -35,6 +35,8 @@ notes:
 - Multi-variant labs must attempt one isolated worker per variant. If workers are blocked, keep all requested variants and record the blocker as `fallbackReason`.
 - Do not claim variants are independent unless a worker receipt exists and `crossVariantLeakage` is false.
 - Keep provenance compact in the drawer; `unknown` is acceptable when exact tokens or tool calls were not captured.
+- Render each worker receipt as a compact card with status, variant id, agent mode/tool, input scope, scratch output, fallback reason, and isolation/leakage/final-edit chips. Do not bury receipt data in a prose sentence.
+- Support `?info=1` or `?drawer=1` as a direct link to the provenance drawer for auditing and screenshots.
 - Shell contract: top toolbar, full-screen stage, optional right drawer hidden by default.
 - Standalone contract: keep all runtime files local to this folder; do not import `_shared` or sibling prototype code.
 - Proof must include `1920x1080`, `1200x820`, `834x1112`, and mobile sanity without body/page scroll on desktop/tablet.

@@ -9,12 +9,15 @@
   "date": "2026-07-08",
   "mode": "comparison",
   "model": "GPT-5",
+  "modelExact": "GPT-5, runtime default",
+  "modelSettings": "not captured",
   "tags": ["browser-ui", "comparison-lab"],
   "question": "What are we trying to learn?",
   "sourcePrompt": "Replace with the shared prompt every variant answers.",
   "comparisonCriteria": ["fit", "clarity", "interaction", "taste"],
   "comparisonMethods": ["gallery", "compare", "focus", "stress"],
   "variantStrategy": "model comparison | skill comparison | prompt comparison | design options",
+  "infoDrawerRequired": true,
   "provenance": {
     "prompts": [
       {
@@ -59,6 +62,7 @@
       "id": "baseline",
       "title": "Baseline",
       "model": "GPT-5",
+      "modelExact": "GPT-5, runtime default",
       "skill": "prototype-lab",
       "status": "actual",
       "agentMode": "single-agent-fallback",
@@ -75,6 +79,7 @@
       "id": "skill-a",
       "title": "Skill A",
       "model": "requested-or-current",
+      "modelExact": "requested-or-current, settings not captured",
       "skill": "requested-skill",
       "status": "planned",
       "agentMode": "unavailable",
