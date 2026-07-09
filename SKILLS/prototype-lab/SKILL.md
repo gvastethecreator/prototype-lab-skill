@@ -22,12 +22,13 @@ Build polished browser prototypes inside `prototypes/` without scattering one-of
 
 3. Select the visual direction.
    - If the user supplied a screenshot/mock or already picked a direction, build from that target.
-   - If comparison mode is active, read `references/variant-comparison.md` before building. Freeze one shared prompt, define the comparison criteria, and vary only the declared dimension: model, skill, prompt treatment, interaction strategy, or visual direction.
+   - If comparison mode is active, read `references/variant-comparison.md` before building. Freeze one shared prompt, define the comparison criteria, lock the comparison dimension, and vary only the declared dimension: model, skill, prompt treatment, interaction strategy, or visual direction.
    - For comparison mode, choose evaluation methods deliberately: gallery, all-up compare, pairwise compare, blind guess/reveal, rankings, iterations, archive, focus, or stress. Do not add every mode unless it helps the review.
    - If comparison mode has more than one variant, read `references/agent-isolation.md` and plan one isolated worker per variant when sub-agent or dedicated agent tooling is available and safe.
+   - For comparison mode, write the integrity contract before dispatch or build: shared brief id, variant ids, locked dimension, allowed per-variant inputs, blocked cross-variant inputs, worker route, output receipt path, attribution status, and fallback rule.
    - If visual quality matters, read `references/taste-calibration.md` and lock the prototype read plus dials for the canvas.
    - If no direction exists, read `references/product-design-loop.md` and run the three-option Product Design loop before building.
-   - Done when there is one selected build target, or an explicit decision to keep multiple views.
+   - Done when there is one selected build target, or an explicit comparison contract that prevents cross-variant leakage and keeps multiple views intentional.
 
 4. Build as a standalone prototype.
    - Copy `assets/prototype-shell/` into the prototype folder, then replace placeholder content.
@@ -38,8 +39,9 @@ Build polished browser prototypes inside `prototypes/` without scattering one-of
    - For comparison mode, include `overview`, `compare`, and `focus` views by default. Add `pairwise`, `blind`, `rankings`, `iterations`, or `archive` views when the review needs them. The compare view shows all variants together at the same scale; the focus view lets reviewers inspect one selected variant. Keep selected view, variant, and pairwise left/right ids URL-backed when comparison, refresh, or sharing matters.
    - Give every variant a visible label, source, hypothesis, and tradeoff. Do not claim a variant was produced by another model, skill, agent, or execution option unless that actually happened. If a requested model/skill cannot be invoked, label it as planned, simulated, or inspired and record the limitation.
    - For multi-variant requests, use the coordinator/worker pattern from `references/agent-isolation.md`: the coordinator freezes the shared brief, workers generate isolated variant outputs, and the coordinator integrates the final shell. If workers are unavailable, record `single-agent-fallback` in provenance.
+   - Integrate from worker receipts, not from memory or blended taste. A variant without an actual isolated receipt must be marked `planned`, `simulated`, `inspired`, or `unavailable`, or record `single-agent-fallback` as its agent mode; do not backfill it as an independent run.
    - If variants use different skills, read each relevant skill before building that variant, keep the variant-specific guidance isolated, and record the skill name in `metadata.json`.
-   - Add a provenance panel in the right drawer for prompts, skills, agent mode, model/execution options, token counts, tool calls, scratch output paths, and known limitations. Record unavailable token/tool-call details as `unknown` or `not captured`; never invent usage metrics.
+   - Add a provenance panel in the right drawer for prompts, skills, agent mode, model/execution options, token counts, tool calls, scratch output paths, input scope, cross-variant leakage status, and known limitations. Record unavailable token/tool-call details as `unknown` or `not captured`; never invent usage metrics.
    - Build ultra-wide/desktop first across `1920x1080` and `1200x820`, then prove tablet `834x1112` and mobile `390x844` sanity. Shell fills `100dvh`, body/page do not scroll, and the primary path fits the stage without requiring page scroll.
    - Use `improve-ui` for semantics, focus, hit areas, wrapping, motion, responsiveness, and browser proof.
    - Keep taste calibration scoped to the prototype canvas unless the request is shell work.
@@ -49,7 +51,8 @@ Build polished browser prototypes inside `prototypes/` without scattering one-of
    - Run the smallest useful logic/static check for non-trivial behavior.
    - Manually exercise core views, controls, reset/back paths, overflow scrolling, ultra-wide, desktop, tablet, and a mobile sanity layout.
    - For comparison mode, exercise the all-variants compare view, each focus variant, the variant selector, refresh/deep-link behavior, and any recorded model/skill attribution. If pairwise, blind, ranking, iteration, or archive modes exist, exercise their selection, reveal/reset, note capture, direct links, and hidden/visible states.
-   - Confirm every requested variant has either an isolated worker result or an explicit fallback/unavailable entry in `metadata.json` and the drawer provenance.
+   - Confirm every requested variant has either an isolated worker receipt or an explicit fallback/unavailable entry in `metadata.json` and the drawer provenance.
+   - Run the comparison integrity check: shared prompt stayed stable except declared prompt variants, no worker received another variant as input, no final attribution exceeds the recorded execution, and no coordinator edits erased worker limitations.
    - If a prototype landing exists or was created, open it, confirm each card iframe loads the correct prototype at scale, and confirm the card link opens the prototype directly.
    - Run `node scripts/validate-prototype-standalone.mjs` so shared runtime references fail before browser QA.
    - Use local browser proof for the prototype folder. If a browser API requires HTTP, run a temporary external static server from outside `prototypes/`; do not add server files to `prototypes/`.
@@ -64,6 +67,7 @@ Build polished browser prototypes inside `prototypes/` without scattering one-of
 - Top toolbar only: toolbar is full-width and holds title, key status, navigation pills, and essential commands. Keep it `40px`-`48px`; allow a second compact row only on narrow mobile.
 - Right drawer: optional, collapsed by default, opens from the right, width `320px`-`380px` on desktop and `min(92vw, 380px)` on small screens. Put controls, debug, notes, and state there.
 - Provenance drawer: include prompts, skills, agent mode/tool, models, token counts, tool calls, scratch output paths, and execution limitations when a prototype compares variants or when reproducibility matters. Keep this compact and factual; `unknown` is better than guessed.
+- Comparison integrity: every multi-variant lab needs a visible shared brief, locked comparison dimension, per-variant input scope, worker receipt or fallback agent mode, and contamination check. Independent means independently executed; otherwise use `planned`, `simulated`, `inspired`, or `unavailable` status, or record `single-agent-fallback` as the agent mode.
 - No default left rail, no bottom status bar, no fake metadata strips. Status can live as one compact toolbar chip or inside the drawer.
 - Comparison labs use the same quiet shell. Put `overview`, `compare`, `focus`, and optional stress/debug views in the top toolbar; put variant maps, source notes, and execution metadata in the right drawer. Scaled variants must remain inspectable; avoid shrinking a full app until labels, states, and controls become unreadable.
 - Compact type: labels/kickers `9px`-`10px`, body/control text `11px`-`12px`, drawer headings `11px`-`13px`, canvas/demo titles only as large as the prototype needs. Avoid hero-scale type inside tool chrome.
@@ -85,6 +89,7 @@ Build polished browser prototypes inside `prototypes/` without scattering one-of
 - Keep selected view/variant URL-backed when sharing, refresh, or direct comparison matters.
 - Store comparison variants as structured data in `app.js` and mirror the stable variant ledger in `metadata.json`; do not scatter variant definitions across comments, markup, and README prose.
 - For isolated variant generation, keep worker scratch files outside `prototypes/`, such as `.scratch/prototype-lab/<prototype-slug>/<variant-id>/`. Do not let multiple workers edit the same final prototype files concurrently.
+- For comparison integrity, record each variant's input scope, output path, execution status, and contamination check in the ledger. Do not let later workers inspect earlier worker scratch, screenshots, critique, rankings, or final shell unless cross-variant iteration is the declared experiment.
 - Surface runtime state in the right drawer, toolbar status chip, or prototype canvas.
 - Add no dependency unless the prototype cannot answer its question without it.
 - Keep code readable enough to absorb or delete later.
@@ -131,6 +136,7 @@ provenance:
 - skills: skill names used or consulted
 - model: model and settings when known
 - agent: sub-agent, dedicated CLI, separate thread, fallback, or unavailable
+- integrity: shared brief id, locked dimension, input scope, leakage check, and attribution status
 - tokens: input/output/total if captured, otherwise unknown
 - tool calls: relevant calls if captured, otherwise not captured
 
@@ -168,12 +174,23 @@ Every prototype folder keeps `metadata.json`. Category, model, tags, and details
     "prompts": ["Shared or variant prompt text."],
     "skills": ["prototype-lab"],
     "models": ["GPT-5"],
+    "integrity": {
+      "sharedBriefId": "shared",
+      "lockedDimension": "single build | model comparison | skill comparison | prompt comparison | design options",
+      "allowedVariantInputs": "shared brief plus assigned variant only",
+      "blockedVariantInputs": "other variants, worker critiques, coordinator preference, rankings, final shell",
+      "crossVariantLeakage": "none detected | not checked | intentional",
+      "attributionRule": "independent only when an isolated worker receipt exists"
+    },
     "agentRuns": [
       {
         "variantId": "baseline",
         "agentMode": "single-agent-fallback",
         "agentTool": "not captured",
         "outputPath": "not captured",
+        "inputScope": "shared brief plus assigned variant only",
+        "receivedOtherVariants": false,
+        "editedFinalPrototype": false,
         "status": "actual"
       }
     ],
@@ -197,6 +214,9 @@ Every prototype folder keeps `metadata.json`. Category, model, tags, and details
       "agentMode": "single-agent-fallback",
       "agentTool": "not captured",
       "outputPath": "not captured",
+      "inputScope": "shared brief plus assigned variant only",
+      "receivedOtherVariants": false,
+      "editedFinalPrototype": false,
       "hypothesis": "What this variant tests.",
       "tradeoff": "Expected strength or risk."
     }

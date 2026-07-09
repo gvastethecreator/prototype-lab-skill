@@ -20,10 +20,32 @@ Freeze these before building:
 - attribution status for each variant: actual, planned, simulated, inspired, or unavailable
 - worker plan: sub-agent, dedicated CLI agent, separate thread, fallback, or unavailable for each variant
 - provenance fields available from the run: prompts, skills, models, settings, token counts, and relevant tool calls
+- integrity contract: shared brief id, locked dimension, allowed inputs, blocked cross-variant inputs, receipt requirement, and fallback rule
 
 Do not silently mutate the prompt between variants unless prompt variation is the declared experiment.
 
 For more than one variant, read `agent-isolation.md` before dispatching or building. Use isolated workers by default when tools are available and safe.
+
+## Integrity Gate
+
+Comparison labs are evidence artifacts, not a way to relabel one design as many sources.
+
+Before building, record:
+
+- `sharedBriefId`: the exact common brief used by every variant
+- `lockedDimension`: what is allowed to differ
+- `invariants`: frame, state, viewport, content volume, shell, proof requirements, and comparison criteria
+- `workerInputScope`: what each worker can see
+- `blockedInputs`: other variant outputs, screenshots, critiques, rankings, coordinator preference, final shell, and sibling scratch
+- `receiptRequired`: output path or captured output, provenance, limitations, and self-check
+
+Before handoff, verify:
+
+- every independent claim has a worker receipt or captured output
+- every fallback/unavailable source is labelled honestly
+- prompt drift exists only when prompt variation is the declared dimension
+- coordinator integration normalized presentation without erasing worker intent
+- no variant was copied from another variant unless iteration from a prior output was the declared experiment
 
 ## Variant Ledger
 
@@ -43,6 +65,9 @@ Each variant needs:
 - `agentMode`: `subagent`, `dedicated-cli`, `separate-thread`, `single-agent-fallback`, or `unavailable`
 - `agentTool`: worker tool or CLI name when known
 - `outputPath`: worker scratch output path or `not captured`
+- `inputScope`: what the worker or fallback build was allowed to see
+- `receivedOtherVariants`: `true`, `false`, or `unknown`
+- `editedFinalPrototype`: `true`, `false`, or `unknown`
 - `tokens`: captured token usage or `unknown`
 - `toolCalls`: captured calls or `not captured`
 
@@ -59,6 +84,8 @@ Use a coordinator/worker pattern:
 5. The coordinator integrates all results into one comparison shell and records provenance.
 
 If worker tooling is unavailable, continue only after recording `single-agent-fallback`; do not describe the variant as independently generated.
+
+If worker tooling is available for only some variants, mark each successful worker result as `actual`, each missing source as `unavailable`, `planned`, or `simulated`, and each one-agent fallback with `agentMode: single-agent-fallback` according to what happened. Mixed-status labs are acceptable; fake uniformity is not.
 
 ## Building With Different Skills
 
@@ -112,6 +139,7 @@ The drawer must include a provenance section for:
 
 - shared prompt and any variant prompt
 - agent mode, agent tool, and worker scratch output when known
+- input scope, receipt status, and cross-variant leakage check
 - skills used or consulted
 - model and settings when known
 - token counts when captured
@@ -142,6 +170,7 @@ Exercise:
 - viewport fit at `1920x1080`, `1200x820`, `834x1112`, and mobile sanity
 - attribution labels and limitations
 - isolated worker results or explicit fallback entries for every requested variant
+- comparison integrity: stable prompt/invariants, locked dimension, no undeclared cross-variant leakage, and no inflated attribution
 
 Proof must make the comparison useful, not just show that four panels exist.
 

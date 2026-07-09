@@ -2,9 +2,9 @@
 
 ![Prototype Lab banner](./assets/readme-banner.png)
 
-Codex skill pack for organized, standalone browser/UI prototypes with metadata, compact interaction shells, isolated multi-variant comparison labs, and screenshot-backed proof.
+Codex skill pack for organized, standalone browser/UI prototypes with metadata, compact interaction shells, isolated multi-variant comparison labs, attribution integrity, and screenshot-backed proof.
 
-Prototype Lab gives Codex a repeatable organization contract for prototype work: chronological folders, local runtime files, a structural full-screen shell, top-toolbar navigation and controls, a collapsible right-side panel, product-design iteration notes, comparison views for variants/models/skills, isolated worker execution for multi-variant requests, an optional evidence-browser landing, and local proof before handoff. It is meant for teams that use prototypes as working evidence, not loose mockups.
+Prototype Lab gives Codex a repeatable organization contract for prototype work: chronological folders, local runtime files, a structural full-screen shell, top-toolbar navigation and controls, a collapsible right-side panel, product-design iteration notes, comparison views for variants/models/skills, isolated worker execution for multi-variant requests, attribution receipts for independent variants, an optional evidence-browser landing, and local proof before handoff. It is meant for teams that use prototypes as working evidence, not loose mockups.
 
 ## Quick Start
 
@@ -30,7 +30,7 @@ Comparison request:
 Use prototype-lab to create four mobile music-player variants from the same prompt, each attributed to a different model, skill, or approach, with compare and focus views.
 ```
 
-For requests like this, the skill treats Codex as the coordinator and uses one isolated worker per variant when sub-agent or dedicated coding-agent tooling is available. Worker outputs should land in scratch/temp space first, then the coordinator integrates them into a single comparison shell. If isolated workers are unavailable, the prototype must record `single-agent-fallback` instead of pretending the variants were independently generated.
+For requests like this, the skill treats Codex as the coordinator and uses one isolated worker per variant when sub-agent or dedicated coding-agent tooling is available. The coordinator freezes one shared brief, locks the comparison dimension, blocks cross-variant inputs, and requires a worker receipt or captured output path before calling a variant independently generated. Worker outputs should land in scratch/temp space first, then the coordinator integrates them into a single comparison shell. If isolated workers are unavailable, the prototype must record `single-agent-fallback` instead of pretending the variants were independently generated.
 
 Comparison labs can expose several review methods: gallery/all-up compare for broad scans, pairwise compare with shareable left/right selections, blind guess/reveal for less biased taste checks, rankings with notes, repeated iterations under the same prompt, and archive toggles for stale variants. Use only the methods that help the decision.
 
@@ -51,7 +51,7 @@ Category, model, tags, status, details, views, and proof live in `metadata.json`
 
 When a workspace has several prototypes and no index, the skill can create `prototypes/index.html` as a static evidence browser with scaled iframe previews, compact metadata cards, search, and direct open links. The landing is navigation only; prototypes do not import from it.
 
-Comparison prototypes also record provenance: shared or variant prompts, skills consulted, model/settings when known, agent mode/tool, scratch output path, token usage when visible, tool calls when visible, and limitations. Unknown usage is written as `unknown` or `not captured`; it is never invented.
+Comparison prototypes also record provenance: shared or variant prompts, skills consulted, model/settings when known, agent mode/tool, input scope, leakage check, scratch output path, token usage when visible, tool calls when visible, and limitations. Unknown usage is written as `unknown` or `not captured`; it is never invented.
 
 ## What's Included
 
@@ -62,7 +62,7 @@ Comparison prototypes also record provenance: shared or variant prompts, skills 
 - [`references/product-design-loop.md`](./SKILLS/prototype-lab/references/product-design-loop.md): product-thinking loop for prototype intent, user flows, and feedback states.
 - [`references/taste-calibration.md`](./SKILLS/prototype-lab/references/taste-calibration.md): compact visual calibration, density, hierarchy, and interaction polish.
 - [`references/variant-comparison.md`](./SKILLS/prototype-lab/references/variant-comparison.md): model, skill, prompt, approach, pairwise, blind, ranking, and iteration comparison workflow.
-- [`references/agent-isolation.md`](./SKILLS/prototype-lab/references/agent-isolation.md): coordinator/worker protocol for isolated variant generation.
+- [`references/agent-isolation.md`](./SKILLS/prototype-lab/references/agent-isolation.md): coordinator/worker protocol, worker receipts, and anti-contamination checks for isolated variant generation.
 
 ## Validate
 

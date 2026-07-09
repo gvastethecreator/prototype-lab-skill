@@ -94,6 +94,15 @@ async function checkSkillFrontmatter() {
   if (!content.includes("references/agent-isolation.md")) {
     errors.push("SKILL.md missing agent isolation reference");
   }
+  if (!/integrity contract/i.test(content)) {
+    errors.push("SKILL.md missing comparison integrity contract");
+  }
+  if (!/worker receipt/i.test(content)) {
+    errors.push("SKILL.md missing worker receipt requirement");
+  }
+  if (!/cross-variant leakage/i.test(content)) {
+    errors.push("SKILL.md missing cross-variant leakage check");
+  }
 }
 
 async function checkMetadataJson() {
@@ -111,6 +120,17 @@ async function checkMetadataJson() {
   }
   if (!Array.isArray(parsed.provenance?.agentRuns)) {
     errors.push("metadata.json provenance missing agentRuns array");
+  }
+  if (!parsed.provenance?.integrity) {
+    errors.push("metadata.json provenance missing integrity contract");
+  }
+  if (!("crossVariantLeakage" in (parsed.provenance?.integrity ?? {}))) {
+    errors.push("metadata.json integrity missing crossVariantLeakage");
+  }
+  for (const run of parsed.provenance?.agentRuns ?? []) {
+    for (const key of ["inputScope", "receivedOtherVariants", "editedFinalPrototype"]) {
+      if (!(key in run)) errors.push(`metadata.json agentRun missing ${key}: ${run.variantId ?? "unknown"}`);
+    }
   }
 }
 
