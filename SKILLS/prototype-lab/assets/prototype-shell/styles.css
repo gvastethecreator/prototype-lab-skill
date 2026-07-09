@@ -11,6 +11,8 @@
   --text-soft: #9a9a9a;
   --text-dim: #6b6b6b;
   --accent: #d7d7d2;
+  --variant-accent: #d7d7d2;
+  --variant-soft: rgba(215, 215, 210, 0.16);
   --drawer-w: clamp(320px, 24vw, 380px);
   --topbar-h: 44px;
   --stage-pad: 8px;
@@ -270,6 +272,14 @@ button {
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: var(--gap);
   margin-top: 12px;
+  min-height: 0;
+}
+
+.demo-grid.is-compare,
+.demo-grid.is-focus,
+.demo-grid.is-stress {
+  display: block;
+  height: calc(100% - 70px);
 }
 
 .demo-cell {
@@ -293,6 +303,298 @@ button {
   margin-top: 5px;
   color: var(--text-dim);
   font-size: 11px;
+}
+
+.summary-card,
+.variant-card,
+.stress-card,
+.label-block,
+.variant-row {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+
+.summary-card {
+  display: grid;
+  gap: 5px;
+  min-height: 94px;
+  padding: 10px;
+}
+
+.summary-card strong,
+.stress-card strong,
+.label-block strong {
+  color: #e1e1dc;
+  font-size: 12px;
+}
+
+.summary-card span,
+.label-block span {
+  color: var(--text-soft);
+  font-size: 11px;
+}
+
+.summary-card small,
+.variant-meta small {
+  color: var(--text-dim);
+  font-size: 10px;
+}
+
+.variant-ledger {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: var(--gap);
+}
+
+.variant-row {
+  display: grid;
+  gap: 4px;
+  min-height: 48px;
+  padding: 8px;
+  color: var(--text);
+  text-align: left;
+}
+
+.variant-row span {
+  overflow: hidden;
+  color: var(--text-dim);
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.variant-row[data-active="true"],
+.variant-picker-button[data-active="true"] {
+  border-color: var(--line-strong);
+  background: var(--panel-2);
+  color: var(--text);
+}
+
+.variant-board {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--gap);
+  height: 100%;
+  min-height: 0;
+}
+
+.variant-card {
+  --variant-accent: #d7d7d2;
+  --variant-soft: rgba(215, 215, 210, 0.16);
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 8px;
+  min-height: 0;
+  overflow: hidden;
+  padding: 8px;
+  text-align: left;
+}
+
+.variant-card[data-active="true"] {
+  border-color: var(--variant-accent);
+}
+
+[data-tone="cyan"] {
+  --variant-accent: #6fd7dc;
+  --variant-soft: rgba(111, 215, 220, 0.16);
+}
+
+[data-tone="gold"] {
+  --variant-accent: #dfc66a;
+  --variant-soft: rgba(223, 198, 106, 0.15);
+}
+
+[data-tone="rose"] {
+  --variant-accent: #e18a9a;
+  --variant-soft: rgba(225, 138, 154, 0.15);
+}
+
+.variant-preview {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 8px;
+  min-height: 0;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(180deg, var(--variant-soft), transparent 36%),
+    #040404;
+  padding: 8px;
+}
+
+.variant-preview.is-mini {
+  height: 100%;
+}
+
+.variant-preview.is-large {
+  height: 100%;
+  min-height: 340px;
+  padding: 12px;
+}
+
+.variant-preview-head,
+.variant-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+
+.variant-preview-head strong {
+  overflow: hidden;
+  color: #f0f0ea;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.variant-preview-head span {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 2px 6px;
+  color: var(--variant-accent);
+  font-size: 9px;
+  text-transform: uppercase;
+}
+
+.variant-display {
+  display: grid;
+  align-content: center;
+  gap: 10px;
+  min-height: 0;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background:
+    linear-gradient(90deg, transparent, var(--variant-soft), transparent),
+    #090909;
+  padding: 10px;
+}
+
+.variant-readout {
+  overflow: hidden;
+  color: #f3f3ef;
+  font-size: 22px;
+  font-weight: 760;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.variant-bars {
+  display: grid;
+  gap: 5px;
+}
+
+.variant-signal {
+  display: block;
+  overflow: hidden;
+  border-left: 2px solid var(--variant-accent);
+  background: rgba(255, 255, 255, 0.045);
+  padding: 5px 7px;
+  color: var(--text-soft);
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.variant-preview p {
+  margin: 0;
+  color: var(--text-dim);
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+.variant-meta {
+  color: var(--text-soft);
+  font-size: 10px;
+}
+
+.variant-meta span,
+.variant-meta small {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.focus-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 300px);
+  gap: var(--gap);
+  height: 100%;
+  min-height: 0;
+}
+
+.focus-preview,
+.variant-notes,
+.stress-grid {
+  min-height: 0;
+}
+
+.variant-notes {
+  display: grid;
+  align-content: start;
+  gap: var(--gap);
+  overflow: auto;
+}
+
+.label-block {
+  display: grid;
+  gap: 5px;
+  padding: 9px;
+}
+
+.stress-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--gap);
+  height: 100%;
+}
+
+.stress-card {
+  display: grid;
+  align-content: start;
+  gap: 7px;
+  min-height: 0;
+  overflow: auto;
+  padding: 10px;
+}
+
+.stress-card span {
+  color: var(--text-soft);
+  font-size: 11px;
+}
+
+.variant-picker {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.variant-picker-button {
+  min-height: 28px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  color: var(--text-soft);
+  font-size: 10px;
+}
+
+.provenance-panel {
+  display: grid;
+  gap: 6px;
+}
+
+.provenance-panel .label-block {
+  background: #050505;
+  padding: 7px;
+}
+
+.provenance-panel .label-block span {
+  overflow-wrap: anywhere;
 }
 
 .plab-backdrop {
@@ -435,6 +737,13 @@ button {
   }
 }
 
+@media (max-width: 1200px) {
+  .variant-board,
+  .stress-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 520px) {
   :root {
     --topbar-h: 84px;
@@ -454,6 +763,30 @@ button {
 
   .demo-grid {
     grid-template-columns: 1fr;
+  }
+
+  .demo-grid.is-compare,
+  .demo-grid.is-focus,
+  .demo-grid.is-stress {
+    height: auto;
+  }
+
+  .variant-board,
+  .stress-grid,
+  .focus-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .variant-preview.is-mini {
+    min-height: 220px;
+  }
+
+  .variant-preview.is-large {
+    min-height: 300px;
+  }
+
+  .variant-readout {
+    font-size: 18px;
   }
 }
 

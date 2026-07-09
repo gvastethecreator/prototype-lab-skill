@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Prototype Index</title>
+    <link rel="stylesheet" href="./prototype-index.css" />
+  </head>
+  <body>
+    <main class="index-shell">
+      <header class="index-topbar">
+        <div>
+          <p class="index-kicker">Prototype Lab</p>
+          <h1>Prototype Index</h1>
+        </div>
+        <div class="index-actions">
+          <label class="index-search">
+            <span>Search</span>
+            <input id="search-input" type="search" placeholder="title, tag, model, skill" />
+          </label>
+          <span class="index-count" id="result-count">0 prototypes</span>
+        </div>
+      </header>
+
+      <section class="index-grid" id="prototype-grid" aria-label="Prototype cards"></section>
+    </main>
+
+    <template id="prototype-card-template">
+      <article class="prototype-card">
+        <a class="preview-link" target="_blank" rel="noreferrer">
+          <span class="preview-frame">
+            <iframe title="" loading="lazy"></iframe>
+          </span>
+        </a>
+        <div class="card-body">
+          <div class="card-title-row">
+            <div>
+              <p class="index-kicker card-category"></p>
+              <h2></h2>
+            </div>
+            <span class="status-pill"></span>
+          </div>
+          <p class="card-question"></p>
+          <dl class="card-meta">
+            <div>
+              <dt>Model</dt>
+              <dd class="card-model"></dd>
+            </div>
+            <div>
+              <dt>Skills</dt>
+              <dd class="card-skills"></dd>
+            </div>
+            <div>
+              <dt>Agent</dt>
+              <dd class="card-agent"></dd>
+            </div>
+            <div>
+              <dt>Proof</dt>
+              <dd class="card-proof"></dd>
+            </div>
+          </dl>
+          <div class="tag-row"></div>
+          <div class="card-actions">
+            <a class="open-link" target="_blank" rel="noreferrer">Open prototype</a>
+            <span class="card-path"></span>
+          </div>
+        </div>
+      </article>
+    </template>
+
+    <script defer src="./prototype-index.js"></script>
+  </body>
+</html>

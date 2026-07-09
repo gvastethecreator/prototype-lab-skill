@@ -14,9 +14,15 @@ const requiredFiles = [
   "SKILLS/prototype-lab/assets/prototype-shell/index.html",
   "SKILLS/prototype-lab/assets/prototype-shell/styles.css",
   "SKILLS/prototype-lab/assets/prototype-shell/app.js",
+  "SKILLS/prototype-lab/assets/prototype-index/README.md",
+  "SKILLS/prototype-lab/assets/prototype-index/index.html",
+  "SKILLS/prototype-lab/assets/prototype-index/prototype-index.css",
+  "SKILLS/prototype-lab/assets/prototype-index/prototype-index.js",
   "SKILLS/prototype-lab/references/product-design-loop.md",
   "SKILLS/prototype-lab/references/quality-bar.md",
   "SKILLS/prototype-lab/references/taste-calibration.md",
+  "SKILLS/prototype-lab/references/variant-comparison.md",
+  "SKILLS/prototype-lab/references/agent-isolation.md",
   "assets/readme-banner.png",
 ];
 
@@ -85,6 +91,9 @@ async function checkSkillFrontmatter() {
   if (!content.includes("metadata.json")) {
     errors.push("SKILL.md missing metadata contract");
   }
+  if (!content.includes("references/agent-isolation.md")) {
+    errors.push("SKILL.md missing agent isolation reference");
+  }
 }
 
 async function checkMetadataJson() {
@@ -97,8 +106,11 @@ async function checkMetadataJson() {
     errors.push(`metadata.json invalid JSON: ${error.message}`);
     return;
   }
-  for (const key of ["id", "month", "number", "slug", "title", "category", "status", "date", "question", "details"]) {
+  for (const key of ["id", "month", "number", "slug", "title", "category", "status", "date", "mode", "question", "details", "comparisonMethods", "provenance", "variants"]) {
     if (!(key in parsed)) errors.push(`metadata.json missing key: ${key}`);
+  }
+  if (!Array.isArray(parsed.provenance?.agentRuns)) {
+    errors.push("metadata.json provenance missing agentRuns array");
   }
 }
 

@@ -8,6 +8,8 @@ Use this after the core prototype works when it is complex, stateful, async, mul
 - UX: navigation, controls, state, errors, empty/loading states, and reset/back paths are visible without explanation.
 - Interface: dark standalone shell, restrained contrast, very compact type, functional icons, no glow/glass, no decorative noise, no oversized radii.
 - Taste: prototype read and dials are explicit when visual quality matters; the canvas has a coherent visual language without generic SaaS/card/glow defaults.
+- Comparison integrity: multi-variant labs keep one shared prompt, clear comparison criteria, actual/planned/simulated attribution, and consistent frames or states for every variant.
+- Provenance integrity: prompts, skills, agent mode/tool, models, token counts, tool calls, scratch output paths, and limitations are present when relevant; unknown values are labelled instead of guessed.
 - Accessibility: semantic controls, labels, visible focus, keyboard path, accessible names for icon-only actions, and no overlapping hit areas.
 - Required viewport fit: at `1920x1080`, `1200x820`, and `834x1112`, the shell fills the viewport with compact chrome, body/page do not scroll, and the primary canvas/demo state is fully inspectable without vertical or horizontal content scroll.
 - Responsiveness: ultra-wide remains bounded and readable, desktop shell comes first, tablet compression stays intentional, mobile stacks panels with intentional text wrapping.
@@ -16,6 +18,10 @@ Use this after the core prototype works when it is complex, stateful, async, mul
 ## Manual Checks
 
 - Switch every internal view.
+- For comparison labs, switch compare/focus views, select every variant, refresh one non-default `view`/`variant` URL, and confirm source labels match the real execution.
+- If the lab includes pairwise, blind, rankings, iterations, or archive modes, verify left/right URL params, reveal/reset behavior, ordered notes, iteration links, and hidden archived variants.
+- Open the drawer and inspect provenance: prompt, skills, agent mode/tool, model/settings, tokens, tool calls, limitations, and active variant attribution.
+- For isolated variant runs, confirm each requested variant has a worker result path or an explicit `single-agent-fallback`/`unavailable` entry.
 - Change every control.
 - Reset state and recover from invalid/empty input where present.
 - Copy/snapshot state if the prototype exposes it.
@@ -25,6 +31,8 @@ Use this after the core prototype works when it is complex, stateful, async, mul
 - Check right drawer scrolling with overflow content and confirm it is hidden by default.
 - Check long titles, long labels, empty values, and dense debug data.
 - Check that visual direction does not hide the prototype question, user path, or state being tested.
+- Check that scaled comparison panels are still legible enough to compare; move details into focus mode instead of shrinking a full app into unreadable thumbnails.
+- If `prototypes/index.html` exists, search/filter, inspect scaled iframe cards, and open at least one direct prototype link.
 - Check for reflexive slop: three-card rows, nested panels, fake metadata strips, nonfunctional debug controls, oversized radii, decorative glow/glass, and generic copy.
 - Check icons are aligned, decorative icons are hidden from assistive tech, and icon-only actions have names.
 - Check empty, error, loading, permission, and retry cases when the prototype has data or async behavior.
@@ -39,6 +47,8 @@ Required for UI changes:
 - desktop screenshot
 - tablet screenshot
 - mobile sanity screenshot when layout changes affect stacking
+- comparison labs: one compare-view proof plus focused proof or notes for every variant
+- prototype landing: one proof screenshot showing scaled cards and one note that direct links work
 - note of any visual or interaction gap that remains
 - selected design read and dials for visual-direction prototypes
 

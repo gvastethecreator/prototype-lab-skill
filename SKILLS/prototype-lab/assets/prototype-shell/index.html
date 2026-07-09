@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Prototype Shell</title>
+    <title>Prototype Comparison Shell</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
@@ -41,7 +41,7 @@
       <header class="plab-topbar">
         <div class="plab-title-wrap">
           <p class="plab-kicker">Prototype</p>
-          <h1 class="plab-title" id="prototype-title">Prototype Shell</h1>
+          <h1 class="plab-title" id="prototype-title">Prototype Comparison Shell</h1>
         </div>
         <nav class="plab-nav" id="view-nav" aria-label="Prototype views"></nav>
         <div class="plab-actions" aria-label="Prototype actions">
@@ -85,6 +85,11 @@
         </div>
 
         <section class="plab-drawer-section">
+          <p class="plab-panel-title">Variants</p>
+          <div class="variant-picker" id="variant-control" aria-label="Variant selector"></div>
+        </section>
+
+        <section class="plab-drawer-section">
           <label class="plab-control-row">
             <span>Density</span>
             <input id="density-control" type="range" min="0" max="2" step="1" value="1" />
@@ -93,6 +98,11 @@
             <span>Debug overlay</span>
             <input id="debug-control" type="checkbox" />
           </label>
+        </section>
+
+        <section class="plab-drawer-section">
+          <p class="plab-panel-title">Provenance</p>
+          <div class="provenance-panel" id="provenance-panel"></div>
         </section>
 
         <section class="plab-drawer-section">

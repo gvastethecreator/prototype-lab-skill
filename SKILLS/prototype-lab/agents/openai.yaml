@@ -1,4 +1,4 @@
 interface:
   display_name: "Prototype Lab"
-  short_description: "Build polished standalone prototypes."
-  default_prompt: "Create or improve a standalone browser/UI prototype using chronological folders, local runtime files, a compact top toolbar, a hidden right controls panel, and local visual QA proof."
+  short_description: "Build UI prototypes, comparison labs, and prototype browsers."
+  default_prompt: "Create or improve a standalone browser/UI prototype, isolated multi-variant comparison lab, or prototype evidence browser using chronological folders, local runtime files, one worker per variant when available, pairwise/blind/ranking review modes when useful, a compact top toolbar, a hidden right controls/provenance panel, URL-backed views/variants, scaled preview cards when indexing prototypes, and local visual QA proof."

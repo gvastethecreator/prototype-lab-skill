@@ -15,6 +15,8 @@ If the user already supplied those details, replay the brief and continue only w
 
 Done when the build target can be judged against a specific user path and visual intent.
 
+If the user explicitly asks for multiple model, skill, prompt, or execution variants, use `variant-comparison.md` as the main structure. Use this Product Design loop only to define visual/interaction options inside that comparison.
+
 ## Three Options
 
 Use `product-design:ideate` plus `imagegen` for exactly three independent directions.

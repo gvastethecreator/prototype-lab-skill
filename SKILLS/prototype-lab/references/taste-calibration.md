@@ -32,8 +32,18 @@ Defaults:
 - Visual direction prototype: variance `6-9`, motion `3-6`, density `2-5`.
 - Game/tool prototype: variance `4-8`, motion `4-8`, density follows playability.
 - Data/debug prototype: variance `1-3`, motion `1-3`, density `7-10`.
+- Comparison lab: variance follows the declared experiment, motion `1-4` unless motion is being compared, density `7-10` for the compare view and `4-7` for focus view.
 
 The shell remains compact and quiet even when the canvas is expressive.
+
+## Comparison Read
+
+For multi-variant labs, write one shared read and one short variant read per option:
+
+- Shared read: `Reading this as: comparison prototype for <reviewer>, testing <same prompt> across <model/skill/prompt/design dimension>, judged by <criteria>.`
+- Variant read: `<variant-id>: using <actual source/status>, expected to improve <hypothesis>, risking <tradeoff>.`
+
+Keep all variants comparable: same state, same frame, same amount of content, and visible source labels. Let the focus view carry detail that the compare view cannot fit.
 
 ## Three-Option Direction
 

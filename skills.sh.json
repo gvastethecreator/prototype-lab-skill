@@ -1,0 +1,13 @@
+{
+  "$schema": "https://skills.sh/schemas/skills.sh.schema.json",
+  "notGrouped": "bottom",
+  "groupings": [
+    {
+      "title": "Prototypes",
+      "description": "Standalone browser/UI prototypes with proof.",
+      "skills": [
+        "prototype-lab"
+      ]
+    }
+  ]
+}
