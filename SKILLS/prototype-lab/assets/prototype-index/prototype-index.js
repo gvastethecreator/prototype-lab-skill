@@ -29,6 +29,9 @@ function searchableText(prototype) {
     prototype.status,
     prototype.model,
     prototype.agent,
+    prototype.runtimeLayout,
+    `${prototype.promptCount ?? 0} prompts`,
+    `${prototype.runCount ?? 0} runs`,
     ...(prototype.skills || []),
     ...(prototype.tags || []),
   ].join(" ").toLowerCase();
@@ -234,6 +237,9 @@ function metadataBadges(prototype) {
     badge(prototype.modelExact || prototype.model || "unknown model", "model", "🤖"),
     ...skills.map((skill) => badge(skill, "skill", "✦")),
     badge(prototype.agent || "unknown agent", "agent", "🧭"),
+    badge(`${prototype.runCount ?? 0} runs`, "run", "↻"),
+    badge(`${prototype.promptCount ?? 0} prompts`, "prompt", "◈"),
+    badge(prototype.runtimeLayout || "unknown runtime", "runtime", "▣"),
     badge(`${prototype.proof ?? "unknown"} proof`, "proof", "✓"),
   ];
 }

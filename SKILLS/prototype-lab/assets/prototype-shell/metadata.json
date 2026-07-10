@@ -1,4 +1,7 @@
 {
+  "schemaVersion": 2,
+  "artifactKind": "prototype",
+  "entrypoint": "index.html",
   "id": "2026/07/001-prototype-name",
   "month": "2026-07",
   "number": 1,
@@ -17,6 +20,8 @@
   "comparisonCriteria": ["fit", "clarity", "interaction", "taste"],
   "comparisonMethods": ["gallery", "compare", "focus", "stress"],
   "variantStrategy": "model comparison | skill comparison | prompt comparison | design options",
+  "promptTemplates": [],
+  "runs": [],
   "infoDrawerRequired": true,
   "provenance": {
     "prompts": [
@@ -93,5 +98,10 @@
       "tradeoff": "Needs real skill execution before final attribution."
     }
   ],
-  "proof": []
+  "proof": [],
+  "packaging": {
+    "primary": true,
+    "includeLinkedPrototypes": true,
+    "defaultProofPolicy": "omit"
+  }
 }

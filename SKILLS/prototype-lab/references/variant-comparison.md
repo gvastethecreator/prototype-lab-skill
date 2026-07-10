@@ -13,6 +13,7 @@ Use one chronological prototype folder with multiple internal variants only when
 Freeze these before building:
 
 - shared prompt or brief
+- reusable prompt template id/version, concrete variables, exact rendered prompt, and rendered SHA-256
 - variant count
 - comparison dimension: model, skill, prompt, interaction strategy, visual language, layout, density, or motion
 - success criteria reviewers should compare
@@ -21,7 +22,7 @@ Freeze these before building:
 - worker plan: sub-agent, dedicated CLI agent, separate thread, fallback, or unavailable for each variant
 - provenance fields available from the run: prompts, skills, models, settings, token counts, and relevant tool calls
 
-Do not silently mutate the prompt between variants unless prompt variation is the declared experiment.
+Do not silently mutate the prompt between variants unless prompt variation is the declared experiment. When repeatability matters, follow `prompt-templates.md` and tie every worker receipt to the exact rendered hash.
 
 For more than one variant, read `agent-isolation.md` before dispatching or building. Use isolated workers by default. If workers are blocked, record the exact fallback reason and still produce the requested variants unless the blocker prevents any build.
 
@@ -40,6 +41,8 @@ Each variant needs:
 - `tradeoff`: expected strength or risk
 - `notes`: relevant execution limitation or observation
 - `prompt`: shared prompt id or variant prompt if prompt variation is the experiment
+- `promptVersion`: integer template version
+- `renderedPromptSha256`: exact rendered prompt hash
 - `agentMode`: `subagent`, `dedicated-cli`, `separate-thread`, `single-agent-fallback`, or `unavailable`
 - `agentTool`: worker tool or CLI name when known
 - `outputPath`: worker scratch output path or `not captured`

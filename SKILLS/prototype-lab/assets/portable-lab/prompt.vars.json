@@ -1,0 +1,9 @@
+{
+  "title": "Prototype experiment",
+  "goal": "Describe the product question this run must answer.",
+  "context": "Provide only the context every run is allowed to share.",
+  "invariants": "- Same content and state\n- Same viewport targets\n- Same output contract",
+  "variant_assignment": "Describe the one model, skill, prompt treatment, or approach assigned to this run.",
+  "deliverable": "Create a self-contained prototype plus metadata and a run receipt.",
+  "evaluation_criteria": "- Prompt fidelity\n- Primary-path clarity\n- Viewport fit\n- Interaction quality"
+}

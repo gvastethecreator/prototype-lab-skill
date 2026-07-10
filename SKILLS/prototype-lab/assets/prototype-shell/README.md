@@ -5,6 +5,9 @@ status: active
 run: open index.html in a browser
 path: prototypes/<YYYY>/<MM>/<NNN>-<prototype-slug>/index.html
 proof: proof/<file>.png
+prompt template: prompts/shared.template.md
+rendered prompt: prompts/shared.rendered.md
+run receipt: runs/<run-id>.json
 
 views:
 - overview: baseline question and main path
@@ -17,7 +20,7 @@ variants:
 - skill-a: planned or actual alternate source and attribution status
 
 provenance:
-- prompt: shared or variant prompt used
+- prompt: id, version, rendered SHA-256, and shared or variant prompt used
 - skills: skill names used or consulted
 - model: model and settings when known
 - agent: sub-agent, dedicated CLI, separate thread, fallback, or unavailable
@@ -32,6 +35,7 @@ provenance:
 notes:
 - Replace this with the decision or next step.
 - Comparison labs must keep one shared prompt and honest model/skill attribution.
+- Reusable/model comparison runs must preserve the template, variables, exact rendered prompt, and one immutable receipt per attempt.
 - Multi-variant labs must attempt one isolated worker per variant. If workers are blocked, keep all requested variants and record the blocker as `fallbackReason`.
 - Do not claim variants are independent unless a worker receipt exists and `crossVariantLeakage` is false.
 - Keep provenance compact in the drawer; `unknown` is acceptable when exact tokens or tool calls were not captured.
@@ -40,3 +44,4 @@ notes:
 - Shell contract: top toolbar, full-screen stage, optional right drawer hidden by default.
 - Standalone contract: keep all runtime files local to this folder; do not import `_shared` or sibling prototype code.
 - Proof must include `1920x1080`, `1200x820`, `834x1112`, and mobile sanity without body/page scroll on desktop/tablet.
+- Portable upload artifacts belong under `dist/prototype-lab/`; do not place ZIP files beside chronological source prototypes.

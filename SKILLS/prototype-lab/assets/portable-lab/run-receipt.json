@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "runId": "REQUIRED-run-id",
+  "status": "planned",
+  "variantId": "REQUIRED-variant-id",
+  "prompt": {
+    "templateId": "shared",
+    "templateVersion": 1,
+    "templatePath": "prompts/shared.template.md",
+    "variablesPath": "prompts/shared.vars.json",
+    "renderedPath": "prompts/shared.rendered.md",
+    "renderedSha256": "REQUIRED-rendered-sha256"
+  },
+  "execution": {
+    "model": "unknown",
+    "modelRoute": "not captured",
+    "reasoningEffort": "not captured",
+    "skills": ["prototype-lab"],
+    "agentMode": "unavailable",
+    "agentTool": "not captured"
+  },
+  "integrity": {
+    "inputScope": "shared brief plus assigned variant only",
+    "receivedOtherVariants": false,
+    "crossVariantLeakage": false,
+    "editedFinalPrototype": false
+  },
+  "artifacts": {
+    "scratchOutputPath": "not captured",
+    "finalPrototypePath": "not captured",
+    "filesChanged": []
+  },
+  "usage": {
+    "inputTokens": "unknown",
+    "outputTokens": "unknown",
+    "totalTokens": "unknown",
+    "toolCalls": "not captured"
+  },
+  "summary": "What this run produced.",
+  "limitations": [],
+  "fallbackReason": "REQUIRED-not-applicable-or-exact-reason"
+}

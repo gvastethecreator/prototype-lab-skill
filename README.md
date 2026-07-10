@@ -2,9 +2,9 @@
 
 ![Prototype Lab banner](./assets/readme-banner.png)
 
-Codex skill pack for organized, standalone browser/UI prototypes with metadata, compact interaction shells, isolated multi-variant comparison labs, attribution integrity, and screenshot-backed proof.
+Codex skill pack for organized, standalone browser/UI prototypes with reusable prompt templates, portable run packs, compact interaction shells, isolated multi-variant comparison labs, attribution integrity, and screenshot-backed proof.
 
-Prototype Lab gives Codex a repeatable organization contract for prototype work: chronological folders, local runtime files, a structural full-screen shell, top-toolbar navigation and controls, a collapsible right-side panel, product-design iteration notes, comparison views for variants/models/skills, isolated worker execution for multi-variant requests, attribution receipts for independent variants, an optional evidence-browser landing, and local proof before handoff. It is meant for teams that use prototypes as working evidence, not loose mockups.
+Prototype Lab gives Codex a repeatable organization contract for prototype work: chronological folders, local runtime files, versioned prompt templates, exact rendered prompt hashes, run receipts, a structural full-screen shell, comparison views for variants/models/skills, isolated worker execution, an optional evidence-browser landing, local proof, and a deterministic static-folder/ZIP handoff. It is meant for teams that use prototypes as working evidence, not loose mockups.
 
 ## Quick Start
 
@@ -53,6 +53,43 @@ When a workspace has several prototypes and no index, the skill can create `prot
 
 Comparison prototypes also record provenance: shared or variant prompts, skills consulted, model/settings when known, agent mode/tool, input scope, leakage check, scratch output path, token usage when visible, tool calls when visible, and limitations. Unknown usage is written as `unknown` or `not captured`; it is never invented.
 
+## Reusable Prompts and Run Packs
+
+For repeatable executions, keep a versioned template, variables, exact rendered prompt, and one JSON receipt per run. The bundled renderer fails on missing placeholders and reports the rendered SHA-256 hash:
+
+```powershell
+node SKILLS/prototype-lab/scripts/render-prompt-template.mjs `
+  --template prototypes/2026/07/027-example/prompts/shared.template.md `
+  --vars prototypes/2026/07/027-example/prompts/shared.vars.json `
+  --output prototypes/2026/07/027-example/prompts/shared.rendered.md
+```
+
+Package a prototype or comparison hub with all linked standalone variants:
+
+```powershell
+node SKILLS/prototype-lab/scripts/package-prototype-lab.mjs `
+  --workspace . `
+  --id 2026/07/027-example
+```
+
+This creates `dist/prototype-lab/027-example-pack/` plus a ZIP. The static root launcher, normalized prompts, run receipts, prototype tree, and `pack.json` hashes travel together. Proof screenshots are omitted by default for smaller uploads; add `--include-proof` for an evidence archive.
+
+## Library Maintenance
+
+Keep chronological source prototypes under `prototypes/<YYYY>/<MM>/`, generated packs under `dist/prototype-lab/`, and worker output under `.scratch/prototype-lab/`. Audit or normalize an existing library without deleting prototypes:
+
+```powershell
+npm run organize:library:check
+npm run organize:library
+npm run package:comparisons
+```
+
+The organizer upgrades legacy metadata additively, records split versus single-file runtimes, preserves IDs and links, moves only month-level legacy archives out of `prototypes/`, and regenerates the evidence index. The comparison command packages every comparison hub plus its linked standalone runs.
+
+## ChatGPT Sites
+
+Yes: a validated pack can be adapted and published with ChatGPT Sites when that capability is available. Prototype Lab treats packaging and publishing as separate permissions, prefers a private deployment first, and requires explicit confirmation immediately before a public/shared deployment unless public visibility was already clearly requested.
+
 ## What's Included
 
 - [`SKILL.md`](./SKILLS/prototype-lab/SKILL.md): the full Codex structure and handoff contract.
@@ -64,6 +101,10 @@ Comparison prototypes also record provenance: shared or variant prompts, skills 
 - [`references/taste-calibration.md`](./SKILLS/prototype-lab/references/taste-calibration.md): compact visual calibration, density, hierarchy, and interaction polish.
 - [`references/variant-comparison.md`](./SKILLS/prototype-lab/references/variant-comparison.md): model, skill, prompt, approach, pairwise, blind, ranking, and iteration comparison workflow.
 - [`references/agent-isolation.md`](./SKILLS/prototype-lab/references/agent-isolation.md): coordinator/worker protocol, worker receipts, and anti-contamination checks for isolated variant generation.
+- [`references/prompt-templates.md`](./SKILLS/prototype-lab/references/prompt-templates.md): reusable prompt versions, variables, rendered hashes, and run ids.
+- [`references/portable-run-pack.md`](./SKILLS/prototype-lab/references/portable-run-pack.md): static/ZIP packaging, upload safety, and ChatGPT Sites handoff.
+- [`scripts/render-prompt-template.mjs`](./SKILLS/prototype-lab/scripts/render-prompt-template.mjs): deterministic prompt renderer.
+- [`scripts/package-prototype-lab.mjs`](./SKILLS/prototype-lab/scripts/package-prototype-lab.mjs): linked-prototype packager with manifest hashes.
 
 ## Validate
 

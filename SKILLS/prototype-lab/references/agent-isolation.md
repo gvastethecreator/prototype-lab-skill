@@ -99,6 +99,8 @@ Minimum receipt fields:
 - `agentMode`
 - `agentTool`
 - `promptId`
+- `promptVersion`
+- `renderedPromptSha256`
 - `inputScope`: what the worker was allowed to see
 - `receivedOtherVariants`: must be `false` unless the experiment intentionally compares after seeing other variants
 - `editedFinalPrototype`: must be `false` unless the worker had exclusive ownership of final files
@@ -152,6 +154,8 @@ Record per variant:
 - `agentMode`: `subagent`, `dedicated-cli`, `separate-thread`, `single-agent-fallback`, or `unavailable`
 - `agentTool`: tool or CLI name when known
 - `promptId`: shared or variant prompt id
+- `promptVersion`: integer template version used for the run
+- `renderedPromptSha256`: hash printed by the prompt renderer for the exact worker input
 - `outputPath`: scratch path or `not captured`
 - `fallbackReason`: why worker isolation was not used, or `not applicable`
 - `inputScope`: what context the worker received

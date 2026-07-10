@@ -456,6 +456,9 @@ body {
 .meta-badge[data-kind="model"] { background: #1557d8; color: #f5f8ff; }
 .meta-badge[data-kind="skill"] { background: #118843; color: #f3fff8; }
 .meta-badge[data-kind="agent"] { background: #b66a00; color: #fff9ed; }
+.meta-badge[data-kind="run"] { background: #0e7490; color: #ecfeff; }
+.meta-badge[data-kind="prompt"] { background: #7e3a9d; color: #fff7ff; }
+.meta-badge[data-kind="runtime"] { background: #475569; color: #f8fafc; }
 .meta-badge[data-kind="proof"] { background: #6d3ed6; color: #fbf8ff; }
 
 .tag-row {

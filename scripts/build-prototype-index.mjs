@@ -98,6 +98,18 @@ function isComparisonHub(metadata) {
   return mode.includes("comparison") || category.includes("comparison");
 }
 
+function promptCount(metadata) {
+  if (Array.isArray(metadata.promptTemplates) && metadata.promptTemplates.length) return metadata.promptTemplates.length;
+  if (Array.isArray(metadata.provenance?.prompts) && metadata.provenance.prompts.length) return metadata.provenance.prompts.length;
+  return metadata.sourcePrompt ? 1 : 0;
+}
+
+function runCount(metadata) {
+  if (Array.isArray(metadata.runs) && metadata.runs.length) return metadata.runs.length;
+  if (Array.isArray(metadata.provenance?.agentRuns) && metadata.provenance.agentRuns.length) return metadata.provenance.agentRuns.length;
+  return Array.isArray(metadata.variants) ? metadata.variants.length : 0;
+}
+
 async function buildEntries() {
   const metadataFiles = await findMetadataFiles(prototypesRoot);
   const entries = [];
@@ -120,6 +132,11 @@ async function buildEntries() {
       skills: skillList(metadata),
       agent: agentLabel(metadata),
       proof: await proofCount(folder, metadata),
+      schemaVersion: Number(metadata.schemaVersion) || 1,
+      artifactKind: metadata.artifactKind || (isComparisonHub(metadata) ? "comparison-hub" : "prototype"),
+      runtimeLayout: metadata.runtimeLayout || "unknown",
+      promptCount: promptCount(metadata),
+      runCount: runCount(metadata),
       mode: metadata.mode || "single",
       views: Array.isArray(metadata.views) ? metadata.views : [],
       sequence: Number(metadata.number) || 0,

@@ -18,11 +18,23 @@ const requiredFiles = [
   "SKILLS/prototype-lab/assets/prototype-index/index.html",
   "SKILLS/prototype-lab/assets/prototype-index/prototype-index.css",
   "SKILLS/prototype-lab/assets/prototype-index/prototype-index.js",
+  "SKILLS/prototype-lab/assets/portable-lab/prompt.template.md",
+  "SKILLS/prototype-lab/assets/portable-lab/prompt.vars.json",
+  "SKILLS/prototype-lab/assets/portable-lab/run-receipt.json",
   "SKILLS/prototype-lab/references/product-design-loop.md",
   "SKILLS/prototype-lab/references/quality-bar.md",
   "SKILLS/prototype-lab/references/taste-calibration.md",
   "SKILLS/prototype-lab/references/variant-comparison.md",
   "SKILLS/prototype-lab/references/agent-isolation.md",
+  "SKILLS/prototype-lab/references/prompt-templates.md",
+  "SKILLS/prototype-lab/references/portable-run-pack.md",
+  "SKILLS/prototype-lab/scripts/render-prompt-template.mjs",
+  "SKILLS/prototype-lab/scripts/package-prototype-lab.mjs",
+  "SKILLS/prototype-lab/scripts/reorganize-prototype-library.mjs",
+  "SKILLS/prototype-lab/scripts/package-comparison-hubs.mjs",
+  "scripts/reorganize-prototype-library.mjs",
+  "scripts/package-comparison-hubs.mjs",
+  "scripts/test-portable-tools.mjs",
   "assets/readme-banner.png",
 ];
 
@@ -94,6 +106,18 @@ async function checkSkillFrontmatter() {
   if (!content.includes("references/agent-isolation.md")) {
     errors.push("SKILL.md missing agent isolation reference");
   }
+  if (!content.includes("references/prompt-templates.md")) {
+    errors.push("SKILL.md missing reusable prompt template reference");
+  }
+  if (!content.includes("references/portable-run-pack.md")) {
+    errors.push("SKILL.md missing portable run pack reference");
+  }
+  if (!content.includes("scripts/package-prototype-lab.mjs")) {
+    errors.push("SKILL.md missing portable package command");
+  }
+  if (!/ChatGPT Sites/i.test(content)) {
+    errors.push("SKILL.md missing ChatGPT Sites publication handoff");
+  }
   if (!/integrity contract/i.test(content)) {
     errors.push("SKILL.md missing comparison integrity contract");
   }
@@ -115,8 +139,20 @@ async function checkMetadataJson() {
     errors.push(`metadata.json invalid JSON: ${error.message}`);
     return;
   }
-  for (const key of ["id", "month", "number", "slug", "title", "category", "status", "date", "mode", "question", "details", "comparisonMethods", "provenance", "variants"]) {
+  for (const key of ["schemaVersion", "artifactKind", "entrypoint", "id", "month", "number", "slug", "title", "category", "status", "date", "mode", "question", "details", "comparisonMethods", "promptTemplates", "runs", "provenance", "variants", "packaging"]) {
     if (!(key in parsed)) errors.push(`metadata.json missing key: ${key}`);
+  }
+  if (!Array.isArray(parsed.promptTemplates)) {
+    errors.push("metadata.json promptTemplates must be an array");
+  }
+  if (!Array.isArray(parsed.runs)) {
+    errors.push("metadata.json runs must be an array");
+  }
+  if (parsed.entrypoint !== "index.html") {
+    errors.push("metadata.json entrypoint must be index.html");
+  }
+  if (!parsed.packaging?.defaultProofPolicy) {
+    errors.push("metadata.json packaging missing defaultProofPolicy");
   }
   if (!Array.isArray(parsed.provenance?.agentRuns)) {
     errors.push("metadata.json provenance missing agentRuns array");
@@ -173,7 +209,7 @@ async function checkLocalPathLeaks() {
 async function walk(dir, output = []) {
   const entries = await fs.readdir(dir, { withFileTypes: true }).catch(() => []);
   for (const entry of entries) {
-    if ([".git", ".local", ".scratch", ".vscode", "node_modules", "dist", "coverage"].includes(entry.name)) {
+    if ([".git", ".local", ".scratch", ".vscode", "node_modules", "dist", "coverage", "prototypes"].includes(entry.name)) {
       continue;
     }
     const absolute = path.join(dir, entry.name);

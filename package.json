@@ -1,11 +1,15 @@
 {
   "name": "prototype-lab-skill",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "scripts": {
     "build:index": "node scripts/build-prototype-index.mjs",
     "create:hub": "node scripts/create-prompt-suite-hub.mjs",
-    "validate": "node scripts/validate-skill-pack.mjs"
+    "organize:library:check": "node scripts/reorganize-prototype-library.mjs",
+    "organize:library": "node scripts/reorganize-prototype-library.mjs --write && node scripts/build-prototype-index.mjs",
+    "package:comparisons": "node scripts/package-comparison-hubs.mjs",
+    "test:portable": "node scripts/test-portable-tools.mjs",
+    "validate": "node scripts/validate-skill-pack.mjs && node scripts/test-portable-tools.mjs"
   }
 }
