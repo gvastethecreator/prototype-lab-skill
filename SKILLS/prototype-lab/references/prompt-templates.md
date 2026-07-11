@@ -36,9 +36,18 @@ use portable placeholders and relative paths in reusable prompts.
 
 When an agent invents a test prompt, require a stable id, title, category,
 difficulty, one-sentence challenge, required behaviors, test dimensions, and
-target viewports. Use the creative starter suite when the user wants broad model
-coverage without supplying a prompt. Copy the selected rendered version into
-the experiment owner folder and record the library id/version/hash in receipts.
+target viewports. For creative capability prompts also record
+`comparisonIntent`, `creativeFreedom`, `fixedOutcomes`, `openDecisions`,
+`assetPolicy`, and `layoutPolicy`. Use the creative starter suite when the user
+wants broad model coverage without supplying a prompt. Copy the selected
+rendered version into the experiment owner folder and record the library
+id/version/hash in receipts.
+
+Do not treat a long list of required controls as creative freedom. In a
+`showcase`, keep the shared brief at or below 320 words, declare at most five
+fixed outcomes, leave at least six meaningful decisions open, and keep visual
+judgment criteria out of the worker prompt. Use
+`capability-comparisons.md` for the direction/spend gate.
 
 ## Artifact Set
 
@@ -74,6 +83,15 @@ contains a marker or its prompt hash does not match the rendered file.
 - Keep model, skill, and reasoning settings out of the shared template when
   they are the comparison dimension; put them in `variant_assignment` and the
   run receipt.
+- Keep coordinator-only skills, memory, hub styling, and taste guidance out of
+  worker prompts.
+- Treat assets as an explicit policy. When `required`, the receipt must include
+  the tool/skill, prompt, project-relative file, SHA-256, dimensions,
+  `consumedBy` references, and materiality proof. `allowed` is not evidence that
+  the asset skill was tested.
+- Use `fixed-supplied` when every comparison condition must receive the same
+  pre-generated files. Freeze their hashes, prohibit regeneration, and require
+  project-local copies plus `consumedBy` and materiality proof.
 - Keep invariant content, state, viewport, and output requirements identical
   across runs unless one of them is the declared comparison dimension.
 - Do not overwrite a rendered prompt after a run. Create a new version or run.

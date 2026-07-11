@@ -2,6 +2,7 @@ const data = window.PROTOTYPE_HUB_DATA || { variants: [], criteria: [] };
 const variants = Array.isArray(data.variants) ? data.variants : [];
 const views = ["overview", "compare", "focus", "provenance"];
 const params = new URLSearchParams(location.search);
+const previewObservers = new Set();
 const state = {
   view: views.includes(params.get("view")) ? params.get("view") : data.defaultView || "overview",
   left: resolveVariant(params.get("left"))?.id || variants[0]?.id,
@@ -39,6 +40,8 @@ function syncUrl() {
 }
 
 function render() {
+  previewObservers.forEach((observer) => observer.disconnect());
+  previewObservers.clear();
   nav.replaceChildren(...views.map((view) => button(label(view), () => setView(view), state.view === view)));
   Object.entries(nodes).forEach(([view, node]) => node.dataset.active = String(view === state.view));
   summary.replaceChildren(chip(`${variants.length} variants`), chip(data.dimension || "prototype"), chip(data.status || "unknown"), chip(data.date || "date unknown"));
@@ -91,10 +94,35 @@ function renderProvenance() {
   ledger.append(sectionTitle("Variant ledger"));
   variants.forEach((variant) => {
     const row = element("article", "ledger-row");
-    row.append(element("strong", "", variant.title), chip(variant.status || "unknown"), element("span", "mono", variant.model || "unknown model"), element("span", "", (variant.skills || []).join(", ") || "unknown skill"), element("span", "mono", `${variant.proof || 0} proof`), link("Open", variant.path));
+    row.append(element("strong", "", variant.title), chip(variant.status || "unknown"), element("span", "mono", `${variant.model || "unknown model"} · ${variant.reasoning || "unknown reasoning"}`), element("span", "", variant.condition || (variant.skills || []).join(", ") || "baseline"), element("span", "mono", `${variant.proof || 0} proof`), link("Open", variant.path));
     ledger.append(row);
+    ledger.append(receiptCard(variant));
   });
   nodes.provenance.replaceChildren(criteria, ledger);
+}
+
+function receiptCard(variant) {
+  const run = variant.run || {};
+  const card = element("article", "receipt-card");
+  const header = element("header", "receipt-head");
+  header.append(element("strong", "", variant.id), chip(run.agentMode || "not captured"));
+  const grid = element("div", "receipt-grid");
+  grid.append(
+    labelValue("Agent", run.agentTool || "not captured"),
+    labelValue("Worker", run.workerId || "not captured"),
+    labelValue("Fork", run.forkTurns || "not captured"),
+    labelValue("Assignment", shortHash(run.assignmentSha256)),
+    labelValue("Input", shortHash(run.inputManifestSha256)),
+    labelValue("Receipt", run.receipt || "not captured")
+  );
+  const footer = element("footer", "receipt-foot");
+  footer.append(
+    chip(run.receivedOtherVariants === false ? "no other variants" : "variant exposure unknown"),
+    chip(run.contextIsolation || "isolation unknown"),
+    chip(run.fallbackReason && run.fallbackReason !== "not applicable" ? "fallback" : "no fallback")
+  );
+  card.append(header, grid, footer);
+  return card;
 }
 
 function variantCard(variant) {
@@ -131,7 +159,27 @@ function previewLink(variant) {
   iframe.src = withParams(variant.path, { embed: "1" });
   iframe.loading = "lazy";
   anchor.replaceChildren(iframe);
+  fitCanonicalPreview(anchor, iframe, variant.previewViewport || data.previewViewport);
   return anchor;
+}
+
+function fitCanonicalPreview(frame, iframe, requested) {
+  const width = Number(requested?.width) || 1200;
+  const height = Number(requested?.height) || 820;
+  iframe.style.width = `${width}px`;
+  iframe.style.height = `${height}px`;
+  iframe.style.transformOrigin = "top left";
+  const fit = () => {
+    const scale = Math.min(frame.clientWidth / width, frame.clientHeight / height);
+    const renderedWidth = width * scale;
+    iframe.style.left = `${Math.max(0, (frame.clientWidth - renderedWidth) / 2)}px`;
+    iframe.style.top = "0px";
+    iframe.style.transform = `scale(${scale})`;
+  };
+  const observer = new ResizeObserver(fit);
+  observer.observe(frame);
+  previewObservers.add(observer);
+  requestAnimationFrame(fit);
 }
 
 function selectVariant(slot, key) {
@@ -177,6 +225,7 @@ function withParams(url, values) {
 }
 
 function label(value) { return value === "provenance" ? "Provenance" : value[0].toUpperCase() + value.slice(1); }
+function shortHash(value) { return /^[a-f0-9]{64}$/i.test(value || "") ? `${value.slice(0, 10)}…` : value || "not captured"; }
 function sectionTitle(value) { return element("h2", "section-title", value); }
 function paragraph(value) { return element("p", "body-copy", value); }
 function empty(value) { return element("section", "empty-state", value); }

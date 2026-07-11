@@ -15,11 +15,11 @@ If the user already supplied those details, replay the brief and continue only w
 
 Done when the build target can be judged against a specific user path and visual intent.
 
-If the user explicitly asks for multiple model, skill, prompt, or execution variants, use `variant-comparison.md` as the main structure. Use this Product Design loop only to define visual/interaction options inside that comparison.
+If the user asks to reveal differences between models, agents, or skills, do not run this shared direction loop; it would leak one design process into every condition. Use `capability-comparisons.md` and isolated direction preflight instead.
 
 ## Three Options
 
-Use `product-design:ideate` plus `imagegen` for exactly three independent directions.
+For one standalone artifact, use `product-design:ideate` for exactly three independent directions. Use `imagegen` only when the declared asset policy requires or allows it and raster exploration materially serves the brief.
 
 Each option must vary at least one meaningful axis:
 

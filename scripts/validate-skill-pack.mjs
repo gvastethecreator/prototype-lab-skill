@@ -15,6 +15,10 @@ const requiredFiles = [
   "SKILLS/prototype-lab/assets/prototype-shell/styles.css",
   "SKILLS/prototype-lab/assets/prototype-shell/app.js",
   "SKILLS/prototype-lab/assets/prototype-shell/artifact-data.js",
+  "SKILLS/prototype-lab/assets/prototype-blank/index.html",
+  "SKILLS/prototype-lab/assets/prototype-blank/styles.css",
+  "SKILLS/prototype-lab/assets/prototype-blank/app.js",
+  "SKILLS/prototype-lab/assets/prototype-blank/artifact-data.js",
   "SKILLS/prototype-lab/assets/prototype-index/README.md",
   "SKILLS/prototype-lab/assets/prototype-index/index.html",
   "SKILLS/prototype-lab/assets/prototype-index/prototype-index.css",
@@ -30,6 +34,7 @@ const requiredFiles = [
   "SKILLS/prototype-lab/assets/prompt-library/prompt-meta.json",
   "SKILLS/prototype-lab/assets/prompt-library/creative-test-suite.json",
   "SKILLS/prototype-lab/references/product-design-loop.md",
+  "SKILLS/prototype-lab/references/capability-comparisons.md",
   "SKILLS/prototype-lab/references/quality-bar.md",
   "SKILLS/prototype-lab/references/taste-calibration.md",
   "SKILLS/prototype-lab/references/variant-comparison.md",
@@ -133,6 +138,15 @@ async function checkSkillFrontmatter() {
   if (!content.includes("scripts/manage-prototype-lab.mjs") || !content.includes("hub.config.json")) {
     errors.push("SKILL.md missing unified workspace and managed hub contract");
   }
+  if (!content.includes("references/capability-comparisons.md") || !/\bexperiment\b/.test(content) || !/\bpreflight\b/.test(content)) {
+    errors.push("SKILL.md missing capability comparison spend gate");
+  }
+  if (!content.includes('fork_turns: "none"')) {
+    errors.push("SKILL.md missing explicit clean-context dispatch contract");
+  }
+  if (!/default\s+`?blank`?\s+scaffold/i.test(content) || !content.includes("assets/prototype-blank/")) {
+    errors.push("SKILL.md missing neutral blank scaffold default");
+  }
   if (!content.includes("prototypes/prompts/") || !content.includes("scripts/manage-prompt-library.mjs")) {
     errors.push("SKILL.md missing workspace prompt library contract");
   }
@@ -165,8 +179,13 @@ async function checkPromptLibraryAssets() {
     for (const key of ["title", "category", "difficulty", "challenge"]) {
       if (!prompt[key] || typeof prompt[key] !== "string") errors.push(`creative prompt ${prompt.id} missing ${key}`);
     }
-    for (const key of ["requiredBehaviors", "testDimensions", "targetViewports"]) {
-      if (!Array.isArray(prompt[key]) || prompt[key].length < 4) errors.push(`creative prompt ${prompt.id} needs at least 4 ${key}`);
+    if (prompt.comparisonIntent !== "showcase" || prompt.creativeFreedom !== "high") errors.push(`creative prompt ${prompt.id} must be a high-freedom showcase`);
+    if (!Array.isArray(prompt.fixedOutcomes) || prompt.fixedOutcomes.length < 1 || prompt.fixedOutcomes.length > 5) errors.push(`creative prompt ${prompt.id} needs 1-5 fixedOutcomes`);
+    if (!Array.isArray(prompt.openDecisions) || prompt.openDecisions.length < 6) errors.push(`creative prompt ${prompt.id} needs at least 6 openDecisions`);
+    if (!prompt.assetPolicy || !["required", "fixed-supplied", "allowed", "forbidden", "worker-choice"].includes(prompt.assetPolicy.mode)) errors.push(`creative prompt ${prompt.id} has invalid assetPolicy`);
+    if (!prompt.layoutPolicy || !["open", "page-scroll", "app-shell", "immersive-stage"].includes(prompt.layoutPolicy)) errors.push(`creative prompt ${prompt.id} has invalid layoutPolicy`);
+    for (const [key, minimum] of [["requiredBehaviors", 3], ["testDimensions", 4], ["targetViewports", 2]]) {
+      if (!Array.isArray(prompt[key]) || prompt[key].length < minimum) errors.push(`creative prompt ${prompt.id} needs at least ${minimum} ${key}`);
     }
   }
 }

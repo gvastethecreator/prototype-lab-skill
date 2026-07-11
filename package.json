@@ -1,6 +1,6 @@
 {
   "name": "prototype-lab-skill",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -8,6 +8,8 @@
     "lab:init": "node scripts/manage-prototype-lab.mjs init",
     "lab:sync": "node scripts/manage-prototype-lab.mjs sync",
     "lab:status": "node scripts/manage-prototype-lab.mjs status",
+    "lab:experiment": "node scripts/manage-prototype-lab.mjs experiment",
+    "lab:preflight": "node scripts/manage-prototype-lab.mjs preflight",
     "build:index": "node scripts/build-prototype-index.mjs",
     "create:prototype": "node scripts/manage-prototype-lab.mjs create",
     "create:hub": "node scripts/manage-prototype-lab.mjs hub",

@@ -1,11 +1,16 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
+  "experimentId": "REQUIRED-experiment-id",
+  "conditionId": "REQUIRED-condition-id",
+  "stage": "build",
+  "slot": 1,
+  "attempt": 1,
   "runId": "REQUIRED-run-id",
   "status": "planned",
   "variantId": "REQUIRED-variant-id",
   "prompt": {
     "libraryId": "not applicable",
-    "libraryVersion": "unknown",
+    "libraryVersion": null,
     "templateId": "shared",
     "templateVersion": 1,
     "templatePath": "prompts/shared.template.md",
@@ -13,30 +18,44 @@
     "renderedPath": "prompts/shared.rendered.md",
     "renderedSha256": "REQUIRED-rendered-sha256"
   },
+  "dispatch": {
+    "workerId": "REQUIRED-worker-id",
+    "agentTool": "REQUIRED-agent-tool",
+    "forkTurns": "none",
+    "assignmentSha256": "REQUIRED-assignment-sha256",
+    "inputManifestSha256": "REQUIRED-input-manifest-sha256"
+  },
   "execution": {
-    "model": "unknown",
-    "modelRoute": "not captured",
-    "reasoningEffort": "not captured",
-    "skills": ["prototype-lab"],
-    "agentMode": "unavailable",
-    "agentTool": "not captured"
+    "requestedModel": "REQUIRED-requested-model",
+    "effectiveModel": "not captured",
+    "effectiveModelSource": "not-captured",
+    "reasoning": "REQUIRED-reasoning",
+    "serviceTier": "not captured",
+    "variantSkills": [],
+    "orchestrationSkillsExposed": []
   },
-  "integrity": {
-    "inputScope": "shared brief plus assigned variant only",
+  "context": {
+    "memoryInputs": [],
+    "contextReads": [],
     "receivedOtherVariants": false,
-    "crossVariantLeakage": false,
-    "editedFinalPrototype": false
+    "crossVariantLeakage": "self-reported-false"
   },
+  "assetPolicy": {
+    "mode": "worker-choice",
+    "skill": "not assigned"
+  },
+  "assets": [],
   "artifacts": {
     "scratchOutputPath": "not captured",
     "finalPrototypePath": "not captured",
-    "filesChanged": []
+    "files": []
   },
+  "verification": [],
   "usage": {
-    "inputTokens": "unknown",
-    "outputTokens": "unknown",
-    "totalTokens": "unknown",
-    "toolCalls": "not captured"
+    "inputTokens": null,
+    "outputTokens": null,
+    "totalTokens": null,
+    "toolCalls": []
   },
   "summary": "What this run produced.",
   "limitations": [],

@@ -3,11 +3,17 @@
   "title": "REQUIRED-title",
   "category": "creative-ui",
   "difficulty": "intermediate",
+  "comparisonIntent": "showcase",
+  "creativeFreedom": "high",
   "origin": "agent-generated",
   "status": "active",
   "challenge": "REQUIRED-one-sentence-challenge",
   "tags": ["browser-ui"],
+  "fixedOutcomes": ["REQUIRED-observable-outcome"],
+  "openDecisions": ["premise", "content", "information architecture", "composition", "interaction model", "visual language"],
   "requiredBehaviors": ["REQUIRED-behavior"],
+  "assetPolicy": { "mode": "worker-choice" },
+  "layoutPolicy": "open",
   "testDimensions": ["REQUIRED-dimension"],
   "targetViewports": ["1920x1080", "1200x820", "834x1112", "390x844"]
 }

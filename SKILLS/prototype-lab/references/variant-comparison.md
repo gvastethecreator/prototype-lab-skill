@@ -2,6 +2,8 @@
 
 Use this when one request asks for multiple prototypes, models, skills, prompts, agents, options, or visual directions that should be reviewed as one experiment.
 
+When the user's purpose is to reveal model/agent/skill capability rather than simply compare already-built options, read `capability-comparisons.md` first. Declare `benchmark` or `showcase`, run direction preflight for creative showcases, and keep Prototype Lab coordinator-only.
+
 ## Default Shape
 
 Build one standalone prototype folder per requested variant when the comparison is about skills, models, agents, execution modes, or independent prototype quality. Add one comparison hub folder that links to or embeds those standalone prototypes and records the shared prompt, criteria, provenance, and proof.
@@ -21,6 +23,9 @@ Freeze these before building:
 - attribution status for each variant: actual, planned, simulated, inspired, or unavailable
 - worker plan: sub-agent, dedicated CLI agent, separate thread, fallback, or unavailable for each variant
 - provenance fields available from the run: prompts, skills, models, settings, token counts, and relevant tool calls
+- experiment intent: `benchmark` or `showcase`
+- layout policy and asset policy
+- fixed outcomes versus decisions intentionally left open
 
 Do not silently mutate the prompt between variants unless prompt variation is the declared experiment. When repeatability matters, follow `prompt-templates.md` and tie every worker receipt to the exact rendered hash.
 
@@ -64,9 +69,9 @@ Receipt UI:
 
 Use a coordinator/worker pattern:
 
-1. The coordinator freezes the shared brief and success criteria.
+1. The coordinator freezes the shared brief and success criteria. For creative showcases, prepare and approve direction packets before any full build.
 2. The coordinator attempts to dispatch one isolated worker per variant using the best available sub-agent, multi-agent, dedicated CLI, or separate-thread mechanism.
-3. Each worker receives only the shared brief, its own variant assignment, and the output contract.
+3. Each worker receives only the shared brief, its own variant assignment, and the output contract, with `fork_turns: "none"`. It does not receive Prototype Lab's interface/taste guidance unless that is the tested treatment.
 4. Workers write to scratch/temp output, not the final prototype files.
 5. The coordinator integrates all results into one comparison shell and records provenance.
 

@@ -15,6 +15,8 @@ The main agent is the coordinator:
 - integrate the final comparison prototype
 - verify the assembled result
 
+For model/skill capability comparisons, keep `prototype-lab` coordinator-only. Variant workers receive the transport packet, not this skill's interface baseline, taste calibration, workspace memory, or hub conventions.
+
 Do not build all variants in one continuous context when the request is explicitly about comparing different models, skills, or agents. First attempt the best available isolation path. If worker execution is unavailable, record the fallback as `single-agent-fallback` and do not claim independent generation.
 
 ## Non-Negotiables
@@ -49,11 +51,9 @@ This keeps the comparison from collapsing into four versions of the coordinator'
 
 ## Worker Prompt Shape
 
-Use this prompt shape for each worker:
+Use a generated experiment assignment for capability comparisons. For ordinary isolated builds, use this minimal prompt shape:
 
 ```text
-Use prototype-lab to create one variant for a multi-variant browser/UI prototype.
-
 Shared brief:
 <same prompt for every worker>
 
@@ -62,12 +62,15 @@ Variant:
 - source: <model/skill/approach/prompt treatment>
 - hypothesis: <what this variant should test>
 - constraints: <viewport, shell, technology, no shared dependencies>
+- assignment SHA-256: <coordinator hash>
+- context: no workspace memory, no coordinator design skill, no other variants
 
 Output:
 - variant summary
 - files or code snippets needed for integration
 - provenance: prompt used, skills consulted, model/settings if known, token usage if visible, tool calls if visible, limitations
 - do not inspect or imitate other variants
+- do not read prototype-lab unless it is the tested treatment
 - do not edit the final prototype folder unless explicitly assigned that folder
 ```
 
@@ -98,6 +101,11 @@ Minimum receipt fields:
 - `variantId`
 - `agentMode`
 - `agentTool`
+- `workerId`: id returned by the coordinator's dispatch tool
+- `forkTurns`: must be `none` for a clean isolated run
+- `requestedModel`, `effectiveModel`, `effectiveModelSource`, and `reasoning`; use `effectiveModel: not captured` plus `effectiveModelSource: not-captured` unless the runtime independently exposes the effective route
+- `assignmentSha256` and `inputManifestSha256`
+- `contextReads`: skills, references, memory, files, or inherited context actually read
 - `promptId`
 - `promptVersion`
 - `renderedPromptSha256`
@@ -110,7 +118,7 @@ Minimum receipt fields:
 - `limitations`
 - `fallbackReason`: `not applicable` for real worker runs
 
-The coordinator records receipts in metadata and uses them to check cross-variant leakage before claiming variants are independently generated.
+For managed capability preflight, the coordinator copies the generated `dispatch.template.json` to `dispatch.json` and fills it with the actual worker id, agent tool, sent paths, and context policy. `preflight` checks that record against the assignment/input hashes and condition. The later build receipt cross-links the build dispatch. A worker's own `crossVariantLeakage: false` is self-reported evidence, not proof of clean context. Claim clean-context isolation only when the dispatch used `fork_turns: "none"`, the assignment hash matches, no memory input was allowed, and the recorded reads contain no sibling or coordinator-only source.
 
 ## Dedicated Agent Options
 
@@ -122,7 +130,7 @@ Use the best available isolation mechanism in the current environment:
 
 Before using CLI workers, verify the CLI exists with `--help`, avoid secrets, keep outputs under scratch/temp, and do not allow commit, push, branch, or worktree operations unless the user explicitly asked for them.
 
-If tool discovery is available, search for multi-agent or sub-agent tooling before falling back. When `multi_agent_v1.spawn_agent` or an equivalent worker tool is available and allowed, spawn one worker per variant with `fork_context` omitted or false unless the worker truly needs inherited context. Pass the skill path and the frozen brief explicitly.
+If tool discovery is available, search for multi-agent or sub-agent tooling before falling back. When `agents.spawn_agent` or an equivalent worker tool is available and allowed, spawn one worker per variant with `fork_turns: "none"` explicitly. Never omit it for a model/skill comparison because omission may inherit coordinator context. Pass the generated assignment packet and only the variant-local skill condition.
 
 Fallback is allowed only when one of these is true:
 
@@ -153,6 +161,10 @@ Record per variant:
 
 - `agentMode`: `subagent`, `dedicated-cli`, `separate-thread`, `single-agent-fallback`, or `unavailable`
 - `agentTool`: tool or CLI name when known
+- `workerId`: coordinator dispatch id
+- `forkTurns`: exact context-fork setting
+- `assignmentSha256`: hash of the complete task payload
+- `inputManifestSha256`: hash of shared brief, condition, skills, tools, assets, and context policy
 - `promptId`: shared or variant prompt id
 - `promptVersion`: integer template version used for the run
 - `renderedPromptSha256`: hash printed by the prompt renderer for the exact worker input
@@ -165,6 +177,7 @@ Record per variant:
 - `model`: model/settings when known
 - `tokenUsage`: input/output/total if visible, otherwise `unknown`
 - `toolCalls`: captured calls if visible, otherwise `not captured`
+- `contextReads`: every skill/reference/memory/source read outside the assignment
 - `limitations`: unavailable tools, failed worker runs, missing token capture, or manual integration notes
 
 Unknown usage is acceptable. Invented usage is not.

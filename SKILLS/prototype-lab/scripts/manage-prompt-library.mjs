@@ -233,6 +233,12 @@ async function savePrompt({ metadata, templateText, variables, createdAt }) {
       requiredBehaviors: uniqueStrings(metadata.requiredBehaviors),
       testDimensions: uniqueStrings(metadata.testDimensions),
       targetViewports: uniqueStrings(metadata.targetViewports),
+      comparisonIntent: metadata.comparisonIntent || current?.comparisonIntent || "benchmark",
+      creativeFreedom: metadata.creativeFreedom || current?.creativeFreedom || "medium",
+      fixedOutcomes: uniqueStrings(metadata.fixedOutcomes || current?.fixedOutcomes || metadata.requiredBehaviors),
+      openDecisions: uniqueStrings(metadata.openDecisions || current?.openDecisions || []),
+      assetPolicy: normalizeAssetPolicy(metadata.assetPolicy || current?.assetPolicy),
+      layoutPolicy: metadata.layoutPolicy || current?.layoutPolicy || "open",
       currentVersion: version,
       versions: [...(current?.versions || []), versionRecord]
     };
@@ -266,7 +272,15 @@ async function buildCatalog() {
       requiredBehaviors: record.requiredBehaviors,
       testDimensions: record.testDimensions,
       targetViewports: record.targetViewports,
+      comparisonIntent: record.comparisonIntent,
+      creativeFreedom: record.creativeFreedom,
+      fixedOutcomes: record.fixedOutcomes,
+      openDecisions: record.openDecisions,
+      assetPolicy: record.assetPolicy,
+      layoutPolicy: record.layoutPolicy,
       currentVersion: record.currentVersion,
+      template: `${record.id}/${current.template}`,
+      variables: `${record.id}/${current.variables}`,
       rendered: `${record.id}/${current.rendered}`,
       renderedSha256: current.renderedSha256
     });
@@ -288,6 +302,16 @@ function validatePromptMetadata(metadata) {
   if (!["starter", "intermediate", "advanced"].includes(metadata.difficulty)) throw new Error("difficulty must be starter, intermediate, or advanced");
   for (const key of ["requiredBehaviors", "testDimensions", "targetViewports"]) {
     if (!Array.isArray(metadata[key]) || metadata[key].length < 1 || metadata[key].some((value) => typeof value !== "string" || !value.trim())) throw new Error(`Prompt metadata requires a non-empty ${key} array`);
+  }
+  const intent = metadata.comparisonIntent || "benchmark";
+  if (!["benchmark", "showcase"].includes(intent)) throw new Error("comparisonIntent must be benchmark or showcase");
+  if (metadata.creativeFreedom && !["low", "medium", "high"].includes(metadata.creativeFreedom)) throw new Error("creativeFreedom must be low, medium, or high");
+  if (metadata.layoutPolicy && !["open", "page-scroll", "app-shell", "immersive-stage"].includes(metadata.layoutPolicy)) throw new Error("layoutPolicy must be open, page-scroll, app-shell, or immersive-stage");
+  normalizeAssetPolicy(metadata.assetPolicy);
+  if (intent === "showcase") {
+    if (metadata.creativeFreedom !== "high") throw new Error("showcase prompts require creativeFreedom high");
+    if (!Array.isArray(metadata.fixedOutcomes) || metadata.fixedOutcomes.length < 1) throw new Error("showcase prompts require fixedOutcomes");
+    if (!Array.isArray(metadata.openDecisions) || metadata.openDecisions.length < 4) throw new Error("showcase prompts require at least four openDecisions");
   }
   const markers = JSON.stringify(metadata).match(/REQUIRED-[A-Za-z0-9-]*/g);
   if (markers) throw new Error(`Prompt metadata contains unfilled markers: ${markers.join(", ")}`);
@@ -324,7 +348,17 @@ function renderTemplate(template, variables) {
 }
 
 function buildSeedPrompt(idea) {
-  return `# ${idea.title}\n\nBuild one polished, genuinely interactive, self-contained browser prototype.\n\n## Challenge\n\n${idea.challenge}\n\n## Required behavior\n\n${idea.requiredBehaviors.map((item) => `- ${item}`).join("\n")}\n\n## Evaluation focus\n\n${idea.testDimensions.map((item) => `- ${item}`).join("\n")}\n\n## Shared constraints\n\n- Use local HTML, CSS, and JavaScript with no external APIs, packages, fonts, images, or network dependencies.\n- Use deterministic seed data and make every visible control work.\n- Include loading, empty, error, success, reset, and long-content states when relevant to the challenge.\n- Support keyboard and pointer input, visible focus, accessible names, and reduced motion.\n- Fit ${idea.targetViewports.join(", ")} without body/page scrolling on desktop or tablet.\n- Preserve the exact prompt and honest model/skill/agent provenance for comparison.\n- Deliver index.html, styles.css, app.js, metadata.json, README.md, and focused proof.\n`;
+  const fixedOutcomes = uniqueStrings(idea.fixedOutcomes || idea.requiredBehaviors);
+  const openDecisions = uniqueStrings(idea.openDecisions || []);
+  const assetPolicy = normalizeAssetPolicy(idea.assetPolicy);
+  const assetLines = assetPolicy.mode === "required"
+    ? `- Asset use is required: use ${assetPolicy.skill} and consume ${assetPolicy.deliverable} in the final experience. A CSS, SVG, or canvas substitute does not satisfy this condition.\n- Record the asset prompt, final project-relative path, output hash, and where the site uses it.`
+    : assetPolicy.mode === "fixed-supplied"
+      ? `- Asset use is fixed: consume ${assetPolicy.deliverable}. Do not replace or regenerate the supplied ${assetPolicy.skill} outputs.\n- Preserve their hashes and record where the site uses them.`
+    : assetPolicy.mode === "forbidden"
+      ? "- Keep the artifact code-native; do not generate or import raster assets."
+      : `- Asset policy: ${assetPolicy.mode}. The worker owns the decision unless the variant assignment says otherwise.`;
+  return `# ${idea.title}\n\nCreate one polished, genuinely interactive, self-contained browser experience.\n\n## Shared brief\n\n${idea.challenge}\n\n## Fixed outcomes\n\n${fixedOutcomes.map((item) => `- ${item}`).join("\n")}\n\n## Open decisions\n\n${openDecisions.length ? openDecisions.map((item) => `- ${item}`).join("\n") : "- Choose the information architecture, composition, interaction model, and visual language unless the brief explicitly fixes them."}\n\n## Behavior floor\n\n${idea.requiredBehaviors.map((item) => `- ${item}`).join("\n")}\n\n## Asset policy\n\n${assetLines}\n\n## Shared constraints\n\n- Layout policy: ${idea.layoutPolicy || "open"}. Do not inherit a Prototype Lab shell or styling.\n- Use local runtime files and project-bound relative assets; no external API or runtime network dependency.\n- Make every visible control work. Add only states that the chosen experience can genuinely enter.\n- Support keyboard and pointer input, visible focus, accessible names, and reduced motion where motion exists.\n- Prove intentional behavior at ${idea.targetViewports.join(", ")}; page scrolling is valid unless the layout policy is app-shell or immersive-stage. Horizontal overflow is never valid.\n- Preserve the exact prompt and honest model/skill/agent provenance for comparison.\n`;
 }
 
 function selectDiverse(candidates, count) {
@@ -352,6 +386,17 @@ function promptFolder(id) {
 
 function uniqueStrings(values) {
   return [...new Set((values || []).map((value) => String(value).trim()).filter(Boolean))];
+}
+
+function normalizeAssetPolicy(value) {
+  const policy = value && typeof value === "object" ? value : { mode: "worker-choice" };
+  if (!["required", "fixed-supplied", "allowed", "forbidden", "worker-choice"].includes(policy.mode)) throw new Error("assetPolicy.mode must be required, fixed-supplied, allowed, forbidden, or worker-choice");
+  if (["required", "fixed-supplied"].includes(policy.mode) && (!policy.skill || !policy.deliverable)) throw new Error(`${policy.mode} assetPolicy needs skill and deliverable`);
+  return {
+    mode: policy.mode,
+    ...(policy.skill ? { skill: String(policy.skill) } : {}),
+    ...(policy.deliverable ? { deliverable: String(policy.deliverable) } : {})
+  };
 }
 
 function assertPortablePrompt(value) {

@@ -1,6 +1,6 @@
 # Prototype Taste Calibration
 
-Use this when a prototype needs visual direction, polish, multiple design options, or real-user review. It adapts useful ideas from `Leonxlnx/taste-skill` for prototypes, while preserving this lab's compact dark standalone shell and proof-first workflow.
+Use this when one standalone prototype needs visual calibration or polish. Do not load it into baseline workers during a model/skill capability comparison; use `capability-comparisons.md` and keep the coordinator visually neutral.
 
 Upstream source: `https://github.com/Leonxlnx/taste-skill` (MIT). Keep this paraphrased and local.
 
@@ -15,7 +15,7 @@ Include:
 - Question: what decision the prototype must answer.
 - User path: the path a reviewer should exercise.
 - Prototype kind: flow, component, interaction model, visual direction, game/tool, data state, or comparison.
-- Register split: the standalone lab shell stays product/tool; the prototype canvas can be brand, product, game, editorial, or experimental.
+- Register split: the workspace/comparison hub stays product/tool; the standalone prototype owns its complete register and does not inherit hub styling.
 - Constraints: standalone shell, viewport targets, debug visibility, controls, local assets, accessibility, metadata, and proof artifacts.
 
 ## Dials
@@ -34,7 +34,7 @@ Defaults:
 - Data/debug prototype: variance `1-3`, motion `1-3`, density `7-10`.
 - Comparison lab: variance follows the declared experiment, motion `1-4` unless motion is being compared, density `7-10` for the compare view and `4-7` for focus view.
 
-The shell remains compact and quiet even when the canvas is expressive.
+The comparison hub remains compact and quiet. The standalone variant may be page-based, immersive, editorial, product, game-like, or experimental according to its declared layout policy.
 
 ## Comparison Read
 
@@ -106,7 +106,7 @@ Prefer:
 
 - Prototype read exists.
 - Dials are set for the canvas when visual quality matters.
-- The shell remains usable: top toolbar, toolbar navigation, hidden-by-default right drawer, full-screen stage, and scroll behavior.
+- The artifact follows its declared layout policy; do not add a top toolbar, drawer, or full-screen stage unless the product direction needs one.
 - Every visible control either works or is marked as a noninteractive test case.
 - State coverage matches the hypothesis: empty/error/loading/permission/long content when relevant.
 - Visual proof exists in the prototype's local `proof/` folder.

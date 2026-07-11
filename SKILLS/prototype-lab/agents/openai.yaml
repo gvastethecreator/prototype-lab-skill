@@ -1,4 +1,4 @@
 interface:
   display_name: "Prototype Lab"
-  short_description: "Manage portable prototype workspaces and hubs."
-  default_prompt: "Use $prototype-lab to create a standalone artifact, add a managed comparison hub when needed, sync workspace health, verify it, and package the ready result."
+  short_description: "Orchestrate, compare, and ship portable prototype experiments."
+  default_prompt: "Use $prototype-lab to plan a high-freedom capability comparison, gate isolated directions before full builds, verify the variants, and package a deploy-ready static result."

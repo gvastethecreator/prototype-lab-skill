@@ -187,6 +187,17 @@ function healthIssues(entry) {
   if (entry.modelExact === "unknown") issues.push({ code: "unknown-model", severity: "info", message: "Capture the model route when available." });
   if (entry.proof === 0) issues.push({ code: "missing-proof", severity: "warning", message: "Add browser or screenshot proof." });
   if (entry.isComparisonHub && entry.runCount < 2) issues.push({ code: "hub-no-variants", severity: "error", message: "Link at least two standalone variants." });
+  const comparisonDimension = String(entry._metadata?.comparisonDimension || entry._metadata?.variantStrategy || "");
+  if (entry.isComparisonHub && /model|skill|agent|reasoning/i.test(comparisonDimension)) {
+    const runs = Array.isArray(entry._metadata?.provenance?.agentRuns) ? entry._metadata.provenance.agentRuns : [];
+    const hash = (value) => /^[a-f0-9]{64}$/i.test(value || "");
+    if (runs.length < 2 || runs.some((run) => !run.workerId || run.forkTurns !== "none" || !hash(run.assignmentSha256) || !hash(run.inputManifestSha256))) {
+      issues.push({ code: "unverified-variant-isolation", severity: "warning", message: "Capability comparison lacks auditable worker ids, clean fork mode, or assignment/input hashes." });
+    }
+    if (runs.some((run) => Array.isArray(run.skills) && run.skills.includes("prototype-lab"))) {
+      issues.push({ code: "coordinator-skill-exposed", severity: "warning", message: "Prototype Lab appears in a variant treatment; keep it coordinator-only unless it is the tested factor." });
+    }
+  }
   return issues;
 }
 

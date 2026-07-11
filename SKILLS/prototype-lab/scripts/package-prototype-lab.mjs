@@ -53,7 +53,23 @@ for (const record of [...records.values()].sort((a, b) => a.id.localeCompare(b.i
 const promptExports = await exportPrompts(records, packRoot, primaryRecord.id);
 const runExports = await exportRuns(records, packRoot, primaryRecord.id);
 await fs.writeFile(path.join(packRoot, "index.html"), buildLauncher(primaryRecord, records), "utf8");
+await fs.writeFile(path.join(packRoot, "prototypes", "index.html"), buildWorkspaceBridge(), "utf8");
 const sanitizedFiles = await sanitizePackTextFiles(packRoot);
+const staticValidation = await validateStaticPack(packRoot);
+const deployment = {
+  format: "prototype-lab-static-site",
+  schemaVersion: 1,
+  publishDirectory: ".",
+  entrypoint: "index.html",
+  mode: "multi-page",
+  spaFallback: false,
+  buildCommand: null,
+  runtime: "static-files",
+  relativeBasePath: true,
+  selfContainedRuntime: true,
+  validation: staticValidation
+};
+await fs.writeFile(path.join(packRoot, "deploy.json"), `${JSON.stringify(deployment, null, 2)}\n`, "utf8");
 
 const hashedFiles = await describeFiles(packRoot);
 const manifest = {
@@ -67,6 +83,7 @@ const manifest = {
   sourceIds: [...records.keys()].sort(),
   prompts: promptExports,
   runs: runExports,
+  deployment,
   sanitizedLocalPaths: sanitizedFiles,
   files: hashedFiles
 };
@@ -81,7 +98,10 @@ console.log(JSON.stringify({
   sourceCount: records.size,
   promptCount: promptExports.length,
   runCount: runExports.length,
-  includesProof: includeProof
+  includesProof: includeProof,
+  deploymentReady: true,
+  publishDirectory: packRoot,
+  entrypoint: "index.html"
 }, null, 2));
 
 async function resolvePrimaryFolder() {
@@ -363,6 +383,7 @@ async function validateDeclaredPortableRecords(record) {
     if (markers.length) {
       throw new Error(`${record.id} ${label} contains unfilled markers: ${markers.join(", ")}`);
     }
+    if (Number(receipt.schemaVersion) >= 2) await validateCanonicalReceiptV2(receipt, `${record.id} ${label}`, record.folder);
     if (receipt.runId !== run.id || receipt.variantId !== run.variantId) {
       throw new Error(`${record.id} ${label} id/variant does not match its receipt`);
     }
@@ -378,6 +399,52 @@ async function validateDeclaredPortableRecords(record) {
     if (path.resolve(receiptRendered) !== path.resolve(prompt.renderedPath)) {
       throw new Error(`${record.id} ${label} receipt points to a different rendered prompt`);
     }
+  }
+}
+
+async function validateCanonicalReceiptV2(receipt, label, ownerFolder) {
+  if (!receipt.experimentId || !receipt.conditionId || !receipt.stage || !Number.isInteger(receipt.slot) || !Number.isInteger(receipt.attempt)) throw new Error(`${label} v2 receipt requires experiment/condition/stage/slot/attempt`);
+  const dispatch = receipt.dispatch || {};
+  if (!dispatch.workerId || !dispatch.agentTool || dispatch.forkTurns !== "none") throw new Error(`${label} v2 receipt requires workerId, agentTool, and forkTurns none`);
+  for (const key of ["assignmentSha256", "inputManifestSha256"]) if (!/^[a-f0-9]{64}$/i.test(dispatch[key] || "")) throw new Error(`${label} v2 receipt requires ${key}`);
+  const execution = receipt.execution || {};
+  if (!execution.requestedModel || !execution.reasoning || !["runtime-observed", "not-captured"].includes(execution.effectiveModelSource) || !Array.isArray(execution.variantSkills) || !Array.isArray(execution.orchestrationSkillsExposed)) throw new Error(`${label} v2 receipt execution is incomplete`);
+  if (execution.effectiveModelSource === "not-captured" && execution.effectiveModel !== "not captured") throw new Error(`${label} must not infer effectiveModel from the requested route`);
+  if (execution.effectiveModelSource === "runtime-observed" && (!execution.effectiveModel || execution.effectiveModel === "not captured")) throw new Error(`${label} runtime-observed effectiveModel is missing`);
+  if (execution.orchestrationSkillsExposed.length) throw new Error(`${label} exposes coordinator skills to the variant worker`);
+  const context = receipt.context || {};
+  if (!Array.isArray(context.memoryInputs) || !Array.isArray(context.contextReads) || context.receivedOtherVariants !== false) throw new Error(`${label} v2 receipt context is incomplete or contaminated`);
+  const policy = receipt.assetPolicy || { mode: "worker-choice" };
+  if (!["required", "fixed-supplied", "allowed", "forbidden", "worker-choice"].includes(policy.mode)) throw new Error(`${label} has invalid asset policy`);
+  if (policy.mode === "required") {
+    if (!policy.skill || !Array.isArray(receipt.assets) || !receipt.assets.length) throw new Error(`${label} required asset policy needs a skill and at least one asset`);
+    for (const [index, asset] of receipt.assets.entries()) {
+      if (!asset.id || !asset.role || !asset.source?.tool || !asset.source?.promptPath || !/^[a-f0-9]{64}$/i.test(asset.source?.promptSha256 || "")) throw new Error(`${label} assets[${index}] is missing source provenance`);
+      if (!Array.isArray(asset.files) || !asset.files.length || asset.files.some((file) => !file.path || !/^[a-f0-9]{64}$/i.test(file.sha256 || ""))) throw new Error(`${label} assets[${index}] needs hashed files`);
+      if (!Array.isArray(asset.consumedBy) || !asset.consumedBy.length || !Array.isArray(asset.materialityProof) || !asset.materialityProof.length) throw new Error(`${label} assets[${index}] must be consumed and proven`);
+      await validateAssetVisualReview(asset, `${label} assets[${index}]`, ownerFolder);
+    }
+  }
+  if (policy.mode === "fixed-supplied") {
+    if (!policy.skill || !Array.isArray(receipt.assets) || !receipt.assets.length) throw new Error(`${label} fixed-supplied asset policy needs a source skill and at least one asset`);
+    for (const [index, asset] of receipt.assets.entries()) {
+      if (!asset.id || !asset.role || !Array.isArray(asset.files) || !asset.files.length || asset.files.some((file) => !file.path || !/^[a-f0-9]{64}$/i.test(file.sha256 || ""))) throw new Error(`${label} fixed assets[${index}] needs identity, role, and hashed files`);
+      if (!Array.isArray(asset.consumedBy) || !asset.consumedBy.length || !Array.isArray(asset.materialityProof) || !asset.materialityProof.length) throw new Error(`${label} fixed assets[${index}] must be consumed and proven`);
+      await validateAssetVisualReview(asset, `${label} fixed assets[${index}]`, ownerFolder);
+    }
+  }
+}
+
+async function validateAssetVisualReview(asset, label, ownerFolder) {
+  const review = asset.visualReview || {};
+  if (review.status !== "passed" || !review.method) throw new Error(`${label} needs a passed visualReview and method`);
+  if (!Number.isInteger(review.expectedItems) || review.expectedItems < 1 || review.reviewedItems !== review.expectedItems) throw new Error(`${label} visualReview must cover the complete finite asset set`);
+  if (!Array.isArray(review.checks) || !review.checks.includes("aspect-ratio") || !review.checks.includes("semantic-mapping") || !review.checks.includes("narrow-viewport")) throw new Error(`${label} visualReview must cover aspect-ratio, semantic-mapping, and narrow-viewport`);
+  if (!Array.isArray(review.proofPaths) || !review.proofPaths.length) throw new Error(`${label} visualReview needs proofPaths`);
+  for (const proofPath of review.proofPaths) {
+    if (/(?:^|[-_.])error(?:[-_.]|$)/i.test(path.basename(proofPath))) throw new Error(`${label} visualReview rejects error-named proof: ${proofPath}`);
+    const proofFile = resolveOwnedFile(ownerFolder, proofPath, `${label}.visualReview.proofPaths`);
+    if (!(await exists(proofFile))) throw new Error(`${label} visualReview proof does not exist: ${proofPath}`);
   }
 }
 
@@ -429,6 +496,20 @@ function buildLauncher(primary, recordsMap) {
 `;
 }
 
+function buildWorkspaceBridge() {
+  return `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta http-equiv="refresh" content="0;url=../index.html">
+    <title>Prototype Lab Pack</title>
+  </head>
+  <body><p><a href="../index.html">Open the portable pack</a></p></body>
+</html>
+`;
+}
+
 async function describeFiles(root) {
   const files = await listFiles(root);
   return Promise.all(files.map(async (file) => {
@@ -472,6 +553,88 @@ async function sanitizePackTextFiles(root) {
     if (hasLocalPath(next)) throw new Error(`Local path remains after sanitization: ${path.relative(root, file)}`);
   }
   return changed;
+}
+
+async function validateStaticPack(root) {
+  const files = await listFiles(root);
+  const fileSet = new Set(files.map((file) => toPosix(path.relative(root, file))));
+  let checkedReferences = 0;
+  let checkedDocuments = 0;
+
+  for (const file of files) {
+    const extension = path.extname(file).toLowerCase();
+    if (extension !== ".html" && extension !== ".css") continue;
+    checkedDocuments += 1;
+    const source = await fs.readFile(file, "utf8");
+    const relativeFile = toPosix(path.relative(root, file));
+
+    if (extension === ".html") {
+      for (const match of source.matchAll(/<(a|audio|iframe|img|link|script|source|video)\b[^>]*>/gi)) {
+        const tag = match[1].toLowerCase();
+        const attribute = tag === "a" || tag === "link" ? "href" : "src";
+        const value = readHtmlAttribute(match[0], attribute);
+        if (!value) continue;
+        checkedReferences += validateStaticReference({
+          root,
+          fileSet,
+          owner: file,
+          relativeFile,
+          value,
+          runtimeResource: tag !== "a"
+        });
+      }
+    } else {
+      for (const match of source.matchAll(/url\(\s*(['"]?)(.*?)\1\s*\)/gi)) {
+        const value = match[2].trim();
+        if (!value) continue;
+        checkedReferences += validateStaticReference({ root, fileSet, owner: file, relativeFile, value, runtimeResource: true });
+      }
+    }
+  }
+
+  const prototypeEntrypoints = [...fileSet].filter((file) => /^prototypes\/.*\/index\.html$/i.test(file)).length;
+  if (!fileSet.has("index.html")) throw new Error("Static pack requires root index.html");
+  if (!prototypeEntrypoints) throw new Error("Static pack requires at least one prototype index.html");
+
+  return {
+    status: "passed",
+    checkedDocuments,
+    checkedReferences,
+    prototypeEntrypoints,
+    rootRelativeReferences: 0,
+    missingLocalReferences: 0,
+    externalRuntimeDependencies: 0
+  };
+}
+
+function readHtmlAttribute(tag, name) {
+  const match = tag.match(new RegExp(`\\b${name}\\s*=\\s*(?:"([^"]*)"|'([^']*)'|([^\\s>]+))`, "i"));
+  return match ? (match[1] ?? match[2] ?? match[3] ?? "").trim() : null;
+}
+
+function validateStaticReference({ root, fileSet, owner, relativeFile, value, runtimeResource }) {
+  if (/^(?:#|mailto:|tel:|javascript:|data:|blob:)/i.test(value)) return 0;
+  if (/^(?:https?:)?\/\//i.test(value)) {
+    if (runtimeResource) throw new Error(`External runtime dependency blocks portable deployment: ${relativeFile} -> ${value}`);
+    return 0;
+  }
+  if (/^[A-Za-z][A-Za-z\d+.-]*:/i.test(value)) return 0;
+  if (value.startsWith("/")) throw new Error(`Root-relative reference blocks subpath deployment: ${relativeFile} -> ${value}`);
+
+  const clean = value.split(/[?#]/, 1)[0];
+  if (!clean) return 0;
+  let decoded;
+  try {
+    decoded = decodeURI(clean);
+  } catch {
+    throw new Error(`Invalid encoded reference in ${relativeFile}: ${value}`);
+  }
+  const absolute = path.resolve(path.dirname(owner), decoded);
+  if (!isWithin(root, absolute)) throw new Error(`Reference escapes static pack: ${relativeFile} -> ${value}`);
+  const candidate = decoded.endsWith("/") ? path.join(absolute, "index.html") : absolute;
+  const candidateRelative = toPosix(path.relative(root, candidate));
+  if (!fileSet.has(candidateRelative)) throw new Error(`Missing local reference in static pack: ${relativeFile} -> ${value}`);
+  return 1;
 }
 
 function sanitizePortableValue(value) {
@@ -618,6 +781,10 @@ function crc32(buffer) {
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
+}
+
+async function exists(file) {
+  return Boolean(await fs.stat(file).catch(() => null));
 }
 
 function isWithin(parent, candidate) {

@@ -21,6 +21,8 @@ Commands:
 | Command | Purpose | Required input |
 | --- | --- | --- |
 | `init` | Install the workspace hub and seed reusable prompts | none; add `--empty` for a blank library |
+| `experiment` | Prepare isolated direction packets for a capability comparison | `--spec <json>` |
+| `preflight` | Validate direction cards and authorize builds after blind review | `--experiment <id>`; add `--review <json>` to approve |
 | `create` | Allocate an id and scaffold one standalone artifact | `--title`, preferably `--question` |
 | `hub` | Create/update a managed comparison | `--title`, `--variants`; optionally `--dimension`, `--criteria` |
 | `sync` | Regenerate managed hubs, prompt catalog, and workspace hub | none |
@@ -53,9 +55,13 @@ Do not edit generated hub files to change variants or criteria. Those changes di
 ```text
 lab create --title "Dispatch board" --question "Can an operator resolve an incident without losing queue context?"
 lab create --title "Dispatch board" --question "..." --prompt midnight-dispatch-board
+lab create --title "Open creative site" --question "..." --scaffold blank --condition baseline --model model-a --reasoning high
+lab create --title "Compact operator tool" --question "..." --scaffold tool
 ```
 
-The manager scans the active month, allocates the next chronological number, copies the standalone scaffold, creates local ownership folders, and optionally freezes a prompt-library version into the artifact.
+The manager scans the active month, allocates the next chronological number, copies a scaffold, creates local ownership folders, and optionally freezes the prompt template, variables, rendered version, and hash into the artifact. `blank` is the neutral default; `tool` is opt-in.
+
+For model/agent/skill capability comparisons, prepare and approve the experiment before creating artifact owners. See `capability-comparisons.md`.
 
 The initial status is `draft` when a question is supplied and `needs-brief` when it is omitted. Change to `active` only after the artifact and factual attribution exist.
 
