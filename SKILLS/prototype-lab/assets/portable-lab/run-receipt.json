@@ -4,6 +4,8 @@
   "status": "planned",
   "variantId": "REQUIRED-variant-id",
   "prompt": {
+    "libraryId": "not applicable",
+    "libraryVersion": "unknown",
     "templateId": "shared",
     "templateVersion": 1,
     "templatePath": "prompts/shared.template.md",

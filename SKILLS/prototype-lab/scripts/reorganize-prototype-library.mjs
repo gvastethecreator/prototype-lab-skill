@@ -97,6 +97,7 @@ async function validateRootEntries() {
   const entries = await fs.readdir(prototypesRoot, { withFileTypes: true });
   for (const entry of entries) {
     if (entry.isDirectory() && /^\d{4}$/.test(entry.name)) continue;
+    if (entry.isDirectory() && entry.name === "prompts") continue;
     if (entry.isFile() && allowedFiles.has(entry.name)) continue;
     throw new Error(`Unexpected prototypes root entry: ${entry.name}`);
   }
@@ -105,6 +106,7 @@ async function validateRootEntries() {
 async function findMetadataFiles(root, current = root, output = []) {
   const entries = await fs.readdir(current, { withFileTypes: true });
   for (const entry of entries.sort((a, b) => a.name.localeCompare(b.name))) {
+    if (current === root && entry.isDirectory() && entry.name === "prompts") continue;
     const absolute = path.join(current, entry.name);
     if (entry.isDirectory()) await findMetadataFiles(root, absolute, output);
     else if (entry.isFile() && entry.name === "metadata.json") output.push(absolute);

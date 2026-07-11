@@ -1,14 +1,25 @@
 {
   "name": "prototype-lab-skill",
-  "version": "0.2.0",
+  "version": "0.4.0",
   "private": true,
   "type": "module",
   "scripts": {
+    "lab": "node scripts/manage-prototype-lab.mjs",
+    "lab:init": "node scripts/manage-prototype-lab.mjs init",
+    "lab:sync": "node scripts/manage-prototype-lab.mjs sync",
+    "lab:status": "node scripts/manage-prototype-lab.mjs status",
     "build:index": "node scripts/build-prototype-index.mjs",
-    "create:hub": "node scripts/create-prompt-suite-hub.mjs",
+    "create:prototype": "node scripts/manage-prototype-lab.mjs create",
+    "create:hub": "node scripts/manage-prototype-lab.mjs hub",
     "organize:library:check": "node scripts/reorganize-prototype-library.mjs",
     "organize:library": "node scripts/reorganize-prototype-library.mjs --write && node scripts/build-prototype-index.mjs",
     "package:comparisons": "node scripts/package-comparison-hubs.mjs",
+    "package:artifact": "node scripts/manage-prototype-lab.mjs pack",
+    "prompts:init": "node scripts/manage-prompt-library.mjs init",
+    "prompts:seed": "node scripts/manage-prompt-library.mjs seed",
+    "prompts:catalog": "node scripts/manage-prompt-library.mjs catalog",
+    "prompts:pick": "node scripts/manage-prompt-library.mjs pick",
+    "prompts:save": "node scripts/manage-prompt-library.mjs save",
     "test:portable": "node scripts/test-portable-tools.mjs",
     "validate": "node scripts/validate-skill-pack.mjs && node scripts/test-portable-tools.mjs"
   }

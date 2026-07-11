@@ -3,79 +3,67 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Prototype Index</title>
+    <title>Prototype Lab</title>
+    <link rel="icon" href="data:," />
     <link rel="stylesheet" href="./prototype-index.css" />
   </head>
   <body>
-    <main class="index-shell">
-      <header class="index-topbar">
-        <div>
-          <p class="index-kicker">Prototype Lab</p>
-          <h1>Prototype Index</h1>
+    <main class="lab-shell">
+      <header class="lab-topbar">
+        <div class="lab-brand">
+          <span class="eyebrow">Workspace</span>
+          <h1>Prototype Lab</h1>
         </div>
-        <div class="index-actions">
-          <div class="compare-controls" aria-label="Prototype comparison picker">
-            <label class="compare-field hub-compare-field">
-              <span>Hub</span>
-              <select id="hub-select" aria-label="Comparison hub"></select>
-            </label>
-            <label class="compare-field">
-              <span>A</span>
-              <select id="compare-left" aria-label="Left prototype"></select>
-            </label>
-            <span class="compare-versus">vs</span>
-            <label class="compare-field">
-              <span>B</span>
-              <select id="compare-right" aria-label="Right prototype"></select>
-            </label>
-            <a class="hub-open" id="compare-open" href="./2026/07/001-winamp-comparison/index.html?view=compare">Open</a>
-          </div>
-          <label class="group-field">
-            <span>Group</span>
-            <select id="group-select" aria-label="Group prototypes by date">
-              <option value="day">Day</option>
-              <option value="week">Week</option>
-              <option value="month">Month</option>
-              <option value="year">Year</option>
-            </select>
-          </label>
-          <label class="index-search">
-            <span>Search</span>
-            <input id="search-input" type="search" placeholder="title, tag, model, skill" />
-          </label>
-          <span class="index-count" id="result-count">0 prototypes</span>
-        </div>
+        <nav id="view-nav" aria-label="Workspace views">
+          <button type="button" data-view="library">Library</button>
+          <button type="button" data-view="comparisons">Comparisons</button>
+          <button type="button" data-view="prompts">Prompts</button>
+          <button type="button" data-view="health">Health</button>
+        </nav>
+        <label class="search-field">
+          <span>Search</span>
+          <input id="search-input" type="search" placeholder="title, model, skill, tag" />
+        </label>
       </header>
 
-      <section class="index-grid" id="prototype-grid" aria-label="Prototype cards"></section>
+      <section class="summary-strip" id="summary-strip" aria-label="Workspace summary"></section>
+
+      <section class="workspace-stage">
+        <section class="workspace-view library-view" data-view="library">
+          <header class="view-toolbar">
+            <div><span class="eyebrow">Artifacts</span><h2>Prototype library</h2></div>
+            <label class="select-field"><span>Group</span><select id="group-select"><option value="day">Day</option><option value="month">Month</option><option value="year">Year</option><option value="none">None</option></select></label>
+          </header>
+          <div class="scroll-region artifact-groups" id="artifact-groups"></div>
+        </section>
+
+        <section class="workspace-view comparison-view" data-view="comparisons">
+          <aside class="hub-list-panel">
+            <header><span class="eyebrow">Experiments</span><h2>Comparison hubs</h2></header>
+            <div class="hub-list" id="hub-list"></div>
+          </aside>
+          <section class="hub-detail" id="hub-detail"></section>
+        </section>
+
+        <section class="workspace-view prompts-view" data-view="prompts">
+          <header class="view-toolbar"><div><span class="eyebrow">Reusable inputs</span><h2>Prompt library</h2></div><a href="./prompts/catalog.json">Open catalog JSON</a></header>
+          <div class="scroll-region prompt-grid" id="prompt-grid"></div>
+        </section>
+
+        <section class="workspace-view health-view" data-view="health">
+          <section class="health-list-panel">
+            <header><span class="eyebrow">Readiness</span><h2>Workspace issues</h2></header>
+            <div class="health-list" id="health-list"></div>
+          </section>
+          <aside class="command-panel">
+            <span class="eyebrow">One workflow</span>
+            <h2>Lab commands</h2>
+            <div id="command-list"></div>
+            <p>Generated hub files are disposable. Edit <code>hub.config.json</code>, then run the Sync command shown above.</p>
+          </aside>
+        </section>
+      </section>
     </main>
-
-    <template id="prototype-card-template">
-      <article class="prototype-card">
-        <a class="preview-link">
-          <span class="preview-frame">
-            <iframe title="" loading="lazy"></iframe>
-          </span>
-        </a>
-        <div class="card-body">
-          <div class="card-title-row">
-            <div>
-              <p class="index-kicker card-category"></p>
-              <h2></h2>
-            </div>
-            <span class="status-pill"></span>
-          </div>
-          <p class="card-question"></p>
-          <div class="card-meta" aria-label="Prototype metadata"></div>
-          <div class="tag-row"></div>
-          <div class="card-foot">
-            <span class="card-date"></span>
-            <span class="card-path"></span>
-          </div>
-        </div>
-      </article>
-    </template>
-
     <script src="./prototype-index-data.js"></script>
     <script defer src="./prototype-index.js"></script>
   </body>

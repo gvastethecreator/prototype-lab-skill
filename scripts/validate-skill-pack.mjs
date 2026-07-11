@@ -14,13 +14,21 @@ const requiredFiles = [
   "SKILLS/prototype-lab/assets/prototype-shell/index.html",
   "SKILLS/prototype-lab/assets/prototype-shell/styles.css",
   "SKILLS/prototype-lab/assets/prototype-shell/app.js",
+  "SKILLS/prototype-lab/assets/prototype-shell/artifact-data.js",
   "SKILLS/prototype-lab/assets/prototype-index/README.md",
   "SKILLS/prototype-lab/assets/prototype-index/index.html",
   "SKILLS/prototype-lab/assets/prototype-index/prototype-index.css",
   "SKILLS/prototype-lab/assets/prototype-index/prototype-index.js",
+  "SKILLS/prototype-lab/assets/comparison-hub/index.html",
+  "SKILLS/prototype-lab/assets/comparison-hub/hub.css",
+  "SKILLS/prototype-lab/assets/comparison-hub/hub.js",
+  "SKILLS/prototype-lab/assets/comparison-hub/hub-data.js",
   "SKILLS/prototype-lab/assets/portable-lab/prompt.template.md",
   "SKILLS/prototype-lab/assets/portable-lab/prompt.vars.json",
   "SKILLS/prototype-lab/assets/portable-lab/run-receipt.json",
+  "SKILLS/prototype-lab/assets/prompt-library/README.md",
+  "SKILLS/prototype-lab/assets/prompt-library/prompt-meta.json",
+  "SKILLS/prototype-lab/assets/prompt-library/creative-test-suite.json",
   "SKILLS/prototype-lab/references/product-design-loop.md",
   "SKILLS/prototype-lab/references/quality-bar.md",
   "SKILLS/prototype-lab/references/taste-calibration.md",
@@ -28,12 +36,18 @@ const requiredFiles = [
   "SKILLS/prototype-lab/references/agent-isolation.md",
   "SKILLS/prototype-lab/references/prompt-templates.md",
   "SKILLS/prototype-lab/references/portable-run-pack.md",
+  "SKILLS/prototype-lab/references/workspace-and-hub.md",
   "SKILLS/prototype-lab/scripts/render-prompt-template.mjs",
   "SKILLS/prototype-lab/scripts/package-prototype-lab.mjs",
   "SKILLS/prototype-lab/scripts/reorganize-prototype-library.mjs",
   "SKILLS/prototype-lab/scripts/package-comparison-hubs.mjs",
+  "SKILLS/prototype-lab/scripts/manage-prompt-library.mjs",
+  "SKILLS/prototype-lab/scripts/manage-prototype-lab.mjs",
+  "SKILLS/prototype-lab/scripts/build-prototype-index.mjs",
   "scripts/reorganize-prototype-library.mjs",
   "scripts/package-comparison-hubs.mjs",
+  "scripts/manage-prompt-library.mjs",
+  "scripts/manage-prototype-lab.mjs",
   "scripts/test-portable-tools.mjs",
   "assets/readme-banner.png",
 ];
@@ -51,6 +65,7 @@ async function main() {
   await checkNoLinkedSkillFolders();
   await checkSkillFrontmatter();
   await checkMetadataJson();
+  await checkPromptLibraryAssets();
   await checkPublicDocs();
   await checkLocalPathLeaks();
 
@@ -97,7 +112,7 @@ async function checkSkillFrontmatter() {
   if (!/^description:\s*".+"/m.test(frontmatter)) {
     errors.push("SKILL.md frontmatter needs a quoted description");
   }
-  if (!content.includes("prototypes/<YYYY>/<MM>/<NNN>-<prototype-slug>/")) {
+  if (!/prototypes\/<YYYY>\/<MM>\/<NNN>-<(?:prototype-)?slug>\//.test(content)) {
     errors.push("SKILL.md missing canonical chronological layout contract");
   }
   if (!content.includes("metadata.json")) {
@@ -115,6 +130,12 @@ async function checkSkillFrontmatter() {
   if (!content.includes("scripts/package-prototype-lab.mjs")) {
     errors.push("SKILL.md missing portable package command");
   }
+  if (!content.includes("scripts/manage-prototype-lab.mjs") || !content.includes("hub.config.json")) {
+    errors.push("SKILL.md missing unified workspace and managed hub contract");
+  }
+  if (!content.includes("prototypes/prompts/") || !content.includes("scripts/manage-prompt-library.mjs")) {
+    errors.push("SKILL.md missing workspace prompt library contract");
+  }
   if (!/ChatGPT Sites/i.test(content)) {
     errors.push("SKILL.md missing ChatGPT Sites publication handoff");
   }
@@ -129,6 +150,27 @@ async function checkSkillFrontmatter() {
   }
 }
 
+async function checkPromptLibraryAssets() {
+  const suiteFile = path.join(root, "SKILLS", "prototype-lab", "assets", "prompt-library", "creative-test-suite.json");
+  const suite = JSON.parse(await readText(suiteFile));
+  if (!Array.isArray(suite.prompts) || suite.prompts.length !== 8) {
+    errors.push("creative prompt suite must contain exactly 8 prompts");
+    return;
+  }
+  const ids = new Set();
+  for (const prompt of suite.prompts) {
+    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(prompt.id || "")) errors.push(`invalid creative prompt id: ${prompt.id ?? "missing"}`);
+    if (ids.has(prompt.id)) errors.push(`duplicate creative prompt id: ${prompt.id}`);
+    ids.add(prompt.id);
+    for (const key of ["title", "category", "difficulty", "challenge"]) {
+      if (!prompt[key] || typeof prompt[key] !== "string") errors.push(`creative prompt ${prompt.id} missing ${key}`);
+    }
+    for (const key of ["requiredBehaviors", "testDimensions", "targetViewports"]) {
+      if (!Array.isArray(prompt[key]) || prompt[key].length < 4) errors.push(`creative prompt ${prompt.id} needs at least 4 ${key}`);
+    }
+  }
+}
+
 async function checkMetadataJson() {
   const file = path.join(root, "SKILLS", "prototype-lab", "assets", "prototype-shell", "metadata.json");
   const raw = await readText(file);
@@ -139,7 +181,7 @@ async function checkMetadataJson() {
     errors.push(`metadata.json invalid JSON: ${error.message}`);
     return;
   }
-  for (const key of ["schemaVersion", "artifactKind", "entrypoint", "id", "month", "number", "slug", "title", "category", "status", "date", "mode", "question", "details", "comparisonMethods", "promptTemplates", "runs", "provenance", "variants", "packaging"]) {
+  for (const key of ["schemaVersion", "artifactKind", "entrypoint", "id", "title", "status", "date", "mode", "question", "model", "modelExact", "promptTemplates", "runs", "views", "proof", "runtimeLayout", "provenance", "packaging"]) {
     if (!(key in parsed)) errors.push(`metadata.json missing key: ${key}`);
   }
   if (!Array.isArray(parsed.promptTemplates)) {
@@ -154,28 +196,8 @@ async function checkMetadataJson() {
   if (!parsed.packaging?.defaultProofPolicy) {
     errors.push("metadata.json packaging missing defaultProofPolicy");
   }
-  if (!Array.isArray(parsed.provenance?.agentRuns)) {
-    errors.push("metadata.json provenance missing agentRuns array");
-  }
-  if (!parsed.provenance?.integrity) {
-    errors.push("metadata.json provenance missing integrity contract");
-  }
-  if (!("crossVariantLeakage" in (parsed.provenance?.integrity ?? {}))) {
-    errors.push("metadata.json integrity missing crossVariantLeakage");
-  }
-  for (const run of parsed.provenance?.agentRuns ?? []) {
-    for (const key of ["inputScope", "receivedOtherVariants", "editedFinalPrototype"]) {
-      if (!(key in run)) errors.push(`metadata.json agentRun missing ${key}: ${run.variantId ?? "unknown"}`);
-    }
-    if (!("fallbackReason" in run)) {
-      errors.push(`metadata.json agentRun missing fallbackReason: ${run.variantId ?? "unknown"}`);
-    }
-  }
-  for (const variant of parsed.variants ?? []) {
-    if (!("fallbackReason" in variant)) {
-      errors.push(`metadata.json variant missing fallbackReason: ${variant.id ?? "unknown"}`);
-    }
-  }
+  if (parsed.artifactKind !== "prototype" || parsed.mode !== "single") errors.push("prototype shell metadata must describe one standalone artifact");
+  if (!Array.isArray(parsed.provenance?.skills) || !Array.isArray(parsed.provenance?.models)) errors.push("metadata.json provenance missing skills/models arrays");
 }
 
 async function checkPublicDocs() {

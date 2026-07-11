@@ -3,6 +3,43 @@
 Use this contract when prompts will be repeated, compared across models or
 skills, tuned over time, or shared with another reviewer.
 
+## Workspace Prompt Library
+
+Keep reusable test prompts in `prototypes/prompts/`, separate from chronological
+prototype folders:
+
+```text
+prototypes/prompts/
+  README.md
+  catalog.json
+  <prompt-id>/
+    prompt.json
+    v001/
+      prompt.template.md
+      prompt.vars.json
+      prompt.rendered.md
+```
+
+Run `scripts/manage-prompt-library.mjs init` to create the library, `seed` to
+install the bundled creative evaluation suite, `save --meta <json> --template
+<md> [--vars <json>]` to persist a user- or agent-authored prompt, and `catalog`
+to rebuild the index. Resolve the script relative to this skill folder.
+Use `pick --count 4` for a deterministic, category-diverse subset; add
+`--difficulty` or `--category` only for a deliberately narrower benchmark.
+
+Default to saving prompts created for model/skill/agent tests. Skip automatic
+storage when the user marks a prompt ephemeral or when it contains secrets,
+customer data, or other material that should not become reusable. Saving creates
+a new immutable version; it never overwrites an executed prompt.
+The manager rejects local absolute paths and obvious secret/private-key shapes;
+use portable placeholders and relative paths in reusable prompts.
+
+When an agent invents a test prompt, require a stable id, title, category,
+difficulty, one-sentence challenge, required behaviors, test dimensions, and
+target viewports. Use the creative starter suite when the user wants broad model
+coverage without supplying a prompt. Copy the selected rendered version into
+the experiment owner folder and record the library id/version/hash in receipts.
+
 ## Artifact Set
 
 Keep these files in the experiment owner folder. For a single prototype that is

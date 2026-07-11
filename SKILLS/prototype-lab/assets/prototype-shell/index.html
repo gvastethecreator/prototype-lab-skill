@@ -3,115 +3,60 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Prototype Comparison Shell</title>
+    <title>Prototype artifact</title>
+    <link rel="icon" href="data:," />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <svg class="icon-sprite" aria-hidden="true" focusable="false">
-      <symbol id="ti-refresh" viewBox="0 0 24 24">
-        <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" />
-        <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" />
-      </symbol>
-      <symbol id="ti-clipboard" viewBox="0 0 24 24">
-        <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" />
-        <path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" />
-      </symbol>
-      <symbol id="ti-panel" viewBox="0 0 24 24">
-        <path d="M4 4h16v16h-16z" />
-        <path d="M15 4v16" />
-      </symbol>
-      <symbol id="ti-sliders" viewBox="0 0 24 24">
-        <path d="M4 21v-7" />
-        <path d="M4 10v-7" />
-        <path d="M12 21v-9" />
-        <path d="M12 8v-5" />
-        <path d="M20 21v-5" />
-        <path d="M20 12v-9" />
-        <path d="M1 14h6" />
-        <path d="M9 8h6" />
-        <path d="M17 16h6" />
-      </symbol>
-      <symbol id="ti-x" viewBox="0 0 24 24">
-        <path d="M18 6l-12 12" />
-        <path d="M6 6l12 12" />
-      </symbol>
-    </svg>
-
-    <div class="plab-shell" data-drawer="closed">
-      <header class="plab-topbar">
-        <div class="plab-title-wrap">
-          <p class="plab-kicker">Prototype</p>
-          <h1 class="plab-title" id="prototype-title">Prototype Comparison Shell</h1>
+    <main class="artifact-shell">
+      <header class="artifact-topbar">
+        <div class="artifact-brand">
+          <span class="eyebrow">Standalone artifact</span>
+          <h1 id="artifact-title">Prototype artifact</h1>
         </div>
-        <nav class="plab-nav" id="view-nav" aria-label="Prototype views"></nav>
-        <div class="plab-actions" aria-label="Prototype actions">
-          <span class="plab-status" id="status-chip">Ready</span>
-          <button class="plab-button" type="button" data-action="reset" title="Reset">
-            <svg class="plab-icon" aria-hidden="true" focusable="false"><use href="#ti-refresh" /></svg>
-            <span>Reset</span>
-          </button>
-          <button class="plab-button" type="button" data-action="snapshot" title="Copy state">
-            <svg class="plab-icon" aria-hidden="true" focusable="false"><use href="#ti-clipboard" /></svg>
-            <span>Copy</span>
-          </button>
-          <button class="plab-button" type="button" data-action="drawer" aria-expanded="false" aria-controls="prototype-drawer" title="Controls">
-            <svg class="plab-icon" aria-hidden="true" focusable="false"><use href="#ti-panel" /></svg>
-            <span>Panel</span>
-          </button>
+        <nav id="artifact-nav" aria-label="Artifact scaffold views"></nav>
+        <div class="artifact-actions">
+          <span class="status" id="artifact-status">draft</span>
+          <button type="button" id="reset-button">Reset</button>
         </div>
       </header>
 
-      <main class="plab-stage" id="stage" tabindex="-1">
-        <section class="plab-content" aria-live="polite">
-          <p class="plab-kicker" id="active-kicker">View</p>
-          <h2 id="active-title">Overview</h2>
-          <p id="active-description">Replace this shell with the prototype goal and primary interaction.</p>
-          <div class="demo-grid" id="demo-grid"></div>
-        </section>
-      </main>
-
-      <button class="plab-backdrop" type="button" data-action="drawer-close" tabindex="-1" aria-hidden="true"></button>
-
-      <aside class="plab-drawer" id="prototype-drawer" aria-label="Prototype controls" aria-hidden="true">
-        <div class="plab-drawer-head">
-          <p class="plab-panel-title">
-            <svg class="plab-icon" aria-hidden="true" focusable="false"><use href="#ti-sliders" /></svg>
-            <span>Controls</span>
-          </p>
-          <button class="plab-icon-button" type="button" data-action="drawer-close" title="Close panel">
-            <svg class="plab-icon" aria-hidden="true" focusable="false"><use href="#ti-x" /></svg>
-            <span class="sr-only">Close panel</span>
-          </button>
-        </div>
-
-        <section class="plab-drawer-section">
-          <p class="plab-panel-title">Variants</p>
-          <div class="variant-picker" id="variant-control" aria-label="Variant selector"></div>
+      <section class="artifact-stage" id="artifact-stage" tabindex="-1">
+        <section class="artifact-view" data-view="canvas" id="view-canvas">
+          <article class="canvas-surface">
+            <span class="eyebrow">Build target</span>
+            <h2>Replace this canvas with the real product surface.</h2>
+            <p>The artifact folder already owns its runtime, metadata, frozen prompts, run receipts, and proof. Keep the final experience independently runnable here.</p>
+            <div class="starter-flow" aria-label="Starter interaction">
+              <div><span>01</span><strong>Primary path</strong><small>One decision-oriented user flow.</small></div>
+              <div><span>02</span><strong>Visible feedback</strong><small>Every control changes real state.</small></div>
+              <div><span>03</span><strong>Proofable result</strong><small>A state worth comparing or sharing.</small></div>
+            </div>
+            <button class="primary-action" type="button" id="demo-action">Exercise starter state</button>
+          </article>
         </section>
 
-        <section class="plab-drawer-section">
-          <label class="plab-control-row">
-            <span>Density</span>
-            <input id="density-control" type="range" min="0" max="2" step="1" value="1" />
-          </label>
-          <label class="plab-control-row">
-            <span>Debug overlay</span>
-            <input id="debug-control" type="checkbox" />
-          </label>
+        <section class="artifact-view" data-view="states" id="view-states">
+          <header class="view-heading"><span class="eyebrow">State checklist</span><h2>Design the non-happy paths before proof.</h2></header>
+          <div class="state-grid" id="state-grid"></div>
         </section>
 
-        <section class="plab-drawer-section">
-          <p class="plab-panel-title">Provenance</p>
-          <div class="provenance-panel" id="provenance-panel"></div>
+        <section class="artifact-view" data-view="brief" id="view-brief">
+          <article class="brief-panel">
+            <span class="eyebrow">Decision question</span>
+            <h2 id="artifact-question"></h2>
+            <div class="brief-grid">
+              <div><span>ID</span><strong id="artifact-id"></strong></div>
+              <div><span>Model</span><strong id="artifact-model"></strong></div>
+              <div><span>Prompt</span><strong id="artifact-prompt"></strong></div>
+              <div><span>Proof</span><strong>proof/</strong></div>
+            </div>
+            <p>Edit <code>metadata.json</code> with factual attribution and add screenshots/browser evidence before changing the status to active.</p>
+          </article>
         </section>
-
-        <section class="plab-drawer-section">
-          <p class="plab-panel-title">State</p>
-          <pre class="plab-state-readout" id="state-readout">{}</pre>
-        </section>
-      </aside>
-    </div>
-
+      </section>
+    </main>
+    <script src="./artifact-data.js"></script>
     <script defer src="./app.js"></script>
   </body>
 </html>

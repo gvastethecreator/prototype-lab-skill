@@ -2,106 +2,30 @@
   "schemaVersion": 2,
   "artifactKind": "prototype",
   "entrypoint": "index.html",
-  "id": "2026/07/001-prototype-name",
-  "month": "2026-07",
-  "number": 1,
-  "slug": "prototype-name",
-  "title": "Prototype Name",
-  "category": "workflow-tools",
-  "status": "active",
-  "date": "2026-07-08",
-  "mode": "comparison",
-  "model": "GPT-5",
-  "modelExact": "GPT-5, runtime default",
-  "modelSettings": "not captured",
-  "tags": ["browser-ui", "comparison-lab"],
-  "question": "What are we trying to learn?",
-  "sourcePrompt": "Replace with the shared prompt every variant answers.",
-  "comparisonCriteria": ["fit", "clarity", "interaction", "taste"],
-  "comparisonMethods": ["gallery", "compare", "focus", "stress"],
-  "variantStrategy": "model comparison | skill comparison | prompt comparison | design options",
+  "id": "YYYY/MM/NNN-prototype",
+  "title": "Prototype artifact",
+  "question": "What should this prototype help decide?",
+  "status": "draft",
+  "date": "YYYY-MM-DD",
+  "mode": "single",
+  "model": "unknown",
+  "modelExact": "unknown",
+  "tags": ["browser-ui"],
   "promptTemplates": [],
   "runs": [],
-  "infoDrawerRequired": true,
-  "provenance": {
-    "prompts": [
-      {
-        "id": "shared",
-        "label": "Shared prompt",
-        "text": "Replace with the shared prompt every variant answers."
-      }
-    ],
-    "skills": ["prototype-lab"],
-    "models": ["GPT-5"],
-    "integrity": {
-      "requestedVariants": 4,
-      "deliveredVariants": 4,
-      "crossVariantLeakage": false,
-      "workerReceiptsRequired": false
-    },
-    "agentRuns": [
-      {
-        "variantId": "baseline",
-        "agentMode": "single-agent-fallback",
-        "agentTool": "not captured",
-        "outputPath": "not captured",
-        "fallbackReason": "not captured",
-        "inputScope": "shared brief only",
-        "receivedOtherVariants": false,
-        "editedFinalPrototype": false,
-        "status": "actual"
-      }
-    ],
-    "tokenUsage": {
-      "input": "unknown",
-      "output": "unknown",
-      "total": "unknown"
-    },
-    "toolCalls": ["not captured"],
-    "limitations": ["Replace unknown usage values only when the run captured them."]
-  },
-  "details": "What changed, why it exists, and what should be reviewed.",
-  "views": ["overview", "compare", "focus", "stress"],
-  "variants": [
-    {
-      "id": "baseline",
-      "title": "Baseline",
-      "model": "GPT-5",
-      "modelExact": "GPT-5, runtime default",
-      "skill": "prototype-lab",
-      "status": "actual",
-      "agentMode": "single-agent-fallback",
-      "agentTool": "not captured",
-      "outputPath": "not captured",
-      "fallbackReason": "not captured",
-      "prompt": "shared",
-      "tokens": "unknown",
-      "toolCalls": "not captured",
-      "hypothesis": "Keep the primary path clear and compact.",
-      "tradeoff": "May be less exploratory than the other options."
-    },
-    {
-      "id": "skill-a",
-      "title": "Skill A",
-      "model": "requested-or-current",
-      "modelExact": "requested-or-current, settings not captured",
-      "skill": "requested-skill",
-      "status": "planned",
-      "agentMode": "unavailable",
-      "agentTool": "not captured",
-      "outputPath": "not captured",
-      "fallbackReason": "worker not yet assigned",
-      "prompt": "shared",
-      "tokens": "unknown",
-      "toolCalls": "not captured",
-      "hypothesis": "Test whether a specialized workflow changes hierarchy.",
-      "tradeoff": "Needs real skill execution before final attribution."
-    }
-  ],
+  "views": ["prototype"],
   "proof": [],
+  "runtimeLayout": "split",
+  "provenance": {
+    "skills": ["prototype-lab"],
+    "models": ["unknown"],
+    "tokenUsage": { "input": "unknown", "output": "unknown", "total": "unknown" },
+    "toolCalls": "not captured",
+    "limitations": []
+  },
   "packaging": {
     "primary": true,
-    "includeLinkedPrototypes": true,
+    "includeLinkedPrototypes": false,
     "defaultProofPolicy": "omit"
   }
 }

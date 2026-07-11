@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Prototype comparison</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="./hub.css" />
+  </head>
+  <body>
+    <main class="hub-shell">
+      <header class="hub-topbar">
+        <div class="hub-brand">
+          <span class="eyebrow">Prototype Lab / managed hub</span>
+          <h1 id="hub-title">Prototype comparison</h1>
+        </div>
+        <nav id="hub-nav" aria-label="Comparison views"></nav>
+        <a class="library-link" href="../../../index.html">Library hub</a>
+      </header>
+
+      <section class="hub-context">
+        <p id="hub-question"></p>
+        <div id="hub-summary"></div>
+      </section>
+
+      <section class="hub-stage">
+        <section class="hub-view" id="view-overview" data-view="overview"></section>
+        <section class="hub-view" id="view-compare" data-view="compare"></section>
+        <section class="hub-view" id="view-focus" data-view="focus"></section>
+        <section class="hub-view" id="view-provenance" data-view="provenance"></section>
+      </section>
+    </main>
+    <script src="./hub-data.js"></script>
+    <script defer src="./hub.js"></script>
+  </body>
+</html>

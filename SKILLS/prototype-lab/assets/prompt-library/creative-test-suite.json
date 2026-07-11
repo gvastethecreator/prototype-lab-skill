@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "suiteId": "creative-model-evaluation-v1",
+  "title": "Creative Model Evaluation",
+  "description": "Eight self-contained browser prototype prompts that exercise different model capabilities without external APIs or assets.",
+  "prompts": [
+    {
+      "id": "midnight-dispatch-board",
+      "title": "Midnight Dispatch Board",
+      "category": "dense-workflow-ui",
+      "difficulty": "intermediate",
+      "challenge": "Build a dense fictional emergency-dispatch workspace where operators triage, assign, and close local incidents without any external data source.",
+      "requiredBehaviors": ["Filter and sort a deterministic incident queue", "Multi-select rows and apply a bulk status change", "Open an incident detail drawer without losing queue context", "Edit priority and assignee inline with clear confirmation", "Support keyboard shortcuts plus undo for the last mutation"],
+      "testDimensions": ["Information density without visual overload", "Interaction feedback and mutation clarity", "Panel hierarchy and stable alignment", "Keyboard and pointer parity", "Overflow and wrapping at narrow widths"],
+      "targetViewports": ["1920x1080", "1200x820", "834x1112", "390x844"]
+    },
+    {
+      "id": "four-frames-one-memory",
+      "title": "Four Frames, One Memory",
+      "category": "visual-storytelling",
+      "difficulty": "starter",
+      "challenge": "Create a tiny storyboard editor that turns four short local prompts into a coherent visual sequence using only inline SVG or CSS-built shapes.",
+      "requiredBehaviors": ["Reorder four scene cards with drag and drop", "Select a scene and edit its caption and mood", "Render each scene with a distinct deterministic abstract composition", "Play the sequence as an interruptible timed story", "Reset to the supplied starter storyboard"],
+      "testDimensions": ["Narrative pacing and visual continuity", "Composition and contrast", "Drag affordances and selection state", "Motion timing with pause and reduced-motion fallback", "Typography fit for short and long captions"],
+      "targetViewports": ["1920x1080", "1200x820", "834x1112", "390x844"]
+    },
+    {
+      "id": "tidepool-logic-map",
+      "title": "Tidepool Logic Map",
+      "category": "spatial-diagram-reasoning",
+      "difficulty": "advanced",
+      "challenge": "Design an SVG map puzzle where a player routes water from a spring through habitat nodes while avoiding blocked rocks and satisfying every marked requirement.",
+      "requiredBehaviors": ["Pan and zoom the diagram without losing the current selection", "Drag nodes with snap-to-grid feedback", "Draw, remove, and visually label connections", "Highlight the active source-to-habitat path", "Validate the graph and explain each unmet requirement", "Provide a deterministic reset puzzle"],
+      "testDimensions": ["Spatial hit testing and connector precision", "Graph-state reasoning and validation", "Pan/zoom affordances and orientation", "Visual layering of nodes, edges, and hazards", "Touch targets at phone width"],
+      "targetViewports": ["1920x1080", "1200x820", "834x1112", "390x844"]
+    },
+    {
+      "id": "greenhouse-at-dusk",
+      "title": "Greenhouse at Dusk",
+      "category": "stateful-interaction",
+      "difficulty": "intermediate",
+      "challenge": "Build a self-contained terrarium simulator in which daily light, water, and temperature choices change plant health over time and persist locally.",
+      "requiredBehaviors": ["Advance a day and apply deterministic resource effects", "Show health, moisture, and growth changes immediately", "Offer one-step undo and a full restart", "Persist progress through a page refresh with localStorage", "Surface a readable consequence log for each action"],
+      "testDimensions": ["State-machine correctness", "Persistence and refresh recovery", "Causal feedback and progress legibility", "Undo/reset safety", "Long-label layout stability"],
+      "targetViewports": ["1920x1080", "1200x820", "834x1112", "390x844"]
+    },
+    {
+      "id": "keyline-cartography",
+      "title": "Keyline Cartography",
+      "category": "accessibility-keyboard",
+      "difficulty": "intermediate",
+      "challenge": "Create a keyboard-first map editor where every tile, tool, and result can be completed without a pointer and all status changes are announced semantically.",
+      "requiredBehaviors": ["Navigate a tile grid with arrow keys and roving focus", "Use visible shortcuts to place, erase, and inspect markers", "Trap and restore focus in the tool palette dialog", "Announce selection, errors, and completion in a live region", "Respect prefers-reduced-motion and preserve focus after rerenders", "Expose meaningful accessible names and descriptions"],
+      "testDimensions": ["Keyboard reachability and focus order", "Screen-reader semantics and live feedback", "Focus visibility against themed surfaces", "Pointer/keyboard parity", "Reduced-motion and zoom resilience"],
+      "targetViewports": ["1920x1080", "1200x820", "834x1112", "390x844"]
+    },
+    {
+      "id": "pocket-planetarium",
+      "title": "Pocket Planetarium",
+      "category": "responsive-layout",
+      "difficulty": "starter",
+      "challenge": "Build an interactive constellation postcard that reflows from a roomy desktop composition to a one-column phone layout while keeping the same core controls usable.",
+      "requiredBehaviors": ["Toggle between three deterministic constellation stories", "Select a star to reveal its local legend", "Resize or reorient the constellation view responsively", "Keep controls reachable in both wide and narrow layouts", "Provide a compact mobile summary instead of horizontal overflow"],
+      "testDimensions": ["Responsive hierarchy and reflow", "Aspect-ratio preservation", "Touch target sizing", "Text wrapping and truncation", "Visual continuity across breakpoints"],
+      "targetViewports": ["1920x1080", "1200x820", "834x1112", "390x844"]
+    },
+    {
+      "id": "archive-of-unsent-letters",
+      "title": "Archive of Unsent Letters",
+      "category": "error-loading-empty-states",
+      "difficulty": "intermediate",
+      "challenge": "Make a local letter archive that deliberately cycles through loading, populated, empty-search, and recoverable-error states without any network request.",
+      "requiredBehaviors": ["Show a deterministic loading skeleton before content appears", "Search into a populated archive and an explicit empty result state", "Simulate a failed collection with retry and error explanation", "Preserve the query and selected letter across state transitions", "Offer a clear reset that returns to the initial archive"],
+      "testDimensions": ["State completeness and transition clarity", "Error copy and recovery affordances", "Skeleton-to-content layout stability", "Empty-state usefulness", "Race-safe interaction feedback"],
+      "targetViewports": ["1920x1080", "1200x820", "834x1112", "390x844"]
+    },
+    {
+      "id": "lantern-run",
+      "title": "Lantern Run",
+      "category": "playful-game-like",
+      "difficulty": "advanced",
+      "challenge": "Create a tiny deterministic canvas or DOM game where a firefly collects drifting lanterns, avoids shadow gaps, and can be played with keyboard or touch.",
+      "requiredBehaviors": ["Move the player with arrow keys and touch controls", "Animate collectible and hazard motion without external assets", "Track score, remaining time, pause, and restart", "Show distinct ready, playing, win, and lose states", "Keep gameplay playable with reduced motion enabled", "Persist the best score only for the current browser"],
+      "testDimensions": ["Game feel and input latency", "Collision fairness and determinism", "HUD legibility during motion", "Pause/resume and terminal-state clarity", "Responsive canvas scaling and touch ergonomics"],
+      "targetViewports": ["1920x1080", "1200x820", "834x1112", "390x844"]
+    }
+  ]
+}

@@ -1,4 +1,4 @@
 interface:
   display_name: "Prototype Lab"
-  short_description: "Build, compare, and package portable UI labs."
-  default_prompt: "Use $prototype-lab to create a self-contained browser prototype, preserve reusable prompts and run receipts, compare isolated variants when requested, verify it visually, and package it as a portable static ZIP pack."
+  short_description: "Manage portable prototype workspaces and hubs."
+  default_prompt: "Use $prototype-lab to create a standalone artifact, add a managed comparison hub when needed, sync workspace health, verify it, and package the ready result."

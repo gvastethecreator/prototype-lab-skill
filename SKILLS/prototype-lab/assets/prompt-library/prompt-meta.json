@@ -1,0 +1,13 @@
+{
+  "id": "REQUIRED-prompt-id",
+  "title": "REQUIRED-title",
+  "category": "creative-ui",
+  "difficulty": "intermediate",
+  "origin": "agent-generated",
+  "status": "active",
+  "challenge": "REQUIRED-one-sentence-challenge",
+  "tags": ["browser-ui"],
+  "requiredBehaviors": ["REQUIRED-behavior"],
+  "testDimensions": ["REQUIRED-dimension"],
+  "targetViewports": ["1920x1080", "1200x820", "834x1112", "390x844"]
+}
