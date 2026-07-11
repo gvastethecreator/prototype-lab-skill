@@ -499,12 +499,15 @@ function sanitizePortableString(value) {
   const patterns = [
     /file:\/\/\/[A-Za-z]:\/[^\s"'<>`]*/gi,
     /\b[A-Za-z]:\\[^\s"'<>`]*/g,
-    /\b[A-Za-z]:\/[^\s"'<>`]*/g
+    /\b[A-Za-z]:\/[^\s"'<>`]*/g,
+    /(^|[\s("'`])\/(?:home|Users|tmp|var|private|etc|usr|opt|workspace|work|project)\/[^\s"'<>`]*/gm
   ];
   for (const pattern of patterns) {
-    text = text.replace(pattern, (token) => {
+    text = text.replace(pattern, (token, prefix = "") => {
       replacements += 1;
-      return portablePathToken(token);
+      const leading = typeof prefix === "string" ? prefix : "";
+      const value = leading && token.startsWith(leading) ? token.slice(leading.length) : token;
+      return `${leading}${portablePathToken(value)}`;
     });
   }
   return { text, replacements };
@@ -521,12 +524,16 @@ function portablePathToken(token) {
   if (normalized.toLowerCase().startsWith(`${workspaceNormalized.toLowerCase()}/`)) {
     return `${normalized.slice(workspaceNormalized.length + 1)}${suffix}`;
   }
-  const basename = path.win32.basename(core) || path.posix.basename(normalized) || "artifact";
+  const basename = normalized.startsWith("/")
+    ? path.posix.basename(normalized)
+    : path.win32.basename(core) || path.posix.basename(normalized);
   return `<local-path>/${basename}${suffix}`;
 }
 
 function hasLocalPath(value) {
-  return /file:\/\/\/[A-Za-z]:\//i.test(value) || /\b[A-Za-z]:[\\/]/.test(value);
+  return /file:\/\/\/[A-Za-z]:\//i.test(value)
+    || /\b[A-Za-z]:[\\/]/.test(value)
+    || /(^|[\s("'`])\/(?:home|Users|tmp|var|private|etc|usr|opt|workspace|work|project)\//m.test(value);
 }
 
 async function listFiles(root, current = root, output = []) {
