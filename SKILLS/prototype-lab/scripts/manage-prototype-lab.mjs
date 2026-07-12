@@ -268,6 +268,16 @@ async function reviewExperimentPreflight() {
     const buildInputManifest = buildStageInputManifest(manifest, variant, card);
     await writeJson(path.join(root, variant.id, "build-input-manifest.json"), buildInputManifest);
     variant.buildInputManifestSha256 = sha256(jsonText(buildInputManifest));
+    await writeJson(
+      path.join(root, variant.id, "build-dispatch.template.json"),
+      buildDispatchTemplate(manifest, variant, variant.buildAssignmentSha256, variant.buildInputManifestSha256)
+    );
+    await writeJson(
+      path.join(root, variant.id, "run-receipt.template.json"),
+      benchmarkReceiptTemplate(manifest, variant, variant.buildAssignmentSha256, variant.buildInputManifestSha256)
+    );
+    variant.buildDispatch = `${variant.id}/build-dispatch.json`;
+    variant.receiptTemplate = `${variant.id}/run-receipt.template.json`;
   }
   manifest.status = "build-authorized";
   manifest.reviewedAt = new Date().toISOString();
@@ -285,7 +295,10 @@ async function reviewExperimentPreflight() {
       path: variant.buildAssignment,
       sha256: variant.buildAssignmentSha256,
       inputManifest: variant.buildInputManifest,
-      inputManifestSha256: variant.buildInputManifestSha256
+      inputManifestSha256: variant.buildInputManifestSha256,
+      dispatchTemplate: `${variant.id}/build-dispatch.template.json`,
+      dispatch: variant.buildDispatch,
+      receiptTemplate: variant.receiptTemplate
     }))
   };
 }
@@ -694,7 +707,7 @@ function buildAssignmentText(manifest, variant, card) {
     : manifest.assetPolicy.mode === "fixed-supplied"
       ? `Use the fixed shared ${manifest.assetPolicy.skill} outputs exactly as supplied. Copy them into the prototype, consume them visibly, preserve their SHA-256 values, and do not replace or regenerate them.`
       : `Asset policy: ${manifest.assetPolicy.mode}.`;
-  return `# ${manifest.title} — authorized build\n\nBuild only this variant in a fresh isolated worker with \`fork_turns: \"none\"\`. Do not read workspace memory, Prototype Lab design guidance, another variant, or review rankings.\n\n## Shared brief\n\n${manifest.sharedBrief}\n\n## Fixed outcomes\n\n${bullets(manifest.fixedOutcomes)}\n\n## Approved direction\n\n\`\`\`json\n${JSON.stringify(card.selectedDirection, null, 2)}\n\`\`\`\n\n## Variant\n\n- id: ${variant.id}\n- requested model: ${variant.model}\n- reasoning: ${variant.reasoning}\n- condition: ${variant.condition}\n- variant skills: ${variant.skills.join(", ") || "none"}\n- shared brief SHA-256: ${manifest.sharedBriefSha256}\n- direction assignment SHA-256: ${variant.assignmentSha256}\n\n## Build contract\n\n- ${assetText}\n- Keep runtime files and assets local and portable.\n- Follow layout policy ${manifest.layoutPolicy}; page scrolling is valid unless this policy forbids it.\n- Support the approved direction at ${manifest.targetViewports.join(", ")}.\n- Add only states required by the experience. Every visible control must work.\n- Preserve the selected direction. Do not normalize it toward a lab shell.\n- Return a canonical run receipt with worker id, requested/effective model when visible, reasoning, fork mode, assignment hash, skill/reference reads, memory inputs, asset manifest, output hashes, proof, and limitations.\n`;
+  return `# ${manifest.title} — authorized build\n\nBuild only this variant in a fresh isolated worker with \`fork_turns: \"none\"\`. Do not read workspace memory, Prototype Lab design guidance, another variant, or review rankings.\n\n## Shared brief\n\n${manifest.sharedBrief}\n\n## Fixed outcomes\n\n${bullets(manifest.fixedOutcomes)}\n\n## Approved direction\n\n\`\`\`json\n${JSON.stringify(card.selectedDirection, null, 2)}\n\`\`\`\n\n## Variant\n\n- id: ${variant.id}\n- requested model: ${variant.model}\n- reasoning: ${variant.reasoning}\n- condition: ${variant.condition}\n- variant skills: ${variant.skills.join(", ") || "none"}\n- shared brief SHA-256: ${manifest.sharedBriefSha256}\n- direction assignment SHA-256: ${variant.assignmentSha256}\n\n## Build contract\n\n- ${assetText}\n- Keep runtime files and assets local and portable.\n- Follow layout policy ${manifest.layoutPolicy}; page scrolling is valid unless this policy forbids it.\n- Support the approved direction at ${manifest.targetViewports.join(", ")}.\n- Add only states required by the experience. Every visible control must work.\n- Preserve the selected direction. Do not normalize it toward a lab shell.\n- Fill the supplied \`run-receipt.template.json\`; do not invent a receipt schema.\n- Return a canonical v2 run receipt with worker id, requested/effective model when visible, reasoning, fork mode, assignment/input hashes, skill/reference reads, memory inputs, asset manifest, output hashes, browser proof, usage when visible, and limitations.\n`;
 }
 
 function buildStageInputManifest(manifest, variant, card) {

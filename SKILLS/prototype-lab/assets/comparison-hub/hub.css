@@ -16,6 +16,7 @@
 html, body { width: 100%; height: 100%; }
 body { margin: 0; overflow: hidden; background: var(--bg); color: var(--text); font-size: 12px; }
 button, select { border: 0; color: inherit; font: inherit; }
+select { color-scheme: dark; }
 button { min-height: 30px; border-radius: 7px; background: #1b1e24; padding: 0 10px; cursor: pointer; }
 button:hover, button[data-active="true"] { background: #2a2e36; }
 button[data-active="true"] { color: var(--accent); }
@@ -53,12 +54,17 @@ button:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid
 .variant-card .body-copy { display: -webkit-box; overflow: hidden; font-size: 10px; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 #view-compare { grid-template-rows: 36px minmax(0,1fr); gap: 6px; }
 .compare-controls { display: flex; align-items: center; justify-content: center; gap: 7px; }
-.variant-select { display: flex; align-items: center; gap: 5px; min-width: 220px; border-radius: 8px; background: var(--panel); padding: 4px; }
+.variant-select { position: relative; display: flex; align-items: center; gap: 5px; min-width: 220px; border-radius: 8px; background: var(--panel); padding: 4px; }
+.variant-select::after { position: absolute; right: 12px; color: var(--muted); content: "⌄"; font-size: 14px; line-height: 1; pointer-events: none; }
 .variant-select > span { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 6px; background: #303640; color: var(--accent); font-weight: 900; }
-.variant-select select { flex: 1; min-width: 0; min-height: 26px; background: transparent; }
+.variant-select select { flex: 1; min-width: 0; min-height: 28px; appearance: none; border: 1px solid transparent; border-radius: 6px; background: #1b1e24; color: var(--text); padding: 0 32px 0 9px; cursor: pointer; }
+.variant-select select:hover { border-color: rgba(197,243,109,.28); background: #242831; }
+.variant-select select:focus-visible { border-color: var(--accent); background: #20242a; }
+.variant-select select option { background: #15181d; color: var(--text); }
+.variant-select select option:checked { background: #303640; color: var(--accent); }
 .versus { color: var(--dim); font-size: 9px; text-transform: uppercase; }
-.compare-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 6px; min-height: 0; }
-.compare-frame { height: 100%; border-radius: 8px; }
+.compare-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); align-content: start; gap: 6px; min-height: 0; }
+.compare-frame { width: 100%; height: auto; aspect-ratio: 1200 / 820; border-radius: 8px; }
 .preview-panel { grid-template-rows: 40px minmax(0,1fr) auto; gap: 6px; }
 #view-focus { grid-template-columns: 174px minmax(0,1fr) 272px; gap: 6px; }
 .focus-rail { display: grid; align-content: start; gap: 5px; }
@@ -99,8 +105,9 @@ button:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid
   .hub-shell { height: auto; min-height: 100dvh; }
   .hub-context { grid-template-columns: 1fr; }
   .hub-context p { white-space: normal; }
-  .hub-stage { min-height: 720px; }
+  .hub-stage { min-height: calc(100dvh - 134px); }
   .variant-grid, .compare-grid { grid-template-columns: 1fr; overflow: auto; }
+  #view-compare { grid-template-rows: auto auto; align-content: start; }
   .compare-controls { align-items: stretch; flex-direction: column; }
   .variant-select { width: 100%; min-width: 0; }
   .versus { display: none; }

@@ -14,7 +14,20 @@ const workspace = path.resolve(args.workspace || process.cwd());
 const libraryRoot = path.join(workspace, "prototypes", "prompts");
 const lockTimeoutMs = Math.max(100, Number(args["lock-timeout-ms"]) || 15_000);
 
-if (command === "init") {
+if (["help", "--help", "-h"].includes(command) || args.help) {
+  console.log(`Prototype Lab prompt library
+
+Commands:
+  init                              initialize prototypes/prompts
+  seed                              install the creative starter suite
+  save --meta <json> --template <md> [--vars <json>]
+                                    save a versioned reusable prompt
+  pick [--count <n>] [--category <id>] [--difficulty <level>]
+                                    select a diverse prompt set
+  catalog                           rebuild and print the prompt catalog
+
+Common options: --workspace <path>, --date <YYYY-MM-DD>`);
+} else if (command === "init") {
   await ensureLibrary();
   console.log(JSON.stringify(await withLibraryLock(() => buildCatalog()), null, 2));
 } else if (command === "seed") {
@@ -426,6 +439,10 @@ function parseArgs(tokens) {
     const token = tokens[index];
     if (!token.startsWith("--")) throw new Error(`Unexpected argument: ${token}`);
     const [name, inlineValue] = token.slice(2).split("=", 2);
+    if (["help"].includes(name)) {
+      parsed[name] = true;
+      continue;
+    }
     const value = inlineValue ?? tokens[++index];
     if (!value || value.startsWith("--")) throw new Error(`Missing value for --${name}`);
     parsed[name] = value;
