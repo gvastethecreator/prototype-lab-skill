@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "packageRoot": "SKILLS/prototype-lab",
   "algorithm": "sha256",
-  "packageSha256": "a30f05ccadb5004934733aae6e8e8b552c9a5cb7b48818b63ca84dc39e46d255",
+  "packageSha256": "da64a266d2a76f3ec88a7a4afed27b9e505a97829e34f68c1d986579a7cd5355",
   "excludedFromDigest": [
     "package-manifest.json"
   ],
@@ -1022,8 +1022,8 @@
     },
     {
       "path": "scripts/manage-prototype-lab.mjs",
-      "sha256": "121ee806d876d22528359af33d39b270fdae3f9cdcadee85f8de46a30c7eb8ca",
-      "bytes": 128010
+      "sha256": "33be8cd55ac0f1e0e0bcaa6c1fca6cf1522cc252f7f779331cdb2e73e0e6530b",
+      "bytes": 128053
     },
     {
       "path": "scripts/package-comparison-hubs.mjs",

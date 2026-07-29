@@ -637,6 +637,7 @@ try {
   assert.deepEqual(status.managedHubs, [managedHub.id]);
   assert.deepEqual(status.legacyHubs, []);
   assert.deepEqual(status.invalidHubs, []);
+  assert.equal(status.issues.some((issue) => issue.id === managedHub.id && issue.code === "unverified-variant-isolation"), false);
   assert.equal(await exists(path.join(managedWorkspace, "prototypes", "index.html")), true);
   assert.equal(await exists(path.join(managedWorkspace, "prototypes", "prototype-index-data.js")), true);
   const contaminatedHubMetadata = JSON.parse(await fs.readFile(path.join(hubFolder, "metadata.json"), "utf8"));
