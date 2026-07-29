@@ -4,10 +4,12 @@ import path from "node:path";
 const root = process.cwd();
 const requiredFiles = [
   "README.md",
+  "DESIGN.md",
   "LICENSE",
   "SECURITY.md",
   "SKILLS/README.md",
   "SKILLS/prototype-lab/SKILL.md",
+  "SKILLS/prototype-lab/package-manifest.json",
   "SKILLS/prototype-lab/agents/openai.yaml",
   "SKILLS/prototype-lab/assets/prototype-shell/README.md",
   "SKILLS/prototype-lab/assets/prototype-shell/metadata.json",
@@ -15,18 +17,34 @@ const requiredFiles = [
   "SKILLS/prototype-lab/assets/prototype-shell/styles.css",
   "SKILLS/prototype-lab/assets/prototype-shell/app.js",
   "SKILLS/prototype-lab/assets/prototype-shell/artifact-data.js",
+  "SKILLS/prototype-lab/assets/prototype-shell/icons/manifest.json",
+  "SKILLS/prototype-lab/assets/prototype-shell/icons/tabler-icons.js",
   "SKILLS/prototype-lab/assets/prototype-blank/index.html",
   "SKILLS/prototype-lab/assets/prototype-blank/styles.css",
   "SKILLS/prototype-lab/assets/prototype-blank/app.js",
   "SKILLS/prototype-lab/assets/prototype-blank/artifact-data.js",
+  "SKILLS/prototype-lab/assets/prototype-mobile/index.html",
+  "SKILLS/prototype-lab/assets/prototype-mobile/styles.css",
+  "SKILLS/prototype-lab/assets/prototype-mobile/app.js",
+  "SKILLS/prototype-lab/assets/prototype-mobile/artifact-data.js",
+  "SKILLS/prototype-lab/assets/prototype-canvas/index.html",
+  "SKILLS/prototype-lab/assets/prototype-canvas/styles.css",
+  "SKILLS/prototype-lab/assets/prototype-canvas/app.js",
+  "SKILLS/prototype-lab/assets/prototype-canvas/artifact-data.js",
   "SKILLS/prototype-lab/assets/prototype-index/README.md",
   "SKILLS/prototype-lab/assets/prototype-index/index.html",
   "SKILLS/prototype-lab/assets/prototype-index/prototype-index.css",
   "SKILLS/prototype-lab/assets/prototype-index/prototype-index.js",
+  "SKILLS/prototype-lab/assets/prototype-index/icons/README.md",
+  "SKILLS/prototype-lab/assets/prototype-index/icons/LICENSE.tabler-icons",
+  "SKILLS/prototype-lab/assets/prototype-index/icons/manifest.json",
+  "SKILLS/prototype-lab/assets/prototype-index/icons/tabler-icons.js",
   "SKILLS/prototype-lab/assets/comparison-hub/index.html",
   "SKILLS/prototype-lab/assets/comparison-hub/hub.css",
   "SKILLS/prototype-lab/assets/comparison-hub/hub.js",
   "SKILLS/prototype-lab/assets/comparison-hub/hub-data.js",
+  "SKILLS/prototype-lab/assets/comparison-hub/icons/manifest.json",
+  "SKILLS/prototype-lab/assets/comparison-hub/icons/tabler-icons.js",
   "SKILLS/prototype-lab/assets/portable-lab/prompt.template.md",
   "SKILLS/prototype-lab/assets/portable-lab/prompt.vars.json",
   "SKILLS/prototype-lab/assets/portable-lab/run-receipt.json",
@@ -48,12 +66,21 @@ const requiredFiles = [
   "SKILLS/prototype-lab/scripts/package-comparison-hubs.mjs",
   "SKILLS/prototype-lab/scripts/manage-prompt-library.mjs",
   "SKILLS/prototype-lab/scripts/manage-prototype-lab.mjs",
+  "SKILLS/prototype-lab/scripts/worker-isolation.mjs",
+  "SKILLS/prototype-lab/scripts/verify-prototype-lab.mjs",
   "SKILLS/prototype-lab/scripts/build-prototype-index.mjs",
   "scripts/reorganize-prototype-library.mjs",
   "scripts/package-comparison-hubs.mjs",
   "scripts/manage-prompt-library.mjs",
   "scripts/manage-prototype-lab.mjs",
+  "scripts/verify-prototype-lab.mjs",
   "scripts/test-portable-tools.mjs",
+  "scripts/test-lab-daily-workflow.mjs",
+  "scripts/test-hub-ui.mjs",
+  "scripts/test-dashboard-ui.mjs",
+  "scripts/test-scaffold-ui.mjs",
+  "scripts/vendor-tabler-icons.mjs",
+  "scripts/verify-published-package.mjs",
   "assets/readme-banner.png",
 ];
 
@@ -71,6 +98,7 @@ async function main() {
   await checkSkillFrontmatter();
   await checkMetadataJson();
   await checkPromptLibraryAssets();
+  await checkTablerIconAssets();
   await checkPublicDocs();
   await checkLocalPathLeaks();
 
@@ -141,14 +169,26 @@ async function checkSkillFrontmatter() {
   if (!content.includes("references/capability-comparisons.md") || !/\bexperiment\b/.test(content) || !/\bpreflight\b/.test(content)) {
     errors.push("SKILL.md missing capability comparison spend gate");
   }
-  if (!content.includes('fork_turns: "none"')) {
-    errors.push("SKILL.md missing explicit clean-context dispatch contract");
+  if (!content.includes("fresh worker with no inherited history")) {
+    errors.push("SKILL.md missing portable fresh-worker isolation contract");
+  }
+  if (!content.includes("codex-fork-turns-none") || !content.includes("dedicated-cli-clean-session")) {
+    errors.push("SKILL.md missing documented host isolation adapters");
   }
   if (!/default\s+`?blank`?\s+scaffold/i.test(content) || !content.includes("assets/prototype-blank/")) {
     errors.push("SKILL.md missing neutral blank scaffold default");
   }
   if (!content.includes("prototypes/prompts/") || !content.includes("scripts/manage-prompt-library.mjs")) {
     errors.push("SKILL.md missing workspace prompt library contract");
+  }
+  for (const command of ["quick", "compare", "materialize", "verify", "finalize", "review", "ship"]) {
+    if (!new RegExp(`\\b${command}\\b`).test(content)) errors.push(`SKILL.md missing ${command} route`);
+  }
+  if (!content.includes("scripts/verify-prototype-lab.mjs") && !content.includes("verify --id")) {
+    errors.push("SKILL.md missing reusable verification contract");
+  }
+  if (!/orchestrator.{0,24}review/i.test(content)) {
+    errors.push("SKILL.md missing orchestrator review handoff");
   }
   if (!/ChatGPT Sites/i.test(content)) {
     errors.push("SKILL.md missing ChatGPT Sites publication handoff");
@@ -187,6 +227,26 @@ async function checkPromptLibraryAssets() {
     for (const [key, minimum] of [["requiredBehaviors", 3], ["testDimensions", 4], ["targetViewports", 2]]) {
       if (!Array.isArray(prompt[key]) || prompt[key].length < minimum) errors.push(`creative prompt ${prompt.id} needs at least ${minimum} ${key}`);
     }
+  }
+}
+
+async function checkTablerIconAssets() {
+  const iconRoot = path.join(root, "SKILLS", "prototype-lab", "assets", "prototype-index", "icons");
+  const manifest = JSON.parse(await readText(path.join(iconRoot, "manifest.json")));
+  if (manifest.package !== "@tabler/icons" || manifest.style !== "outline" || !/^\d+\.\d+\.\d+$/.test(manifest.version || "")) {
+    errors.push("Tabler icon manifest must pin an outline package version");
+    return;
+  }
+  if (!Array.isArray(manifest.icons) || manifest.icons.length < 40) errors.push("Tabler icon manifest must list the complete cross-surface set");
+  for (const surface of ["comparison-hub", "prototype-shell"]) {
+    const surfaceManifest = JSON.parse(await readText(path.join(root, "SKILLS", "prototype-lab", "assets", surface, "icons", "manifest.json")));
+    if (JSON.stringify(surfaceManifest) !== JSON.stringify(manifest)) errors.push(`${surface} must use the same pinned Tabler icon manifest as the dashboard`);
+  }
+  const registry = await readText(path.join(iconRoot, "tabler-icons.js"));
+  for (const name of manifest.icons || []) {
+    const svg = await readText(path.join(iconRoot, `${name}.svg`));
+    if (!svg.includes('viewBox="0 0 24 24"') || !svg.includes('stroke="currentColor"') || !svg.includes('stroke-width="2"')) errors.push(`invalid Tabler outline SVG: ${name}`);
+    if (!registry.includes(`"${name}"`)) errors.push(`Tabler registry missing icon: ${name}`);
   }
 }
 

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "experimentId": "REQUIRED-experiment-id",
   "conditionId": "REQUIRED-condition-id",
   "stage": "build",
@@ -21,6 +21,13 @@
   "dispatch": {
     "workerId": "REQUIRED-worker-id",
     "agentTool": "REQUIRED-agent-tool",
+    "isolation": {
+      "capability": "fresh-worker-no-inherited-history",
+      "adapter": "codex-fork-turns-none",
+      "inheritedHistory": false,
+      "coordinatorContextExposed": false,
+      "evidence": "fork_turns:none"
+    },
     "forkTurns": "none",
     "assignmentSha256": "REQUIRED-assignment-sha256",
     "inputManifestSha256": "REQUIRED-input-manifest-sha256"

@@ -47,7 +47,8 @@ local prompt/run records, worker receipts, and README files when present.
   publishing them.
 - Reject declared prompt hashes that do not match their rendered files and run
   receipts that still contain `REQUIRED-` markers.
-- For canonical v2 receipts, require coordinator worker id, `forkTurns: none`,
+- For canonical v3 receipts, require coordinator worker id, a verified fresh-worker
+  isolation adapter (Codex `forkTurns: none` only when using its adapter),
   assignment/input hashes, requested model/reasoning, empty coordinator-skill
   exposure, explicit context reads, and uncontaminated variant input. Require
   `effectiveModelSource: runtime-observed|not-captured`; never copy a requested
@@ -81,6 +82,8 @@ From a target workspace, resolve this skill folder and run:
 node <skill-root>/scripts/package-prototype-lab.mjs --workspace . --id <YYYY/MM/NNN-slug>
 node <skill-root>/scripts/package-prototype-lab.mjs --workspace . --id <YYYY/MM/NNN-slug> --include-proof
 ```
+
+For the normal handoff route use `lab ship --id <id> [--include-proof]`. It requires full verification, finalizes the owner, and then invokes this packager. Use `lab pack` directly only when status management and browser evidence have already been handled separately.
 
 The default destination is `dist/prototype-lab/`. Surface both the unpacked
 folder and ZIP path in the handoff.

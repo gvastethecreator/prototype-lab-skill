@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { deflateRawSync } from "node:zlib";
+import { validatedFreshWorkerIsolation } from "./worker-isolation.mjs";
 
 const crcTable = Array.from({ length: 256 }, (_, index) => {
   let value = index;
@@ -383,7 +384,8 @@ async function validateDeclaredPortableRecords(record) {
     if (markers.length) {
       throw new Error(`${record.id} ${label} contains unfilled markers: ${markers.join(", ")}`);
     }
-    if (Number(receipt.schemaVersion) >= 2) await validateCanonicalReceiptV2(receipt, `${record.id} ${label}`, record.folder);
+    if (Number(receipt.schemaVersion) >= 3) await validateCanonicalReceiptV3(receipt, `${record.id} ${label}`, record.folder);
+    else if (Number(receipt.schemaVersion) >= 2) await validateCanonicalReceiptV2(receipt, `${record.id} ${label}`, record.folder);
     if (receipt.runId !== run.id || receipt.variantId !== run.variantId) {
       throw new Error(`${record.id} ${label} id/variant does not match its receipt`);
     }
@@ -407,13 +409,27 @@ async function validateCanonicalReceiptV2(receipt, label, ownerFolder) {
   const dispatch = receipt.dispatch || {};
   if (!dispatch.workerId || !dispatch.agentTool || dispatch.forkTurns !== "none") throw new Error(`${label} v2 receipt requires workerId, agentTool, and forkTurns none`);
   for (const key of ["assignmentSha256", "inputManifestSha256"]) if (!/^[a-f0-9]{64}$/i.test(dispatch[key] || "")) throw new Error(`${label} v2 receipt requires ${key}`);
+  await validateCanonicalReceiptDetails(receipt, label, ownerFolder, "v2");
+}
+
+async function validateCanonicalReceiptV3(receipt, label, ownerFolder) {
+  if (!receipt.experimentId || !receipt.conditionId || !receipt.stage || !Number.isInteger(receipt.slot) || !Number.isInteger(receipt.attempt)) throw new Error(`${label} v3 receipt requires experiment/condition/stage/slot/attempt`);
+  const dispatch = receipt.dispatch || {};
+  if (!dispatch.workerId || !dispatch.agentTool) throw new Error(`${label} v3 receipt requires workerId and agentTool`);
+  const isolationIssues = validatedFreshWorkerIsolation(dispatch.isolation, { forkTurns: dispatch.forkTurns, label: `${label} v3 receipt dispatch` });
+  if (isolationIssues.length) throw new Error(isolationIssues.join("; "));
+  for (const key of ["assignmentSha256", "inputManifestSha256"]) if (!/^[a-f0-9]{64}$/i.test(dispatch[key] || "")) throw new Error(`${label} v3 receipt requires ${key}`);
+  await validateCanonicalReceiptDetails(receipt, label, ownerFolder, "v3");
+}
+
+async function validateCanonicalReceiptDetails(receipt, label, ownerFolder, version) {
   const execution = receipt.execution || {};
-  if (!execution.requestedModel || !execution.reasoning || !["runtime-observed", "not-captured"].includes(execution.effectiveModelSource) || !Array.isArray(execution.variantSkills) || !Array.isArray(execution.orchestrationSkillsExposed)) throw new Error(`${label} v2 receipt execution is incomplete`);
+  if (!execution.requestedModel || !execution.reasoning || !["runtime-observed", "not-captured"].includes(execution.effectiveModelSource) || !Array.isArray(execution.variantSkills) || !Array.isArray(execution.orchestrationSkillsExposed)) throw new Error(`${label} ${version} receipt execution is incomplete`);
   if (execution.effectiveModelSource === "not-captured" && execution.effectiveModel !== "not captured") throw new Error(`${label} must not infer effectiveModel from the requested route`);
   if (execution.effectiveModelSource === "runtime-observed" && (!execution.effectiveModel || execution.effectiveModel === "not captured")) throw new Error(`${label} runtime-observed effectiveModel is missing`);
   if (execution.orchestrationSkillsExposed.length) throw new Error(`${label} exposes coordinator skills to the variant worker`);
   const context = receipt.context || {};
-  if (!Array.isArray(context.memoryInputs) || !Array.isArray(context.contextReads) || context.receivedOtherVariants !== false) throw new Error(`${label} v2 receipt context is incomplete or contaminated`);
+  if (!Array.isArray(context.memoryInputs) || !Array.isArray(context.contextReads) || context.receivedOtherVariants !== false) throw new Error(`${label} ${version} receipt context is incomplete or contaminated`);
   const policy = receipt.assetPolicy || { mode: "worker-choice" };
   if (!["required", "fixed-supplied", "allowed", "forbidden", "worker-choice"].includes(policy.mode)) throw new Error(`${label} has invalid asset policy`);
   if (policy.mode === "required") {

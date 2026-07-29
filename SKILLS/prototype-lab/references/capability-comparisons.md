@@ -19,12 +19,16 @@ lab experiment --spec experiments/example-benchmark.json --direct-build
 
 This bypasses showcase direction review by design; it does not bypass clean dispatch, asset parity, receipts, browser proof, or honest claim limits. `--direct-build` must reject a showcase spec.
 
-Each direct build packet includes a canonical v2 receipt template. Workers fill
+Direct build is one primary product surface per variant work unit. If a brief contains five unrelated interfaces, declare fifteen variants for three conditions, not three workers each owning five products. Every variant needs `workUnit`; add `sourceFixture` when adopting an existing surface. A skill treatment also needs an `activationContract` with `instruction -> observableEffect -> proofTarget` interventions and named required artifacts. Missing contracts block packet creation.
+
+Each direct build packet includes a canonical v3 receipt template. Workers fill
 that template instead of inventing provenance fields. When assets are generated
 or fixed-supplied, the packet also requires complete finite-set visual review:
 mapping, cell/item aspect ratio, stretching/bleed/subject-loss checks, and one
 narrow-viewport fixture. A blocked harness or runtime P0/P1 keeps the artifact
 unverified even when interaction assertions pass.
+
+The build worker owns its capture-review-correction loop. Coordinator capture is comparison evidence, not a substitute for builder-owned proof. A treatment run that read the skill but omitted its required artifacts is `skill-unverified`, not complete.
 
 ## Keep The Coordinator Out Of The Canvas
 
@@ -80,7 +84,7 @@ For every creative showcase with more than one variant, run direction preflight 
 
 Each isolated worker receives the same shared brief and only its own condition. It returns `direction.json`; it does not write runtime code or generate the final image.
 
-The coordinator—not the worker—copies `dispatch.template.json` to `dispatch.json` and records the actual worker id, agent tool, `fork_turns`, sent paths, hashes, exposed skills, memory inputs, and variant exposure. Preflight fails when this dispatch record is missing or contaminated. The worker records effective-model visibility and skill/reference reads in `direction.json`; keep coordinator evidence separate from worker self-report.
+The coordinator—not the worker—copies `dispatch.template.json` to `dispatch.json` and records the actual worker id, agent tool, fresh-worker isolation adapter/evidence, sent paths, hashes, exposed skills, memory inputs, and variant exposure. Preflight fails when this dispatch record is missing or contaminated. The worker records effective-model visibility and skill/reference reads in `direction.json`; keep coordinator evidence separate from worker self-report.
 
 Require:
 
@@ -134,7 +138,7 @@ Examples:
 
 Do not copy the target skill's advice into the shared brief. That leaks the treatment into the control group.
 
-After preflight, the skill variant must identify `instruction -> observable effect -> proof target`. If those effects are absent in the rendered result, label the run `skill-no-effect`; do not call it a successful skill comparison.
+Before direct build, and after preflight for showcases, the skill variant must identify `instruction -> observable effect -> proof target`. If those effects are absent in the rendered result, label the run `skill-no-effect` or `skill-unverified`; do not call it a successful skill comparison.
 
 ## Evaluation
 
@@ -159,6 +163,15 @@ A showcase fails when:
 
 ## Managed Preflight Commands
 
+Generate an editable starting spec instead of hand-writing the schema:
+
+```text
+lab experiment --init --id impossible-object --intent showcase --models model-a,model-b --skill ruthless-designer
+lab experiment --init --id prompt-benchmark --intent benchmark --models model-a,model-b --from-prompt <library-id>
+```
+
+The initializer expands model/skill conditions, copies reusable prompt fields when selected, validates the result, and writes `experiments/<id>.json`. Review that file before preparing packets.
+
 Prepare assignment packets from a portable JSON spec:
 
 ```text
@@ -181,6 +194,8 @@ lab preflight --experiment impossible-object --review .scratch/prototype-lab/imp
 
 The script validates dispatch provenance, exact input hashes, the published fingerprint vocabulary, asset requirements, skill interventions, and pair coverage. It reports fingerprint convergence as a warning. Human/agent blind semantic judgment owns whether two directions are genuinely distinct.
 
+After authorization, run `lab materialize --experiment <id>`. This creates one chronological final owner per variant, copies the local build assignment/input manifest/dispatch template/receipt template into `runs/`, freezes the shared prompt inside each owner, and records the resulting artifact ids back into the experiment manifest. Dispatch fresh build workers against those owners; do not build directly inside `.scratch`.
+
 ## Portable Experiment Spec
 
 ```json
@@ -201,8 +216,19 @@ The script validates dispatch provenance, exact input hashes, the published fing
   "layoutPolicy": "open",
   "targetViewports": ["1200x820", "390x844"],
   "variants": [
-    { "id": "model-baseline", "model": "model-a", "reasoning": "high", "condition": "baseline", "skills": [] },
-    { "id": "model-design", "model": "model-a", "reasoning": "high", "condition": "design-skill", "skills": ["ruthless-designer"] }
+    { "id": "model-baseline", "model": "model-a", "reasoning": "high", "condition": "baseline", "skills": [], "workUnit": "impossible-object" },
+    {
+      "id": "model-design",
+      "model": "model-a",
+      "reasoning": "high",
+      "condition": "design-skill",
+      "skills": ["ruthless-designer"],
+      "workUnit": "impossible-object",
+      "activationContract": {
+        "interventions": [{ "skill": "ruthless-designer", "instruction": "Run the full choose-build-prove loop.", "observableEffect": "The result has a product-specific direction and signature move.", "proofTarget": "Direction artifacts plus before, after, and DPR 2 detail proof." }],
+        "requiredArtifacts": ["context-card.json", "direction-cards.json", "kill-list.json", "finish-ledger.json", "proof/detail.png"]
+      }
+    }
   ]
 }
 ```

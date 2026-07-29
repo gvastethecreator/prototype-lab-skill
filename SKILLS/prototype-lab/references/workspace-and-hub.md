@@ -21,13 +21,28 @@ Commands:
 | Command | Purpose | Required input |
 | --- | --- | --- |
 | `init` | Install the workspace hub and seed reusable prompts | none; add `--empty` for a blank library |
-| `experiment` | Prepare isolated direction packets for a capability comparison | `--spec <json>` |
+| `quick` | Create the smallest daily prototype owner | `--title`; preferably `--question` |
+| `adopt` | Copy an existing self-contained static build into a managed owner | `--path`; optionally `--title`, `--question` |
+| `fork` | Create a linked iteration with clean runs and proof | `--id`; optionally `--title` |
+| `experiment` | Generate a spec or prepare isolated comparison packets | `--init ...` or `--spec <json>` |
 | `preflight` | Validate direction cards and authorize builds after blind review | `--experiment <id>`; add `--review <json>` to approve |
+| `materialize` | Create final artifact owners and local build packets | `--experiment <id>` after authorization |
 | `create` | Allocate an id and scaffold one standalone artifact | `--title`, preferably `--question` |
-| `hub` | Create/update a managed comparison | `--title`, `--variants`; optionally `--dimension`, `--criteria` |
+| `compare` / `hub` | Create/update a managed comparison | `--title`, `--variants`; optionally `--dimension`, `--criteria`, `--modes` |
+| `record` | Attach factual execution and a canonical receipt | `--id`; optional model/skills/receipt fields |
+| `attach-proof` | Copy evidence into its owner and metadata | `--id`, `--files` |
+| `verify` | Check portability and browser evidence | `--id`; `--profile quick|full` |
+| `finalize` | Mark complete only after verification | `--id` |
+| `review` | Attach an orchestrator comparison report | `--id --init` or `--id --report <json>` |
+| `open` | Open the library or one artifact | optional `--id` |
+| `preview` | Serve the library or one artifact from loopback HTTP | optional `--id`, `--port`, `--open` |
 | `sync` | Regenerate managed hubs, prompt catalog, and workspace hub | none |
-| `status` | Report counts, legacy/invalid hubs, and readiness issues | none |
+| `status` | Report artifacts, experiments, issues, and resume actions | none |
+| `doctor` | Check runtime/install health separately from content readiness | none |
 | `pack` | Create a portable static folder and ZIP | `--id`; optionally `--include-proof` |
+| `ship` | Finalize with full evidence, then package | `--id`; optionally `--include-proof` |
+
+Use `lab help <command>` for focused help. Prompt-library operations are available as `lab prompt list|pick|save|seed|init`.
 
 ## Ownership
 
@@ -57,6 +72,9 @@ lab create --title "Dispatch board" --question "Can an operator resolve an incid
 lab create --title "Dispatch board" --question "..." --prompt midnight-dispatch-board
 lab create --title "Open creative site" --question "..." --scaffold blank --condition baseline --model model-a --reasoning high
 lab create --title "Compact operator tool" --question "..." --scaffold tool
+lab quick --title "Fast interaction test" --question "Can the user recover?" --profile mobile
+lab adopt --path dist --title "Existing static build" --question "Is it portable?"
+lab fork --id 001 --title "Compact iteration"
 ```
 
 The manager scans the active month, allocates the next chronological number, copies a scaffold, creates local ownership folders, and optionally freezes the prompt template, variables, rendered version, and hash into the artifact. `blank` is the neutral default; `tool` is opt-in.
@@ -65,10 +83,13 @@ For model/agent/skill capability comparisons, prepare and approve the experiment
 
 The initial status is `draft` when a question is supplied and `needs-brief` when it is omitted. Change to `active` only after the artifact and factual attribution exist.
 
+Profiles are routing hints, not visual themes: `blank`, compact `tool`, neutral `mobile`, responsive 2D/WebGL-ready `canvas`, `data`, and imported static output. Keep the final runtime host-neutral regardless of profile.
+
 ## Creating A Managed Hub
 
 ```text
 lab hub --title "Dispatch model comparison" --variants 001,002 --dimension model --criteria "task clarity,interaction feedback,viewport fit"
+lab compare --title "Dispatch design review" --variants 001,002 --dimension design --modes compare,blind,rank,iterations,review
 ```
 
 The manager resolves unique short ids, links standalone artifacts, creates `hub.config.json`, and derives the runtime and metadata. It refuses to replace an unmanaged folder.
@@ -96,6 +117,10 @@ Editable fields:
 
 After editing, run `lab sync`. The hub provides overview, exact URL-backed A/B comparison, focus, and provenance views.
 
+New hubs include the orchestrator Review view by default. Optional modes add blind source reveal, subjective browser-local ranking with JSON export, linked iterations, and archived variants. Set `archived: true` or `iteration` on a variant override in `hub.config.json`.
+
+Generate the orchestrator report template with `lab review --id <hub> --init`. After inspecting every final variant and its proof, attach a completed JSON with `lab review --id <hub> --report <json>`. The command also writes a readable Markdown report under `reviews/` and enables the hub Review view.
+
 ## Workspace Hub
 
 Open `prototypes/index.html` directly. It is a static management surface, not a runtime dependency of artifacts.
@@ -103,7 +128,13 @@ Open `prototypes/index.html` directly. It is a static management surface, not a 
 - **Library**: search and browse chronological artifact previews.
 - **Comparisons**: select a hub, inspect members, and open an exact A/B URL.
 - **Prompts**: inspect active reusable inputs and rendered versions.
+- **Receipts**: inspect the factual execution trail, verification, isolation,
+  usage, hashes, and limitations recorded for each task.
 - **Health**: find missing decisions, model attribution, proof, or broken hub links; copy canonical commands.
+
+`status` also scans `.scratch/prototype-lab/*/experiment.json` and returns exact commands to resume preflight or materialize authorized builds. `doctor` answers whether the tool can run; `status` answers whether the workspace is ready.
+
+Use `open` for self-contained artifacts that work under `file://`. Use `preview --id <id> --open` when ES modules, fetch, media, or browser security require an HTTP origin. Preview binds only to `127.0.0.1`; stop it with Ctrl+C. `--check --port 0` starts an ephemeral server, requests the target once, and shuts it down for diagnostics.
 
 The hub cannot execute shell commands from the browser. Run copied commands through Codex or a terminal, then refresh after `lab sync`.
 

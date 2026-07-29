@@ -20,7 +20,9 @@ prototypes/prompts/
       prompt.rendered.md
 ```
 
-Run `scripts/manage-prompt-library.mjs init` to create the library, `seed` to
+Prefer the unified interface: `lab prompt init`, `lab prompt seed`, `lab prompt
+list`, `lab prompt pick`, and `lab prompt save`. Internally these route to
+`scripts/manage-prompt-library.mjs`. Run its `init` command to create the library, `seed` to
 install the bundled creative evaluation suite, `save --meta <json> --template
 <md> [--vars <json>]` to persist a user- or agent-authored prompt, and `catalog`
 to rebuild the index. Resolve the script relative to this skill folder.

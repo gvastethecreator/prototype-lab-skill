@@ -3,67 +3,141 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
     <title>Prototype Lab</title>
     <link rel="icon" href="data:," />
     <link rel="stylesheet" href="./prototype-index.css" />
   </head>
   <body>
+    <a class="skip-link" href="#workspace-stage">Skip to workspace</a>
     <main class="lab-shell">
-      <header class="lab-topbar">
-        <div class="lab-brand">
-          <span class="eyebrow">Workspace</span>
-          <h1>Prototype Lab</h1>
-        </div>
-        <nav id="view-nav" aria-label="Workspace views">
-          <button type="button" data-view="library">Library</button>
-          <button type="button" data-view="comparisons">Comparisons</button>
-          <button type="button" data-view="prompts">Prompts</button>
-          <button type="button" data-view="health">Health</button>
+      <aside class="lab-sidebar" aria-label="Prototype Lab navigation">
+        <header class="lab-brand">
+          <span class="brand-mark" data-icon="beaker" aria-hidden="true"></span>
+          <span class="brand-copy"><strong>Prototype Lab</strong><small>Prototype workspace</small></span>
+        </header>
+
+        <nav id="view-nav" class="primary-nav" role="tablist" aria-label="Workspace views" aria-orientation="vertical">
+          <button type="button" role="tab" data-view="library" aria-controls="view-library"><span data-icon="library" aria-hidden="true"></span><span class="nav-label">Library</span></button>
+          <button type="button" role="tab" data-view="comparisons" aria-controls="view-comparisons"><span data-icon="compare" aria-hidden="true"></span><span class="nav-label">Comparisons</span></button>
+          <button type="button" role="tab" data-view="prompts" aria-controls="view-prompts"><span data-icon="spark" aria-hidden="true"></span><span class="nav-label">Prompts</span></button>
+          <button type="button" role="tab" data-view="receipts" aria-controls="view-receipts"><span data-icon="receipt" aria-hidden="true"></span><span class="nav-label">Receipts</span></button>
+          <button type="button" role="tab" data-view="health" aria-controls="view-health"><span data-icon="pulse" aria-hidden="true"></span><span class="nav-label">Health</span></button>
         </nav>
-        <label class="search-field">
-          <span>Search</span>
-          <input id="search-input" type="search" placeholder="title, model, skill, tag" />
-        </label>
-      </header>
 
-      <section class="summary-strip" id="summary-strip" aria-label="Workspace summary"></section>
+        <section class="sidebar-signal" id="sidebar-signal" aria-label="Workspace signal"></section>
 
-      <section class="workspace-stage">
-        <section class="workspace-view library-view" data-view="library">
-          <header class="view-toolbar">
-            <div><span class="eyebrow">Artifacts</span><h2>Prototype library</h2></div>
-            <label class="select-field"><span>Group</span><select id="group-select"><option value="day">Day</option><option value="month">Month</option><option value="year">Year</option><option value="none">None</option></select></label>
-          </header>
-          <div class="scroll-region artifact-groups" id="artifact-groups"></div>
-        </section>
+        <footer class="sidebar-footer">
+          <span data-icon="local" aria-hidden="true"></span>
+          <span><strong>Local-first</strong><small>Static · portable · inspectable</small></span>
+        </footer>
+      </aside>
 
-        <section class="workspace-view comparison-view" data-view="comparisons">
-          <aside class="hub-list-panel">
-            <header><span class="eyebrow">Experiments</span><h2>Comparison hubs</h2></header>
-            <div class="hub-list" id="hub-list"></div>
-          </aside>
-          <section class="hub-detail" id="hub-detail"></section>
-        </section>
+      <section class="lab-main">
+        <header class="lab-topbar">
+          <div class="page-context">
+            <span class="page-kicker" id="page-kicker">Workspace / Library</span>
+            <h1 id="page-title">Prototype library</h1>
+            <p id="page-description">Browse every runnable artifact and its evidence.</p>
+          </div>
 
-        <section class="workspace-view prompts-view" data-view="prompts">
-          <header class="view-toolbar"><div><span class="eyebrow">Reusable inputs</span><h2>Prompt library</h2></div><a href="./prompts/catalog.json">Open catalog JSON</a></header>
-          <div class="scroll-region prompt-grid" id="prompt-grid"></div>
-        </section>
+          <div class="topbar-actions">
+            <label class="search-field" id="search-field">
+              <span class="field-label">Search workspace</span>
+              <span class="search-control"><span data-icon="search" aria-hidden="true"></span><input id="search-input" type="search" placeholder="Search artifacts" autocomplete="off" /></span>
+            </label>
+            <button class="quick-action" id="quick-command" type="button"><span data-icon="plus" aria-hidden="true"></span><span>New prototype</span></button>
+          </div>
+        </header>
 
-        <section class="workspace-view health-view" data-view="health">
-          <section class="health-list-panel">
-            <header><span class="eyebrow">Readiness</span><h2>Workspace issues</h2></header>
-            <div class="health-list" id="health-list"></div>
+        <section class="workspace-stage" id="workspace-stage">
+          <section class="workspace-view library-view" id="view-library" role="tabpanel" data-view="library" tabindex="0">
+            <section class="insight-grid library-insights" id="library-insights" aria-label="Library overview"></section>
+            <section class="library-browser content-panel">
+              <header class="panel-toolbar">
+                <div>
+                  <span class="eyebrow"><span data-icon="layers" aria-hidden="true"></span> Artifact catalog</span>
+                  <h2>Runnable experiments</h2>
+                  <p id="library-result-count">All artifacts in the active workspace.</p>
+                </div>
+                <label class="select-field"><span>Group by</span><select id="group-select"><option value="day">Day</option><option value="month">Month</option><option value="year">Year</option><option value="none">None</option></select></label>
+              </header>
+              <div class="scroll-region artifact-groups" id="artifact-groups"></div>
+            </section>
           </section>
-          <aside class="command-panel">
-            <span class="eyebrow">One workflow</span>
-            <h2>Lab commands</h2>
-            <div id="command-list"></div>
-            <p>Generated hub files are disposable. Edit <code>hub.config.json</code>, then run the Sync command shown above.</p>
-          </aside>
+
+          <section class="workspace-view comparison-view" id="view-comparisons" role="tabpanel" data-view="comparisons" tabindex="0" hidden>
+            <section class="insight-grid comparison-insights" id="comparison-insights" aria-label="Comparison overview"></section>
+            <section class="comparison-workbench">
+              <aside class="hub-list-panel content-panel">
+                <header class="panel-title">
+                  <span class="eyebrow"><span data-icon="beaker" aria-hidden="true"></span> Experiments</span>
+                  <h2>Comparison hubs</h2>
+                  <p>Select a decision space to inspect.</p>
+                </header>
+                <div class="hub-list" id="hub-list"></div>
+              </aside>
+              <section class="hub-detail content-panel" id="hub-detail"></section>
+            </section>
+          </section>
+
+          <section class="workspace-view prompts-view" id="view-prompts" role="tabpanel" data-view="prompts" tabindex="0" hidden>
+            <section class="insight-grid prompt-insights" id="prompt-insights" aria-label="Prompt library overview"></section>
+            <section class="prompt-library-panel content-panel">
+              <header class="panel-toolbar">
+                <div>
+                  <span class="eyebrow"><span data-icon="spark" aria-hidden="true"></span> Reusable inputs</span>
+                  <h2>Prompt library</h2>
+                  <p id="prompt-result-count">Versioned prompts ready for another run.</p>
+                </div>
+                <a class="secondary-action" href="./prompts/catalog.json"><span data-icon="code" aria-hidden="true"></span>Catalog JSON</a>
+              </header>
+              <div class="scroll-region prompt-grid" id="prompt-grid"></div>
+            </section>
+          </section>
+
+          <section class="workspace-view receipts-view" id="view-receipts" role="tabpanel" data-view="receipts" tabindex="0" hidden>
+            <section class="insight-grid receipt-insights" id="receipt-insights" aria-label="Execution receipt overview"></section>
+            <section class="receipt-workbench">
+              <aside class="receipt-list-panel content-panel">
+                <header class="panel-title">
+                  <span class="eyebrow"><span data-icon="receipt" aria-hidden="true"></span> Execution ledger</span>
+                  <h2>Task receipts</h2>
+                  <p id="receipt-result-count">Factual records attached to managed tasks.</p>
+                </header>
+                <div class="receipt-list" id="receipt-list"></div>
+              </aside>
+              <section class="receipt-detail-panel" id="receipt-detail" aria-live="polite"></section>
+            </section>
+          </section>
+
+          <section class="workspace-view health-view" id="view-health" role="tabpanel" data-view="health" tabindex="0" hidden>
+            <section class="insight-grid health-insights" id="health-insights" aria-label="Workspace health overview"></section>
+            <section class="health-workbench">
+              <section class="health-list-panel content-panel">
+                <header class="panel-title">
+                  <span class="eyebrow"><span data-icon="pulse" aria-hidden="true"></span> Readiness queue</span>
+                  <h2>Issues requiring attention</h2>
+                  <p>Resolve blockers first, then improve evidence coverage.</p>
+                </header>
+                <div class="health-list" id="health-list"></div>
+              </section>
+              <aside class="command-panel content-panel">
+                <header class="panel-title">
+                  <span class="eyebrow"><span data-icon="terminal" aria-hidden="true"></span> Four routes</span>
+                  <h2>Command center</h2>
+                  <p>Copy a canonical command and continue in Codex or a terminal.</p>
+                </header>
+                <div id="command-list"></div>
+              </aside>
+            </section>
+          </section>
         </section>
       </section>
     </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+    <script src="./icons/tabler-icons.js"></script>
     <script src="./prototype-index-data.js"></script>
     <script defer src="./prototype-index.js"></script>
   </body>

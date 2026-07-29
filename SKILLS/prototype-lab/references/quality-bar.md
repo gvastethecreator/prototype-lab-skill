@@ -55,6 +55,12 @@ Required for UI changes:
 - note of any visual or interaction gap that remains
 - selected design read and dials for visual-direction prototypes
 
+## Verification Receipt
+
+Run `lab verify --id <id> --profile full --init-review` to create `proof/browser-review.json`. Exercise the real entrypoint, count and exercise every visible control, test navigation targets, then record all four canonical viewports, fit, horizontal and vertical overflow, scroll owner, scrollbar treatment, console/runtime errors, structured interaction and accessibility checks, and the finish dimensions. The 1920x1080 review needs DPR 2 detail evidence. Set `status: passed` only from actual browser evidence; native default scrollbar chrome, skipped controls, missing navigation, or a failed applicable finish dimension blocks it.
+
+`lab verify --profile quick` checks self-containment, metadata, paths, and references. It does not claim browser correctness. `full` additionally validates the browser receipt and its screenshots. `lab finalize` writes the verification report and changes ordinary artifacts to `complete` only after the selected profile passes. Experiment variants also require a coordinator comparison review whose variant completion is `pass` with no blockers; a review blocker keeps or returns the owner to blocked. `lab ship` requires the full profile.
+
 When the repo provides these scripts, run them before handoff and fix actionable failures:
 
 ```bash

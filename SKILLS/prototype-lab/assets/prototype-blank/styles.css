@@ -1,3 +1,5 @@
+:root { color-scheme: dark; --black: #000; --surface: #080808; --text: #ededed; font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
 *, *::before, *::after { box-sizing: border-box; }
-html, body { min-height: 100%; }
-body { margin: 0; }
+html, body { min-width: 320px; min-height: 100%; margin: 0; background: var(--black); color: var(--text); }
+body { min-height: 100dvh; }
+#app { width: 100%; min-height: 100dvh; background: var(--surface); }

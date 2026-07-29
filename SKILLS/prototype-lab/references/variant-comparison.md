@@ -71,7 +71,7 @@ Use a coordinator/worker pattern:
 
 1. The coordinator freezes the shared brief and success criteria. For creative showcases, prepare and approve direction packets before any full build.
 2. The coordinator attempts to dispatch one isolated worker per variant using the best available sub-agent, multi-agent, dedicated CLI, or separate-thread mechanism.
-3. Each worker receives only the shared brief, its own variant assignment, and the output contract, with `fork_turns: "none"`. It does not receive Prototype Lab's interface/taste guidance unless that is the tested treatment.
+3. Each worker receives only the shared brief, its own variant assignment, and the output contract in a fresh no-history context. Use the documented host adapter in `agent-isolation.md`; `fork_turns: "none"` is Codex-only evidence. It does not receive Prototype Lab's interface/taste guidance unless that is the tested treatment.
 4. Workers write to scratch/temp output, not the final prototype files.
 5. The coordinator integrates all results into one comparison shell and records provenance.
 
@@ -122,8 +122,30 @@ Pattern note: public comparison galleries such as `https://www.whichai.dev/` use
 - `rankings`: capture ordered picks plus short taste notes. Make rankings clearly subjective unless backed by measured criteria.
 - `iterations`: expose repeated runs as numbered attempts under the same model/skill. Keep the prompt fixed so iteration quality can be compared.
 - `archive`: allow hiding stale or superseded variants without deleting provenance.
+- `orchestrator review`: attach a final evidence-backed assessment after every variant and its proof have been inspected. Keep it separate from worker provenance and subjective user ranking.
 
 These are evaluation modes, not decoration. Include only the modes that help the user's decision.
+
+Managed hubs expose optional modes through `hub.config.json` or `lab compare --modes compare,blind,rank,iterations,review,archive`:
+
+- Blind mode hides source labels until reveal.
+- Rank mode persists subjective ordering and notes in local browser storage and exports a JSON decision record.
+- Iterations groups lineaged forks without erasing earlier runs.
+- Archive hides stale variants from active comparison while retaining provenance.
+- Review renders the attached orchestrator JSON and links its Markdown report.
+
+## Orchestrator Review
+
+Run `lab review --id <hub-id> --init` after the variants and their browser proof are final. The orchestrator must inspect every variant against the shared criteria, then fill:
+
+- concise summary and recommendation
+- confidence level
+- one assessment per criterion with evidence paths
+- strengths, weaknesses, evidence, and verdict per variant
+- comparative findings
+- caveats and next steps
+
+Do not include hidden chain-of-thought. Record conclusions, observable evidence, uncertainty, and limitations. Attach the completed JSON with `lab review --id <hub-id> --report <json>`; the command writes canonical JSON and Markdown inside the hub and regenerates its Review view.
 
 The drawer must include a provenance section for:
 
@@ -159,6 +181,7 @@ Exercise:
 - pairwise links when pairwise mode is included
 - blind reveal/reset path when blind mode is included
 - ranking save/export or recorded notes when rankings are included
+- orchestrator review rendering and Markdown link when review mode is included
 - focus view for every variant
 - URL refresh/deep links for at least one non-default variant
 - variant selector in toolbar or drawer

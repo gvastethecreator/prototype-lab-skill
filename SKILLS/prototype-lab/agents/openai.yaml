@@ -1,4 +1,4 @@
 interface:
   display_name: "Prototype Lab"
-  short_description: "Orchestrate, compare, and ship portable prototype experiments."
-  default_prompt: "Use $prototype-lab to plan a high-freedom capability comparison, gate isolated directions before full builds, verify the variants, and package a deploy-ready static result."
+  short_description: "Create, compare, review, and ship portable browser prototypes."
+  default_prompt: "Use $prototype-lab to choose the smallest suitable route, create or adopt a portable browser prototype, verify it with evidence, and compare or package it only when useful."

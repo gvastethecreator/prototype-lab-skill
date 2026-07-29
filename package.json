@@ -1,15 +1,19 @@
 {
   "name": "prototype-lab-skill",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
   "type": "module",
   "scripts": {
+    "assets:icons": "node scripts/vendor-tabler-icons.mjs",
     "lab": "node scripts/manage-prototype-lab.mjs",
     "lab:init": "node scripts/manage-prototype-lab.mjs init",
     "lab:sync": "node scripts/manage-prototype-lab.mjs sync",
     "lab:status": "node scripts/manage-prototype-lab.mjs status",
     "lab:experiment": "node scripts/manage-prototype-lab.mjs experiment",
     "lab:preflight": "node scripts/manage-prototype-lab.mjs preflight",
+    "lab:quick": "node scripts/manage-prototype-lab.mjs quick",
+    "lab:verify": "node scripts/manage-prototype-lab.mjs verify",
+    "lab:doctor": "node scripts/manage-prototype-lab.mjs doctor",
     "build:index": "node scripts/build-prototype-index.mjs",
     "create:prototype": "node scripts/manage-prototype-lab.mjs create",
     "create:hub": "node scripts/manage-prototype-lab.mjs hub",
@@ -23,6 +27,12 @@
     "prompts:pick": "node scripts/manage-prompt-library.mjs pick",
     "prompts:save": "node scripts/manage-prompt-library.mjs save",
     "test:portable": "node scripts/test-portable-tools.mjs",
-    "validate": "node scripts/validate-skill-pack.mjs && node scripts/test-portable-tools.mjs"
+    "test:daily": "node scripts/test-lab-daily-workflow.mjs",
+    "test:ui": "node scripts/test-hub-ui.mjs",
+    "test:dashboard": "node scripts/test-dashboard-ui.mjs",
+    "test:scaffolds": "node scripts/test-scaffold-ui.mjs",
+    "package:manifest": "node scripts/verify-published-package.mjs --check",
+    "package:manifest:write": "node scripts/verify-published-package.mjs --write",
+    "validate": "node scripts/validate-skill-pack.mjs && node scripts/verify-published-package.mjs --check && node scripts/test-portable-tools.mjs && node scripts/test-lab-daily-workflow.mjs"
   }
 }

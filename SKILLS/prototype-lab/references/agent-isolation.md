@@ -31,6 +31,8 @@ Do not build all variants in one continuous context when the request is explicit
 
 ## Isolation Contract
 
+Require the capability first: every independent variant runs in a **fresh worker with no inherited history**. The coordinator must prove that the worker did not receive its transcript, workspace memory, or sibling variants; host flags are evidence for that capability, never the public contract.
+
 Workers receive only:
 
 - shared prompt or brief
@@ -102,7 +104,7 @@ Minimum receipt fields:
 - `agentMode`
 - `agentTool`
 - `workerId`: id returned by the coordinator's dispatch tool
-- `forkTurns`: must be `none` for a clean isolated run
+- `isolation`: object with `capability: fresh-worker-no-inherited-history`, one supported `adapter`, `inheritedHistory: false`, `coordinatorContextExposed: false`, and adapter-specific `evidence`
 - `requestedModel`, `effectiveModel`, `effectiveModelSource`, and `reasoning`; use `effectiveModel: not captured` plus `effectiveModelSource: not-captured` unless the runtime independently exposes the effective route
 - `assignmentSha256` and `inputManifestSha256`
 - `contextReads`: skills, references, memory, files, or inherited context actually read
@@ -118,7 +120,7 @@ Minimum receipt fields:
 - `limitations`
 - `fallbackReason`: `not applicable` for real worker runs
 
-For managed capability preflight, the coordinator copies the generated `dispatch.template.json` to `dispatch.json` and fills it with the actual worker id, agent tool, sent paths, and context policy. `preflight` checks that record against the assignment/input hashes and condition. The later build receipt cross-links the build dispatch. A worker's own `crossVariantLeakage: false` is self-reported evidence, not proof of clean context. Claim clean-context isolation only when the dispatch used `fork_turns: "none"`, the assignment hash matches, no memory input was allowed, and the recorded reads contain no sibling or coordinator-only source.
+For managed capability preflight, the coordinator copies the generated `dispatch.template.json` to `dispatch.json` and fills it with the actual worker id, agent tool, isolation adapter, sent paths, and context policy. `preflight` checks that record against the assignment/input hashes and condition. The later build receipt cross-links the build dispatch. A worker's own `crossVariantLeakage: false` is self-reported evidence, not proof of clean context. Claim clean-context isolation only when the selected adapter proves no inherited history, the assignment hash matches, no memory input was allowed, and the recorded reads contain no sibling or coordinator-only source.
 
 ## Dedicated Agent Options
 
@@ -130,7 +132,13 @@ Use the best available isolation mechanism in the current environment:
 
 Before using CLI workers, verify the CLI exists with `--help`, avoid secrets, keep outputs under scratch/temp, and do not allow commit, push, branch, or worktree operations unless the user explicitly asked for them.
 
-If tool discovery is available, search for multi-agent or sub-agent tooling before falling back. When `agents.spawn_agent` or an equivalent worker tool is available and allowed, spawn one worker per variant with `fork_turns: "none"` explicitly. Never omit it for a model/skill comparison because omission may inherit coordinator context. Pass the generated assignment packet and only the variant-local skill condition.
+If tool discovery is available, search for multi-agent or sub-agent tooling before falling back. Use one supported adapter and record its evidence:
+
+- **Codex adapter — `codex-fork-turns-none`:** use `agents.spawn_agent` with `fork_turns: "none"`; record `forkTurns: "none"` and `evidence: "fork_turns:none"`.
+- **Dedicated CLI adapter — `dedicated-cli-clean-session`:** start one new CLI process in a packet-only scratch directory; do not pass a prior transcript or workspace memory, omit `forkTurns`, and record `evidence: "fresh-process-packet-only"`.
+- **Separate-thread adapter — `separate-thread-fresh-context`:** start a new worker thread with no prior conversation, omit `forkTurns`, and record `evidence: "fresh-thread-no-history"`.
+
+Never claim a clean worker merely because an adapter label is present. The receipt must also prove `inheritedHistory: false`, `coordinatorContextExposed: false`, empty memory inputs, and no sibling path in the sent/observed context.
 
 Fallback is allowed only when one of these is true:
 
@@ -162,7 +170,8 @@ Record per variant:
 - `agentMode`: `subagent`, `dedicated-cli`, `separate-thread`, `single-agent-fallback`, or `unavailable`
 - `agentTool`: tool or CLI name when known
 - `workerId`: coordinator dispatch id
-- `forkTurns`: exact context-fork setting
+- `isolation`: capability, adapter, no-history assertions, and host-specific evidence
+- `forkTurns`: Codex-only evidence when `isolation.adapter` is `codex-fork-turns-none`; omit it for other adapters
 - `assignmentSha256`: hash of the complete task payload
 - `inputManifestSha256`: hash of shared brief, condition, skills, tools, assets, and context policy
 - `promptId`: shared or variant prompt id

@@ -3,6 +3,7 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { hasVerifiedFreshWorkerIsolation, isolationAdapterLabel } from "./worker-isolation.mjs";
 
 export async function collectPrototypeIndex({ workspace = process.cwd() } = {}) {
   const workspaceRoot = path.resolve(workspace);
@@ -17,6 +18,7 @@ export async function collectPrototypeIndex({ workspace = process.cwd() } = {}) 
     const metadata = JSON.parse(await fs.readFile(file, "utf8"));
     const id = metadata.id || toPosix(path.relative(prototypesRoot, folder));
     const proof = await proofCount(folder, metadata);
+    const receipts = await collectReceipts(folder, metadata);
     const isHub = isComparisonHub(metadata);
     const entry = {
       id,
@@ -37,6 +39,8 @@ export async function collectPrototypeIndex({ workspace = process.cwd() } = {}) 
       runtimeLayout: metadata.runtimeLayout || "unknown",
       promptCount: promptCount(metadata),
       runCount: runCount(metadata),
+      receiptCount: receipts.length,
+      receipts,
       mode: metadata.mode || "single",
       views: Array.isArray(metadata.views) ? metadata.views : [],
       sequence: Number(metadata.number) || sequenceFromId(id),
@@ -60,6 +64,13 @@ export async function collectPrototypeIndex({ workspace = process.cwd() } = {}) 
   const comparisonHubs = hubRecords.filter((hub) => hub.variantIds.length > 1);
   const promptLibrary = await readPromptLibrary(prototypesRoot);
   const publicEntries = entries.map(({ _folder, _metadata, ...entry }) => entry);
+  const receipts = publicEntries.flatMap((entry) => entry.receipts.map((receipt) => ({
+    ...receipt,
+    ownerId: entry.id,
+    ownerTitle: entry.title,
+    ownerPath: entry.path,
+    ownerStatus: entry.status
+  })));
   const issueCount = publicEntries.reduce((total, entry) => total + entry.issues.length, 0);
 
   return {
@@ -72,11 +83,13 @@ export async function collectPrototypeIndex({ workspace = process.cwd() } = {}) 
       readyHubs: comparisonHubs.length,
       managedHubs: comparisonHubs.filter((hub) => hub.managed).length,
       prompts: promptLibrary.count,
+      receipts: receipts.length,
       issues: issueCount
     },
     prototypes: publicEntries,
     comparisonHubs,
-    promptLibrary
+    promptLibrary,
+    receipts
   };
 }
 
@@ -141,6 +154,70 @@ function runCount(metadata) {
   return Array.isArray(metadata.variants) ? metadata.variants.length : 0;
 }
 
+async function collectReceipts(folder, metadata) {
+  const records = [];
+  const seen = new Set();
+  const sources = [
+    ...(Array.isArray(metadata.runs) ? metadata.runs : []),
+    ...(Array.isArray(metadata.provenance?.agentRuns) ? metadata.provenance.agentRuns : [])
+  ];
+  for (const [index, run] of sources.entries()) {
+    const receiptPath = typeof run?.receipt === "string" ? run.receipt : typeof run?.workerReceipt === "string" ? run.workerReceipt : null;
+    const key = receiptPath || `${run?.id || run?.runId || "run"}-${index}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    let receipt = null;
+    if (receiptPath && !path.isAbsolute(receiptPath)) {
+      const absolute = path.resolve(folder, receiptPath);
+      if (absolute.startsWith(path.resolve(folder) + path.sep)) receipt = await readJson(absolute, null);
+    }
+    const source = receipt && typeof receipt === "object" ? receipt : run || {};
+    const execution = source.execution || {};
+    const dispatch = source.dispatch || {};
+    const isolation = dispatch.isolation || run?.isolation || null;
+    const context = source.context || {};
+    const usage = source.usage || {};
+    const verification = Array.isArray(source.verification) ? source.verification : [];
+    const limitations = Array.isArray(source.limitations) ? source.limitations : [];
+    records.push({
+      id: source.runId || run?.id || run?.runId || `run-${index + 1}`,
+      runId: source.runId || run?.runId || run?.id || "not captured",
+      variantId: source.variantId || run?.variantId || "single",
+      status: source.status || run?.status || "unknown",
+      stage: source.stage || "run",
+      schemaVersion: Number(source.schemaVersion) || 1,
+      receiptPath: receiptPath || "not captured",
+      agentMode: run?.agentMode || (dispatch.workerId ? "subagent" : "not captured"),
+      agentTool: dispatch.agentTool || run?.agentTool || "not captured",
+      workerId: dispatch.workerId || run?.workerId || "not captured",
+      isolation,
+      isolationAdapter: isolationAdapterLabel(isolation),
+      forkTurns: dispatch.forkTurns || run?.forkTurns || "not applicable",
+      requestedModel: execution.requestedModel || run?.requestedModel || "not captured",
+      effectiveModel: execution.effectiveModel || run?.effectiveModel || "not captured",
+      reasoning: execution.reasoning || run?.reasoning || "not captured",
+      skills: Array.isArray(execution.variantSkills) ? execution.variantSkills : Array.isArray(run?.skills) ? run.skills : [],
+      assignmentSha256: dispatch.assignmentSha256 || run?.assignmentSha256 || "not captured",
+      inputManifestSha256: dispatch.inputManifestSha256 || run?.inputManifestSha256 || "not captured",
+      receivedOtherVariants: context.receivedOtherVariants ?? run?.receivedOtherVariants ?? "unknown",
+      contextIsolation: hasVerifiedFreshWorkerIsolation({ isolation, forkTurns: dispatch.forkTurns || run?.forkTurns }) && (context.receivedOtherVariants ?? run?.receivedOtherVariants) === false ? "dispatch-recorded" : "unverified",
+      crossVariantLeakage: context.crossVariantLeakage || "unknown",
+      summary: source.summary || run?.summary || "No run summary recorded.",
+      limitations,
+      verificationCount: verification.length,
+      verificationPassed: verification.filter((item) => item?.status === "passed" || item?.passed === true).length,
+      assetsCount: Array.isArray(source.assets) ? source.assets.length : 0,
+      filesCount: Array.isArray(source.artifacts?.files) ? source.artifacts.files.length : 0,
+      inputTokens: Number.isFinite(usage.inputTokens) ? usage.inputTokens : null,
+      outputTokens: Number.isFinite(usage.outputTokens) ? usage.outputTokens : null,
+      totalTokens: Number.isFinite(usage.totalTokens) ? usage.totalTokens : null,
+      toolCalls: Array.isArray(usage.toolCalls) ? usage.toolCalls.length : 0,
+      fallbackReason: source.fallbackReason || run?.fallbackReason || "not applicable"
+    });
+  }
+  return records;
+}
+
 function buildHub(entry, idSet, prototypesRoot, workspaceRoot) {
   const metadata = entry._metadata;
   const variants = new Set();
@@ -187,12 +264,13 @@ function healthIssues(entry) {
   if (entry.modelExact === "unknown") issues.push({ code: "unknown-model", severity: "info", message: "Capture the model route when available." });
   if (entry.proof === 0) issues.push({ code: "missing-proof", severity: "warning", message: "Add browser or screenshot proof." });
   if (entry.isComparisonHub && entry.runCount < 2) issues.push({ code: "hub-no-variants", severity: "error", message: "Link at least two standalone variants." });
+  if (entry.isComparisonHub && entry.views.includes("review") && !entry._metadata?.reviews?.length) issues.push({ code: "missing-coordinator-review", severity: "warning", message: "Attach the orchestrator's evidence-backed comparison review." });
   const comparisonDimension = String(entry._metadata?.comparisonDimension || entry._metadata?.variantStrategy || "");
   if (entry.isComparisonHub && /model|skill|agent|reasoning/i.test(comparisonDimension)) {
     const runs = Array.isArray(entry._metadata?.provenance?.agentRuns) ? entry._metadata.provenance.agentRuns : [];
     const hash = (value) => /^[a-f0-9]{64}$/i.test(value || "");
-    if (runs.length < 2 || runs.some((run) => !run.workerId || run.forkTurns !== "none" || !hash(run.assignmentSha256) || !hash(run.inputManifestSha256))) {
-      issues.push({ code: "unverified-variant-isolation", severity: "warning", message: "Capability comparison lacks auditable worker ids, clean fork mode, or assignment/input hashes." });
+    if (runs.length < 2 || runs.some((run) => !run.workerId || !hasVerifiedFreshWorkerIsolation(run) || !hash(run.assignmentSha256) || !hash(run.inputManifestSha256))) {
+      issues.push({ code: "unverified-variant-isolation", severity: "warning", message: "Capability comparison lacks auditable worker ids, fresh-worker adapter evidence, or assignment/input hashes." });
     }
     if (runs.some((run) => Array.isArray(run.skills) && run.skills.includes("prototype-lab"))) {
       issues.push({ code: "coordinator-skill-exposed", severity: "warning", message: "Prototype Lab appears in a variant treatment; keep it coordinator-only unless it is the tested factor." });

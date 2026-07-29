@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "id": "field-anomaly-ruthless-benchmark",
+  "title": "Field Anomaly Recorder Benchmark",
+  "intent": "benchmark",
+  "question": "What changes across models and when ruthless-designer is activated for a rugged field investigation interface?",
+  "sharedBrief": "Create a complete web interface for a portable field recorder and anomaly investigation system.\n\nThe product is used during expeditions, technical inspections or unusual field investigations. Its purpose is to capture evidence, monitor environmental conditions, identify abnormal patterns and document events while they occur. The interface should support fast decisions in situations where the operator may be moving, working under pressure or dealing with unreliable signals.\n\nThe system may process audio recordings, environmental sensors, event logs, photographs, short video captures, geolocation, timestamps, anomaly classifications and investigator notes. Decide which data must remain visible during live operation and which information belongs to review, history or detailed inspection.\n\nThe overall character should resemble rugged professional instrumentation translated into a sophisticated digital interface. It can draw inspiration from field audio recorders, electromagnetic meters, industrial testing equipment, navigation devices and scientific instruments, but it must not imitate a specific real product.\n\nUse a predominantly black and graphite palette, with subtle differences between the outer surface, embedded panels and active displays. Primary interaction and navigation states may use violet or ultraviolet light. Environmental measurements should use restrained categorical colors such as orange for electromagnetic activity, cyan for magnetic or atmospheric readings, green for stable conditions and red for dangerous values. These colors should make the system easier to scan.\n\nSurfaces should feel durable, tactile and slightly industrial. Use rounded but robust geometry, recessed display areas, dark matte materials, compact buttons, inset sections and occasional metallic details. Avoid making the interface look fragile, glossy or purely ornamental. Controls should appear large enough to operate reliably and should communicate state clearly.\n\nThe visual hierarchy should reflect field use. Recording state, active signal, current event, critical sensor readings and available storage or battery should be understandable quickly. Secondary details may be denser, but should never compete with the active operation.\n\nWaveforms, spectra, sensor graphs, timestamps, GPS readings and event markers can be important visual elements. They should feel like functional instruments rather than decorative charts. Consider combining live measurements with an event-based system that allows unusual moments to be marked, reviewed and classified.\n\nThe atmosphere may contain a subtle sense of mystery, but avoid superficial paranormal clichés. The credibility should come from serious instrumentation being applied to uncertain or unexplained phenomena.\n\nInteractions may include starting and pausing recordings, placing timeline markers, capturing evidence, changing sensor modes, browsing previous anomalies, opening detailed readings, locking an event or adjusting sensitivity. Simulated live values and animated signals should respond coherently to the system state.\n\nMotion should be minimal and purposeful: waveform movement, sensor updates, recording indicators, warning pulses and state changes. Avoid constant decorative animation.\n\nDo not follow a predefined panel arrangement. Determine the layout according to the workflow of preparation, live capture, detection, documentation and review.\n\nBuild the result as a responsive, self-contained HTML interface using HTML, CSS and JavaScript. It should feel like a real tool that an investigator could operate, not simply a futuristic dashboard skin.",
+  "fixedOutcomes": [
+    "Live operation exposes recording state, active signal, critical sensor readings, battery, and storage at a glance",
+    "The operator can start or pause recording, place an event marker, capture evidence, and change at least one sensor setting",
+    "Recorded anomalies can be opened for review with classification, timestamp, location, and investigator notes",
+    "Simulated live values and purposeful motion respond coherently to recording and sensor state",
+    "The interface remains self-contained, responsive, keyboard-usable, and free of horizontal page overflow"
+  ],
+  "openDecisions": [
+    "premise",
+    "content strategy",
+    "information architecture",
+    "composition",
+    "interaction model",
+    "visual language",
+    "responsive structure"
+  ],
+  "assetPolicy": {
+    "mode": "forbidden"
+  },
+  "layoutPolicy": "app-shell",
+  "targetViewports": [
+    "1200x820",
+    "390x844"
+  ],
+  "variants": [
+    {
+      "id": "gpt-5-5-baseline",
+      "model": "gpt-5.5",
+      "reasoning": "xhigh",
+      "condition": "baseline",
+      "skills": []
+    },
+    {
+      "id": "gpt-5-5-ruthless-designer",
+      "model": "gpt-5.5",
+      "reasoning": "xhigh",
+      "condition": "ruthless-designer",
+      "skills": [
+        "ruthless-designer"
+      ]
+    },
+    {
+      "id": "gpt-5-6-luna-baseline",
+      "model": "gpt-5.6-luna",
+      "reasoning": "max",
+      "condition": "baseline",
+      "skills": []
+    },
+    {
+      "id": "gpt-5-6-luna-ruthless-designer",
+      "model": "gpt-5.6-luna",
+      "reasoning": "max",
+      "condition": "ruthless-designer",
+      "skills": [
+        "ruthless-designer"
+      ]
+    },
+    {
+      "id": "gpt-5-6-terra-baseline",
+      "model": "gpt-5.6-terra",
+      "reasoning": "max",
+      "condition": "baseline",
+      "skills": []
+    },
+    {
+      "id": "gpt-5-6-terra-ruthless-designer",
+      "model": "gpt-5.6-terra",
+      "reasoning": "max",
+      "condition": "ruthless-designer",
+      "skills": [
+        "ruthless-designer"
+      ]
+    },
+    {
+      "id": "gpt-5-6-sol-baseline",
+      "model": "gpt-5.6-sol",
+      "reasoning": "xhigh",
+      "condition": "baseline",
+      "skills": []
+    },
+    {
+      "id": "gpt-5-6-sol-ruthless-designer",
+      "model": "gpt-5.6-sol",
+      "reasoning": "xhigh",
+      "condition": "ruthless-designer",
+      "skills": [
+        "ruthless-designer"
+      ]
+    }
+  ]
+}

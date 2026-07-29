@@ -236,6 +236,24 @@ try {
   };
   await writeJson(receiptPath, fixedSuppliedReceipt);
   await run(packager, ["--workspace", temporaryRoot, "--id", "2026/07/002-hub", "--no-zip"]);
+  const cliV3Receipt = structuredClone(contaminatedV2Receipt);
+  cliV3Receipt.schemaVersion = 3;
+  cliV3Receipt.execution.effectiveModelSource = "runtime-observed";
+  cliV3Receipt.dispatch = {
+    ...cliV3Receipt.dispatch,
+    isolation: freshIsolation("dedicated-cli-clean-session")
+  };
+  delete cliV3Receipt.dispatch.forkTurns;
+  cliV3Receipt.assetPolicy = { mode: "worker-choice" };
+  cliV3Receipt.assets = [];
+  await writeJson(receiptPath, cliV3Receipt);
+  await run(packager, ["--workspace", temporaryRoot, "--id", "2026/07/002-hub", "--no-zip"]);
+  cliV3Receipt.dispatch.isolation.inheritedHistory = true;
+  await writeJson(receiptPath, cliV3Receipt);
+  await assert.rejects(
+    run(packager, ["--workspace", temporaryRoot, "--id", "2026/07/002-hub", "--no-zip"]),
+    /inheritedHistory must be false/
+  );
   await writeJson(receiptPath, validReceipt);
 
   await write(path.join(child, ".env"), "SHOULD_NOT_SHIP=true");
@@ -364,8 +382,20 @@ try {
     layoutPolicy: "open",
     targetViewports: ["1200x820", "390x844"],
     variants: [
-      { id: "model-baseline", model: "model-a", reasoning: "high", condition: "baseline", skills: [] },
-      { id: "model-design", model: "model-a", reasoning: "high", condition: "design", skills: ["ruthless-designer"] }
+      { id: "model-baseline", model: "model-a", reasoning: "high", condition: "baseline", skills: [], workUnit: "unknown-sense-experience", sourceFixture: "fixtures/source.html" },
+      {
+        id: "model-design",
+        model: "model-a",
+        reasoning: "high",
+        condition: "design",
+        skills: ["ruthless-designer"],
+        workUnit: "unknown-sense-experience",
+        sourceFixture: "fixtures/source.html",
+        activationContract: {
+          interventions: [{ skill: "ruthless-designer", instruction: "Run the full choose-build-prove loop.", observableEffect: "A product-specific direction and signature are visible.", proofTarget: "Direction artifacts and before/after/detail proof." }],
+          requiredArtifacts: ["context-card.json", "direction-cards.json", "finish-ledger.json", "proof/detail.png"]
+        }
+      }
     ]
   });
   const overconstrainedSpecFile = path.join(managedWorkspace, "experiments", "overconstrained-showcase.json");
@@ -415,10 +445,33 @@ try {
     layoutPolicy: "open",
     targetViewports: ["1200x820", "390x844"],
     variants: [
-      { id: "model-baseline", model: "model-a", reasoning: "high", condition: "baseline", skills: [] },
-      { id: "model-design", model: "model-a", reasoning: "high", condition: "design", skills: ["ruthless-designer"] }
+      { id: "model-baseline", model: "model-a", reasoning: "high", condition: "baseline", skills: [], workUnit: "direct-unknown-sense", sourceFixture: "fixtures/source.html" },
+      {
+        id: "model-design",
+        model: "model-a",
+        reasoning: "high",
+        condition: "design",
+        skills: ["ruthless-designer"],
+        workUnit: "direct-unknown-sense",
+        sourceFixture: "fixtures/source.html",
+        layoutPolicy: "immersive-stage",
+        targetViewports: ["1920x1080"],
+        activationContract: {
+          interventions: [{ skill: "ruthless-designer", instruction: "Run the full choose-build-prove loop.", observableEffect: "A product-specific direction and signature are visible.", proofTarget: "Direction artifacts and before/after/detail proof." }],
+          requiredArtifacts: ["context-card.json", "direction-cards.json", "finish-ledger.json", "proof/detail.png"]
+        }
+      }
     ]
   });
+  const missingContractSpec = JSON.parse(await fs.readFile(directBenchmarkSpec, "utf8"));
+  missingContractSpec.id = "direct-benchmark-missing-contract";
+  missingContractSpec.title = "Direct Benchmark Missing Contract";
+  delete missingContractSpec.variants[1].activationContract;
+  await writeJson(path.join(managedWorkspace, "experiments", "direct-benchmark-missing-contract.json"), missingContractSpec);
+  await assert.rejects(
+    run(workspaceManager, ["experiment", "--workspace", managedWorkspace, "--spec", "experiments/direct-benchmark-missing-contract.json", "--direct-build"]),
+    /requires activationContract/
+  );
   const directPrepared = JSON.parse((await run(workspaceManager, ["experiment", "--workspace", managedWorkspace, "--spec", "experiments/direct-benchmark.json", "--direct-build"])).stdout);
   assert.equal(directPrepared.status, "build-authorized");
   assert.equal(directPrepared.directBuild, true);
@@ -430,11 +483,22 @@ try {
   assert.equal(await exists(path.join(directRoot, "model-baseline", "run-receipt.template.json")), true);
   assert.equal(await exists(path.join(directRoot, "preflight-review.template.json")), false);
   const directAssignment = await fs.readFile(path.join(directRoot, "model-baseline", "build-assignment.md"), "utf8");
+  const treatmentAssignment = await fs.readFile(path.join(directRoot, "model-design", "build-assignment.md"), "utf8");
   assert.match(directAssignment, /exploratory-n1/);
   assert.match(directAssignment, /inspect every finite item/);
+  assert.match(treatmentAssignment, /fail-closed execution contracts/);
+  assert.match(directAssignment, /Build only this primary surface/);
   const directReceiptTemplate = JSON.parse(await fs.readFile(path.join(directRoot, "model-baseline", "run-receipt.template.json"), "utf8"));
-  assert.equal(directReceiptTemplate.schemaVersion, 2);
+  assert.equal(directReceiptTemplate.schemaVersion, 3);
+  assert.equal(directReceiptTemplate.dispatch.isolation.capability, "fresh-worker-no-inherited-history");
   assert.equal(directReceiptTemplate.dispatch.assignmentSha256, directPrepared.buildAssignments[0].sha256);
+  const treatmentReceiptTemplate = JSON.parse(await fs.readFile(path.join(directRoot, "model-design", "run-receipt.template.json"), "utf8"));
+  assert.equal(treatmentReceiptTemplate.skillActivation.status, "planned");
+  assert.equal(treatmentReceiptTemplate.skillActivation.requiredArtifacts.length, 4);
+  const treatmentInputManifest = JSON.parse(await fs.readFile(path.join(directRoot, "model-design", "build-input-manifest.json"), "utf8"));
+  assert.equal(treatmentInputManifest.layoutPolicy, "immersive-stage");
+  assert.deepEqual(treatmentInputManifest.targetViewports, ["1920x1080"]);
+  assert.deepEqual(treatmentInputManifest.canonicalFixtures, ["fixtures/source.html"]);
   const prepared = JSON.parse((await run(workspaceManager, ["experiment", "--workspace", managedWorkspace, "--spec", "experiments/capability-showcase.json"])).stdout);
   assert.equal(prepared.intent, "showcase");
   assert.equal(prepared.variants.length, 2);
@@ -442,7 +506,8 @@ try {
   assert.match(prepared.variants[0].inputManifestSha256, /^[a-f0-9]{64}$/);
   const experimentRoot = path.join(managedWorkspace, ".scratch", "prototype-lab", "capability-showcase");
   const experimentManifest = JSON.parse(await fs.readFile(path.join(experimentRoot, "experiment.json"), "utf8"));
-  assert.equal(experimentManifest.contextContract.forkTurns, "none");
+  assert.equal(experimentManifest.contextContract.capability, "fresh-worker-no-inherited-history");
+  assert.equal(experimentManifest.contextContract.defaultAdapter, "codex-fork-turns-none");
   assert.equal(experimentManifest.contextContract.coordinatorSkillExposedToWorkers, false);
   assert.match(experimentManifest.variants[0].directionInputManifestSha256, /^[a-f0-9]{64}$/);
   const baselineInputManifestFile = path.join(experimentRoot, "model-baseline", "direction-input-manifest.json");
@@ -452,7 +517,7 @@ try {
   const missingDispatch = JSON.parse((await run(workspaceManager, ["preflight", "--workspace", managedWorkspace, "--experiment", "capability-showcase"])).stdout);
   assert.equal(missingDispatch.issues.some((issue) => issue.code === "missing-dispatch"), true);
   await writeJson(path.join(experimentRoot, "model-baseline", "dispatch.json"), dispatchFixture(experimentManifest, experimentManifest.variants[0], "worker-direction-baseline"));
-  await writeJson(path.join(experimentRoot, "model-design", "dispatch.json"), dispatchFixture(experimentManifest, experimentManifest.variants[1], "worker-direction-design"));
+  await writeJson(path.join(experimentRoot, "model-design", "dispatch.json"), dispatchFixture(experimentManifest, experimentManifest.variants[1], "worker-direction-design", "dedicated-cli-clean-session"));
   const baselineDirection = directionFixture(experimentManifest.variants[0], false);
   const designDirection = directionFixture(experimentManifest.variants[1], true);
   designDirection.selectedDirection.fingerprint = { ...baselineDirection.selectedDirection.fingerprint };
@@ -493,7 +558,7 @@ try {
   const rejectedSpec = JSON.parse(await fs.readFile(experimentSpecFile, "utf8"));
   rejectedSpec.id = "review-rejected-showcase";
   rejectedSpec.title = "Review Rejected Showcase";
-  rejectedSpec.assetPolicy = { mode: "fixed-supplied", skill: "imagegen", deliverable: "the same shared atlas and hash in every condition" };
+  rejectedSpec.assetPolicy = { mode: "fixed-supplied", skill: "imagegen", deliverable: "the same shared atlas and hash in every condition", files: [{ path: "fixtures/benchmark-atlas.png", sha256: createHash("sha256").update(await fs.readFile(directBenchmarkAssets)).digest("hex") }] };
   const rejectedSpecFile = path.join(managedWorkspace, "experiments", "review-rejected-showcase.json");
   await writeJson(rejectedSpecFile, rejectedSpec);
   await run(workspaceManager, ["experiment", "--workspace", managedWorkspace, "--spec", "experiments/review-rejected-showcase.json"]);
@@ -539,8 +604,8 @@ try {
   assert.deepEqual(alphaMetadata.provenance.skills, []);
   assert.deepEqual(alphaMetadata.provenance.orchestrationSkills, ["prototype-lab"]);
   assert.deepEqual(betaMetadata.provenance.skills, ["ruthless-designer"]);
-  alphaMetadata.provenance.agentRuns = [{ agentMode: "subagent", agentTool: "agents.spawn_agent", workerId: "worker-alpha", forkTurns: "none", assignmentSha256: "a".repeat(64), inputManifestSha256: "b".repeat(64), receipt: "runs/alpha.json", fallbackReason: "not applicable", receivedOtherVariants: false, contextIsolation: "dispatch-recorded" }];
-  betaMetadata.provenance.agentRuns = [{ agentMode: "subagent", agentTool: "agents.spawn_agent", workerId: "worker-beta", forkTurns: "none", assignmentSha256: "c".repeat(64), inputManifestSha256: "d".repeat(64), receipt: "runs/beta.json", fallbackReason: "not applicable", receivedOtherVariants: false, contextIsolation: "dispatch-recorded" }];
+  alphaMetadata.provenance.agentRuns = [{ agentMode: "subagent", agentTool: "agents.spawn_agent", workerId: "worker-alpha", isolation: freshIsolation("codex-fork-turns-none"), forkTurns: "none", assignmentSha256: "a".repeat(64), inputManifestSha256: "b".repeat(64), receipt: "runs/alpha.json", fallbackReason: "not applicable", receivedOtherVariants: false, contextIsolation: "dispatch-recorded" }];
+  betaMetadata.provenance.agentRuns = [{ agentMode: "dedicated-cli", agentTool: "example-agent-cli", workerId: "worker-beta", isolation: freshIsolation("dedicated-cli-clean-session"), assignmentSha256: "c".repeat(64), inputManifestSha256: "d".repeat(64), receipt: "runs/beta.json", fallbackReason: "not applicable", receivedOtherVariants: false, contextIsolation: "dispatch-recorded" }];
   await writeJson(alphaMetadataFile, alphaMetadata);
   await writeJson(betaMetadataFile, betaMetadata);
   const managedHub = JSON.parse((await run(workspaceManager, ["hub", "--workspace", managedWorkspace, "--date", "2026-07-11", "--title", "Board Comparison", "--variants", "001,002", "--dimension", "model", "--criteria", "clarity,feedback,fit"])).stdout);
@@ -563,7 +628,8 @@ try {
   assert.match(hubData, /ruthless-designer/);
   assert.match(hubData, /worker-alpha/);
   assert.match(hubData, /worker-beta/);
-  assert.match(hubData, /"forkTurns": "none"/);
+  assert.match(hubData, /"isolationAdapter": "codex-fork-turns-none"/);
+  assert.match(hubData, /"isolationAdapter": "dedicated-cli-clean-session"/);
   const syncedHubMetadata = JSON.parse(await fs.readFile(path.join(hubFolder, "metadata.json"), "utf8"));
   assert.deepEqual(syncedHubMetadata.provenance.agentRuns.map((run) => run.workerId), ["worker-alpha", "worker-beta"]);
   assert.equal(syncedHubMetadata.provenance.agentRuns.some((run) => run.agentTool === "not captured"), false);
@@ -574,7 +640,7 @@ try {
   assert.equal(await exists(path.join(managedWorkspace, "prototypes", "index.html")), true);
   assert.equal(await exists(path.join(managedWorkspace, "prototypes", "prototype-index-data.js")), true);
   const contaminatedHubMetadata = JSON.parse(await fs.readFile(path.join(hubFolder, "metadata.json"), "utf8"));
-  contaminatedHubMetadata.provenance.agentRuns[0].forkTurns = "all";
+  contaminatedHubMetadata.provenance.agentRuns[1].isolation.inheritedHistory = true;
   await writeJson(path.join(hubFolder, "metadata.json"), contaminatedHubMetadata);
   const contaminatedStatus = JSON.parse((await run(workspaceManager, ["status", "--workspace", managedWorkspace])).stdout);
   assert.equal(contaminatedStatus.issues.some((issue) => issue.id === managedHub.id && issue.code === "unverified-variant-isolation"), true);
@@ -693,15 +759,15 @@ function directionFixture(variant, treated) {
   };
 }
 
-function dispatchFixture(experiment, variant, workerId) {
-  return {
-    schemaVersion: 1,
+function dispatchFixture(experiment, variant, workerId, adapter = "codex-fork-turns-none") {
+  const dispatch = {
+    schemaVersion: 2,
     experimentId: experiment.id,
     variantId: variant.id,
     stage: "direction",
     workerId,
     agentTool: "agents.spawn_agent",
-    forkTurns: "none",
+    isolation: freshIsolation(adapter),
     requestedModel: variant.model,
     reasoning: variant.reasoning,
     variantSkills: variant.skills,
@@ -711,5 +777,22 @@ function dispatchFixture(experiment, variant, workerId) {
     sentPaths: [`${variant.id}/assignment.md`, `${variant.id}/direction.template.json`, `${variant.id}/direction-input-manifest.json`],
     memoryInputs: [],
     receivedOtherVariants: false
+  };
+  if (adapter === "codex-fork-turns-none") dispatch.forkTurns = "none";
+  return dispatch;
+}
+
+function freshIsolation(adapter) {
+  const evidence = {
+    "codex-fork-turns-none": "fork_turns:none",
+    "dedicated-cli-clean-session": "fresh-process-packet-only",
+    "separate-thread-fresh-context": "fresh-thread-no-history"
+  }[adapter];
+  return {
+    capability: "fresh-worker-no-inherited-history",
+    adapter,
+    inheritedHistory: false,
+    coordinatorContextExposed: false,
+    evidence
   };
 }
