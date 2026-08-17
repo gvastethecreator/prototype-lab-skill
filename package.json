@@ -2,6 +2,7 @@
   "name": "prototype-lab-skill",
   "version": "0.6.0",
   "private": true,
+  "packageManager": "pnpm@11.21.0",
   "type": "module",
   "scripts": {
     "assets:icons": "node scripts/vendor-tabler-icons.mjs",
@@ -33,6 +34,7 @@
     "test:scaffolds": "node scripts/test-scaffold-ui.mjs",
     "package:manifest": "node scripts/verify-published-package.mjs --check",
     "package:manifest:write": "node scripts/verify-published-package.mjs --write",
-    "validate": "node scripts/validate-skill-pack.mjs && node scripts/verify-published-package.mjs --check && node scripts/test-portable-tools.mjs && node scripts/test-lab-daily-workflow.mjs"
+    "validate": "node scripts/validate-skill-pack.mjs && node scripts/verify-published-package.mjs --check && node scripts/test-portable-tools.mjs && node scripts/test-lab-daily-workflow.mjs",
+    "check": "node scripts/validate-skill-pack.mjs && node scripts/verify-published-package.mjs --check && node scripts/test-portable-tools.mjs && node scripts/test-lab-daily-workflow.mjs"
   }
 }

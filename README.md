@@ -1,10 +1,33 @@
-# Prototype Lab
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/header/document.svg?title=Prototype+Lab&subtitle=Prototype.+Compare.+Prove.+Ship.&logo=flask&theme=green&align=center&mode=dark" />
+    <img alt="Prototype Lab — prototype, compare, prove, and ship" src="https://shieldcn.dev/header/document.svg?title=Prototype+Lab&subtitle=Prototype.+Compare.+Prove.+Ship.&logo=flask&theme=green&align=center&mode=light" />
+  </picture>
+</p>
 
-![Prototype Lab banner](./assets/readme-banner.png)
+<p align="center">
+  <a href="https://github.com/gvastethecreator/prototype-lab-skill/actions/workflows/ci.yml"><img alt="CI status" src="https://shieldcn.dev/github/ci/gvastethecreator/prototype-lab-skill.svg?workflow=ci&branch=main&variant=secondary&size=xs" /></a>
+  <a href="https://gvastethecreator.github.io/prototype-lab-skill/"><img alt="Project site" src="https://shieldcn.dev/badge/site-lab%20notes-166534.svg?logo=githubpages&variant=branded&size=xs" /></a>
+  <a href="https://agentskills.io/"><img alt="Agent Skills compatible" src="https://shieldcn.dev/badge/Agent+Skills-compatible-111111.svg?variant=secondary&size=xs" /></a>
+  <a href="https://pnpm.io/"><img alt="pnpm 11.21" src="https://shieldcn.dev/badge/pnpm-11.21-f69220.svg?logo=pnpm&variant=secondary&size=xs" /></a>
+  <a href="LICENSE"><img alt="MIT license" src="https://shieldcn.dev/github/license/gvastethecreator/prototype-lab-skill.svg?variant=secondary&size=xs" /></a>
+</p>
 
 Codex skill and local workspace manager for quickly creating or adopting standalone browser prototypes, iterating them, running honest comparisons, attaching evidence-backed reviews, and packaging portable static artifacts.
 
 The project uses one command surface. The browser hub is generated from artifact metadata; comparison hubs are generated from small editable manifests. Runtime HTML is no longer the place where membership, criteria, and provenance are manually maintained.
+
+[Project site](https://gvastethecreator.github.io/prototype-lab-skill/) · [Skill workflow](./SKILLS/prototype-lab/SKILL.md) · [Contributing](./CONTRIBUTING.md) · [Sponsor](https://github.com/sponsors/gvastethecreator)
+
+## Product tour
+
+These captures come from the real browser suites and isolated test workspaces. They contain no personal project data.
+
+| Prototype library | Readiness and recovery |
+| --- | --- |
+| ![Prototype Lab library with artifact catalog, evidence coverage, search, and grouping controls](docs/assets/screenshots/prototype-library.png) | ![Prototype Lab health view with readiness queue and copyable recovery commands](docs/assets/screenshots/readiness-health.png) |
+| **Orchestrator review** | **Provenance ledger** |
+| ![Comparison hub showing an evidence-backed orchestrator recommendation](docs/assets/screenshots/orchestrator-review.png) | ![Comparison provenance view exposing worker, assignment, input, and receipt boundaries](docs/assets/screenshots/provenance-ledger.png) |
 
 ## Install
 
@@ -28,27 +51,27 @@ Then invoke `$prototype-lab` or run the workspace manager directly from the inst
 In this repository:
 
 ```powershell
-npm run lab -- help
-npm run lab -- init
-npm run lab -- quick --title "Dispatch board" --question "Can an operator resolve an incident without losing queue context?" --profile tool
-npm run lab -- open
-npm run lab -- preview --id 001 --open
-npm run lab -- verify --id 001 --profile full --init-review
-npm run lab -- finalize --id 001
-npm run lab -- fork --id 001 --title "Dispatch board compact"
-npm run lab -- compare --title "Dispatch comparison" --variants 001,002 --dimension design --modes compare,blind,rank,iterations,review
-npm run lab -- review --id 003 --init
-npm run lab -- review --id 003 --report <completed-review.json>
-npm run lab -- experiment --init --id capability-showcase --intent showcase --models gpt-5.5,gpt-5.6-sol --skill ruthless-designer
-npm run lab -- experiment --spec experiments/capability-showcase.json
-npm run lab -- experiment --spec experiments/natural-benchmark.json --direct-build
-npm run lab -- preflight --experiment capability-showcase
-npm run lab -- preflight --experiment capability-showcase --review .scratch/prototype-lab/capability-showcase/preflight-review.json
-npm run lab -- materialize --experiment capability-showcase
-npm run lab -- sync
-npm run lab -- status
-npm run lab -- doctor
-npm run lab -- ship --id 003 --include-proof
+pnpm run lab -- help
+pnpm run lab -- init
+pnpm run lab -- quick --title "Dispatch board" --question "Can an operator resolve an incident without losing queue context?" --profile tool
+pnpm run lab -- open
+pnpm run lab -- preview --id 001 --open
+pnpm run lab -- verify --id 001 --profile full --init-review
+pnpm run lab -- finalize --id 001
+pnpm run lab -- fork --id 001 --title "Dispatch board compact"
+pnpm run lab -- compare --title "Dispatch comparison" --variants 001,002 --dimension design --modes compare,blind,rank,iterations,review
+pnpm run lab -- review --id 003 --init
+pnpm run lab -- review --id 003 --report <completed-review.json>
+pnpm run lab -- experiment --init --id capability-showcase --intent showcase --models gpt-5.5,gpt-5.6-sol --skill ruthless-designer
+pnpm run lab -- experiment --spec experiments/capability-showcase.json
+pnpm run lab -- experiment --spec experiments/natural-benchmark.json --direct-build
+pnpm run lab -- preflight --experiment capability-showcase
+pnpm run lab -- preflight --experiment capability-showcase --review .scratch/prototype-lab/capability-showcase/preflight-review.json
+pnpm run lab -- materialize --experiment capability-showcase
+pnpm run lab -- sync
+pnpm run lab -- status
+pnpm run lab -- doctor
+pnpm run lab -- ship --id 003 --include-proof
 ```
 
 In another workspace:
@@ -120,7 +143,7 @@ prototypes/
 
 Every standalone artifact keeps its runtime, metadata, frozen prompts, run receipts, and proof local. A hub links and compares variants; it does not own or modify their runtime code.
 
-For a managed comparison, edit `hub.config.json` and run `npm run lab -- sync`. Do not maintain variant data inside generated HTML or JavaScript.
+For a managed comparison, edit `hub.config.json` and run `pnpm run lab -- sync`. Do not maintain variant data inside generated HTML or JavaScript.
 
 ## Workspace Hub
 
@@ -144,8 +167,8 @@ architectures instead of sharing one generic dashboard layout.
 ## Portable Packs
 
 ```powershell
-npm run lab -- pack --id 003
-npm run lab -- pack --id 003 --include-proof
+pnpm run lab -- pack --id 003
+pnpm run lab -- pack --id 003 --include-proof
 ```
 
 The pack includes the primary artifact, linked variants, normalized prompts and receipts, a root launcher, a host-neutral `deploy.json`, and a SHA-256 manifest. Proof is omitted by default for smaller uploads. A successful package is a build-free, multi-page static publish directory; packaging rejects root-relative paths, missing local assets, and remote runtime dependencies.
@@ -155,8 +178,8 @@ A validated static pack can be adapted to ChatGPT Sites or another static host. 
 ## Development Validation
 
 ```powershell
-npm run validate
-npm run package:manifest
+pnpm run validate
+pnpm run package:manifest
 python <codex-home>/skills/.system/skill-creator/scripts/quick_validate.py SKILLS/prototype-lab
 ```
 
@@ -168,3 +191,7 @@ The test suite exercises prompt versioning, held-out rubrics, overconstrained-br
 ## License
 
 [MIT](./LICENSE)
+
+## Support
+
+If Prototype Lab helps your work, you can support continued maintenance through [GitHub Sponsors](https://github.com/sponsors/gvastethecreator) or [Ko-fi](https://ko-fi.com/gvaste).

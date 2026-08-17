@@ -16,7 +16,7 @@ Treat `prototypes/` as a managed experiment workspace. Keep every result indepen
 | Measure models, agents, reasoning, or skills | `experiment` |
 | Verify, finalize, and package | `ship` |
 
-Run `node <skill-root>/scripts/manage-prototype-lab.mjs help` for the full interface. In this repository use `npm run lab -- <command>`.
+Run `node <skill-root>/scripts/manage-prototype-lab.mjs help` for the full interface. In this repository use `pnpm run lab -- <command>`.
 
 ## Quick Route
 

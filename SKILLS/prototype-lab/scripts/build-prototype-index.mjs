@@ -9,7 +9,7 @@ export async function collectPrototypeIndex({ workspace = process.cwd() } = {}) 
   const workspaceRoot = path.resolve(workspace);
   const prototypesRoot = path.join(workspaceRoot, "prototypes");
   const packageJson = await readJson(path.join(workspaceRoot, "package.json"), {});
-  const commandPrefix = packageJson.scripts?.lab ? "npm run lab --" : "node <skill-root>/scripts/manage-prototype-lab.mjs";
+  const commandPrefix = packageJson.scripts?.lab ? "pnpm run lab --" : "node <skill-root>/scripts/manage-prototype-lab.mjs";
   const metadataFiles = await findMetadataFiles(prototypesRoot, prototypesRoot);
   const entries = [];
 

@@ -13,7 +13,7 @@ node <skill-root>/scripts/manage-prototype-lab.mjs <command> --workspace <worksp
 Repository-local development can use the shorter npm wrapper:
 
 ```text
-npm run lab -- <command>
+pnpm run lab -- <command>
 ```
 
 Commands:

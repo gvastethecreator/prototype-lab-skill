@@ -1998,7 +1998,7 @@ function jsonText(value) { return `${JSON.stringify(value, null, 2)}\n`; }
 async function writeJson(file, value) { await fs.mkdir(path.dirname(file), { recursive: true }); await fs.writeFile(file, jsonText(value), "utf8"); }
 async function findFiles(root, name, output = []) { const entries = await fs.readdir(root, { withFileTypes: true }).catch(() => []); for (const entry of entries) { if (entry.name.startsWith(".") || entry.name === "proof" || (root === prototypesRoot && entry.name === "prompts")) continue; const file = path.join(root, entry.name); if (entry.isDirectory()) await findFiles(file, name, output); else if (entry.name === name) output.push(file); } return output; }
 async function runNode(script, commandArgs) { return execFileAsync(process.execPath, [script, ...commandArgs], { cwd: workspace, encoding: "utf8", maxBuffer: 4 * 1024 * 1024 }); }
-async function detectCommandPrefix() { const packageJson = await readJson(path.join(workspace, "package.json"), {}); return packageJson.scripts?.lab ? "npm run lab --" : "node <skill-root>/scripts/manage-prototype-lab.mjs"; }
+async function detectCommandPrefix() { const packageJson = await readJson(path.join(workspace, "package.json"), {}); return packageJson.scripts?.lab ? "pnpm run lab --" : "node <skill-root>/scripts/manage-prototype-lab.mjs"; }
 
 function parseArgs(values) {
   const parsed = {};

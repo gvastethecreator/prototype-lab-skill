@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "packageRoot": "SKILLS/prototype-lab",
   "algorithm": "sha256",
-  "packageSha256": "da64a266d2a76f3ec88a7a4afed27b9e505a97829e34f68c1d986579a7cd5355",
+  "packageSha256": "d208a7daf3781f2c1099a44ca260cba0e3c3717c3a2afbe99c0eb6d817756286",
   "excludedFromDigest": [
     "package-manifest.json"
   ],
@@ -562,8 +562,8 @@
     },
     {
       "path": "assets/prototype-index/icons/README.md",
-      "sha256": "38423bf21b913fd34b7dd2c74de4af4dde18356496d0c434c94de88820e31206",
-      "bytes": 612
+      "sha256": "eda0e48be2f63afdc7a56a1ab90db4fb87a65e897c302f02d686b792b18461f6",
+      "bytes": 613
     },
     {
       "path": "assets/prototype-index/icons/receipt-2.svg",
@@ -1007,13 +1007,13 @@
     },
     {
       "path": "references/workspace-and-hub.md",
-      "sha256": "7bb2ec062e6eb2c85b25d49b29ca46cab64ec37663417512b845eefe32ec3bbf",
-      "bytes": 8660
+      "sha256": "5ec7b4cfc709debffa3df6b41f5d9eaa557d1f8d9681e01031c82bd58b388c6f",
+      "bytes": 8661
     },
     {
       "path": "scripts/build-prototype-index.mjs",
-      "sha256": "c769c49d4b18224ac38c888184200e0dd0e6fb93a3b8f99a95edbb9780433c43",
-      "bytes": 16940
+      "sha256": "770279354d683d5b020bbaa5aded81756a477f8c6fc08e59aa46e005db52fa1a",
+      "bytes": 16941
     },
     {
       "path": "scripts/manage-prompt-library.mjs",
@@ -1022,8 +1022,8 @@
     },
     {
       "path": "scripts/manage-prototype-lab.mjs",
-      "sha256": "33be8cd55ac0f1e0e0bcaa6c1fca6cf1522cc252f7f779331cdb2e73e0e6530b",
-      "bytes": 128053
+      "sha256": "555b3a1169e631d6117e20331c6752d077d7c0f7a6d3736eea9e8eca510d136f",
+      "bytes": 128054
     },
     {
       "path": "scripts/package-comparison-hubs.mjs",
@@ -1057,8 +1057,8 @@
     },
     {
       "path": "SKILL.md",
-      "sha256": "325643e957f898200db3a1b94a546aa917c6ac53f9d9d7fcfa9721d9ba6b3d98",
-      "bytes": 7514
+      "sha256": "a9672b10131fc114e48067e05e16de117852e1e17003cb6c03353b34dfc46ab6",
+      "bytes": 7515
     }
   ]
 }

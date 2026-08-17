@@ -1,0 +1,264 @@
+{
+  "generated_at": "2026-08-15T06:32:05Z",
+  "generated_from_commit": "2ee51f26fd51354b7044fa4c7555a5b9d5bbd2e6",
+  "scope": [
+    "."
+  ],
+  "nodes": [
+    {
+      "id": "repository",
+      "path": "README.md",
+      "role": "Owns the tracked files for the repository module.",
+      "type": "module",
+      "boundary": "Repository",
+      "entrypoints": [
+        "README.md:Product tour"
+      ],
+      "tests": [],
+      "constraints": [
+        "This baseline uses tracked source and explicit dependency references only."
+      ],
+      "evidence": {
+        "status": "verified",
+        "locations": [
+          {
+            "path": "README.md",
+            "symbol": "Product tour"
+          }
+        ]
+      }
+    },
+    {
+      "id": "scripts",
+      "path": "scripts",
+      "role": "Owns the tracked files for the scripts module.",
+      "type": "service",
+      "boundary": "Scripts",
+      "entrypoints": [
+        "scripts/build-prototype-index.mjs:#!/usr/bin/env node"
+      ],
+      "tests": [],
+      "constraints": [
+        "This baseline uses tracked source and explicit dependency references only."
+      ],
+      "evidence": {
+        "status": "verified",
+        "locations": [
+          {
+            "path": "scripts/build-prototype-index.mjs",
+            "symbol": "#!/usr/bin/env node"
+          }
+        ]
+      }
+    },
+    {
+      "id": "skills",
+      "path": "SKILLS",
+      "role": "Owns the tracked files for the SKILLS module.",
+      "type": "module",
+      "boundary": "Skills",
+      "entrypoints": [
+        "SKILLS/prototype-lab/assets/comparison-hub/index.html:Prototype comparison"
+      ],
+      "tests": [],
+      "constraints": [
+        "This baseline uses tracked source and explicit dependency references only."
+      ],
+      "evidence": {
+        "status": "verified",
+        "locations": [
+          {
+            "path": "SKILLS/prototype-lab/assets/comparison-hub/index.html",
+            "symbol": "Prototype comparison"
+          }
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "repository",
+      "to": "scripts",
+      "type": "calls",
+      "evidence": {
+        "status": "verified",
+        "locations": [
+          {
+            "path": "package.json",
+            "symbol": "scripts/vendor-tabler-icons.mjs"
+          },
+          {
+            "path": "package.json",
+            "symbol": "scripts/manage-prototype-lab.mjs"
+          },
+          {
+            "path": "package.json",
+            "symbol": "scripts/build-prototype-index.mjs"
+          },
+          {
+            "path": "package.json",
+            "symbol": "scripts/reorganize-prototype-library.mjs"
+          },
+          {
+            "path": "package.json",
+            "symbol": "scripts/package-comparison-hubs.mjs"
+          },
+          {
+            "path": "package.json",
+            "symbol": "scripts/manage-prompt-library.mjs"
+          },
+          {
+            "path": "package.json",
+            "symbol": "scripts/test-portable-tools.mjs"
+          },
+          {
+            "path": "package.json",
+            "symbol": "scripts/test-lab-daily-workflow.mjs"
+          }
+        ]
+      }
+    },
+    {
+      "from": "repository",
+      "to": "skills",
+      "type": "reads",
+      "evidence": {
+        "status": "verified",
+        "locations": [
+          {
+            "path": "README.md",
+            "symbol": "./SKILLS/prototype-lab/SKILL.md"
+          },
+          {
+            "path": "README.md",
+            "symbol": "prototype-lab"
+          }
+        ]
+      }
+    },
+    {
+      "from": "scripts",
+      "to": "skills",
+      "type": "imports",
+      "evidence": {
+        "status": "verified",
+        "locations": [
+          {
+            "path": "scripts/build-prototype-index.mjs",
+            "symbol": "../SKILLS/prototype-lab/scripts/build-prototype-index.mjs"
+          },
+          {
+            "path": "scripts/manage-prompt-library.mjs",
+            "symbol": "../SKILLS/prototype-lab/scripts/manage-prompt-library.mjs"
+          },
+          {
+            "path": "scripts/manage-prototype-lab.mjs",
+            "symbol": "../SKILLS/prototype-lab/scripts/manage-prototype-lab.mjs"
+          },
+          {
+            "path": "scripts/package-comparison-hubs.mjs",
+            "symbol": "../SKILLS/prototype-lab/scripts/package-comparison-hubs.mjs"
+          },
+          {
+            "path": "scripts/reorganize-prototype-library.mjs",
+            "symbol": "../SKILLS/prototype-lab/scripts/reorganize-prototype-library.mjs"
+          },
+          {
+            "path": "scripts/verify-prototype-lab.mjs",
+            "symbol": "../SKILLS/prototype-lab/scripts/verify-prototype-lab.mjs"
+          }
+        ]
+      }
+    },
+    {
+      "from": "skills",
+      "to": "repository",
+      "type": "reads",
+      "evidence": {
+        "status": "verified",
+        "locations": [
+          {
+            "path": "SKILLS/prototype-lab/references/agent-isolation.md",
+            "symbol": "README.md"
+          },
+          {
+            "path": "SKILLS/prototype-lab/references/quality-bar.md",
+            "symbol": "README.md"
+          },
+          {
+            "path": "SKILLS/prototype-lab/references/taste-calibration.md",
+            "symbol": "README.md"
+          }
+        ]
+      }
+    },
+    {
+      "from": "skills",
+      "to": "scripts",
+      "type": "reads",
+      "evidence": {
+        "status": "verified",
+        "locations": [
+          {
+            "path": "SKILLS/prototype-lab/SKILL.md",
+            "symbol": "scripts/manage-prototype-lab.mjs"
+          },
+          {
+            "path": "SKILLS/prototype-lab/SKILL.md",
+            "symbol": "scripts/manage-prompt-library.mjs"
+          },
+          {
+            "path": "SKILLS/prototype-lab/references/prompt-templates.md",
+            "symbol": "scripts/manage-prompt-library.mjs"
+          }
+        ]
+      }
+    }
+  ],
+  "flows": [
+    {
+      "trigger": "Tracked reference package.json:scripts/vendor-tabler-icons.mjs",
+      "steps": [
+        "repository",
+        "scripts",
+        "skills"
+      ],
+      "outcome": "The verified dependency path reaches skills through 2 step(s)."
+    },
+    {
+      "trigger": "Tracked reference README.md:./SKILLS/prototype-lab/SKILL.md",
+      "steps": [
+        "repository",
+        "skills",
+        "scripts"
+      ],
+      "outcome": "The verified dependency path reaches scripts through 2 step(s)."
+    },
+    {
+      "trigger": "Tracked reference scripts/build-prototype-index.mjs:../SKILLS/prototype-lab/scripts/build-prototype-index.mjs",
+      "steps": [
+        "scripts",
+        "skills",
+        "repository"
+      ],
+      "outcome": "The verified dependency path reaches repository through 2 step(s)."
+    },
+    {
+      "trigger": "Tracked reference SKILLS/prototype-lab/references/agent-isolation.md:README.md",
+      "steps": [
+        "skills",
+        "repository",
+        "scripts"
+      ],
+      "outcome": "The verified dependency path reaches scripts through 2 step(s)."
+    },
+    {
+      "trigger": "Tracked reference package.json:scripts/vendor-tabler-icons.mjs to scripts",
+      "steps": [
+        "repository",
+        "scripts"
+      ],
+      "outcome": "The verified dependency path reaches scripts through 1 step(s)."
+    }
+  ]
+}

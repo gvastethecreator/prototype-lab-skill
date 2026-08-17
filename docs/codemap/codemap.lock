@@ -1,0 +1,69 @@
+{
+  "source_commit": "2ee51f26fd51354b7044fa4c7555a5b9d5bbd2e6",
+  "working_tree_dirty": true,
+  "generated_at": "2026-08-15T06:32:05Z",
+  "scanned_scope": [
+    "."
+  ],
+  "excluded_directories": [
+    ".cache",
+    ".git",
+    ".hg",
+    ".next",
+    ".nuxt",
+    ".scratch",
+    ".svn",
+    ".turbo",
+    ".venv",
+    "__pycache__",
+    "build",
+    "coverage",
+    "dist",
+    "docs/codemap",
+    "generated",
+    "node_modules",
+    "out",
+    "target",
+    "vendor",
+    "venv"
+  ],
+  "fingerprint_algorithm": "sha256-path-content-v1",
+  "modules": [
+    {
+      "id": ".",
+      "path": ".",
+      "file_count": 8,
+      "fingerprint": "fa213f58ed9e10f082fa80de0349e76dfa76fd6840b7bfe4e018181387607724"
+    },
+    {
+      "id": ".github",
+      "path": ".github",
+      "file_count": 1,
+      "fingerprint": "11882d3a87ea40c69c458354552c3249d80f496ce1d7d04ca4056e20506c690a"
+    },
+    {
+      "id": "SKILLS",
+      "path": "SKILLS",
+      "file_count": 212,
+      "fingerprint": "1e2b239f226a8150ab8952673237e5906c165e7c181ae3e82bfc65e8ddbc8666"
+    },
+    {
+      "id": "assets",
+      "path": "assets",
+      "file_count": 1,
+      "fingerprint": "505f74f73df5f3524bec36887070b7644c6ee89804f3ccf826a3c773011197d0"
+    },
+    {
+      "id": "experiments",
+      "path": "experiments",
+      "file_count": 1,
+      "fingerprint": "97f2cb0152afb22f4df30ecad34630f49f7c5f3c8074634b17d2cf2daf850582"
+    },
+    {
+      "id": "scripts",
+      "path": "scripts",
+      "file_count": 14,
+      "fingerprint": "c2c6c6590b32274fa0d6743c52b0fb8b82bcdc65fc5efa5932cfb5cd20fc1f24"
+    }
+  ]
+}
