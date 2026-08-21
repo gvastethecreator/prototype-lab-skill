@@ -26,6 +26,7 @@ const directionFingerprintEnums = {
 };
 const artifactDataStart = "/* prototype-lab:artifact-data:start */";
 const artifactDataEnd = "/* prototype-lab:artifact-data:end */";
+const varyCopyExclude = new Set(["metadata.json", "README.md", "proof", "runs", "prompts", "positions", "reviews", "plan.json", "vary-card.js", "vary-data.js", "hub.config.json", "hub-data.js", "hub.css", "hub.js"]);
 const [command = "status", ...rawTokens] = process.argv.slice(2);
 const tokens = [...rawTokens];
 const nestedCommand = ["prompt", "help"].includes(command) && tokens[0] && !tokens[0].startsWith("--") ? tokens.shift() : null;
@@ -71,6 +72,8 @@ if (["help", "--help", "-h"].includes(command) || args.help) {
   print({ command, ...(await adoptPrototype()) });
 } else if (command === "fork") {
   print({ command, ...(await forkPrototype()) });
+} else if (command === "vary") {
+  print({ command, ...(await manageVaryRound()) });
 } else if (command === "materialize") {
   print({ command, ...(await materializeExperiment()) });
 } else if (command === "record") {
@@ -101,7 +104,7 @@ if (["help", "--help", "-h"].includes(command) || args.help) {
   const output = await runNode(path.join(scriptRoot, "package-prototype-lab.mjs"), packageArgs);
   process.stdout.write(output.stdout);
 } else {
-  throw new Error("Unknown command. Run `lab help` to see quick, compare, experiment, ship, and workspace commands.");
+  throw new Error("Unknown command. Run `lab help` to see quick, vary, compare, experiment, ship, and workspace commands.");
 }
 
 async function initializeExperimentSpec() {
@@ -1276,7 +1279,7 @@ async function doctorWorkspace() {
   const nodeMajor = Number(process.versions.node.split(".")[0]);
   const checks = [
     { id: "node", status: nodeMajor >= 20 ? "passed" : "blocked", detail: `Node ${process.versions.node}; Prototype Lab requires Node 20 or newer.` },
-    { id: "skill-assets", status: await exists(path.join(skillRoot, "assets", "prototype-blank", "index.html")) ? "passed" : "blocked", detail: "Bundled scaffolds are available." },
+    { id: "skill-assets", status: await exists(path.join(skillRoot, "assets", "prototype-blank", "index.html")) && await exists(path.join(skillRoot, "assets", "vary-card", "vary-card.js")) ? "passed" : "blocked", detail: "Bundled scaffolds and design-round host are available." },
     { id: "workspace", status: await exists(workspace) ? "passed" : "blocked", detail: toPosix(workspace) },
     { id: "library", status: await exists(path.join(prototypesRoot, "index.html")) ? "passed" : "warning", detail: await exists(path.join(prototypesRoot, "index.html")) ? "Workspace hub exists." : `Run ${labCommand("init")}.` },
     { id: "prompts", status: await exists(path.join(prototypesRoot, "prompts", "catalog.json")) ? "passed" : "warning", detail: await exists(path.join(prototypesRoot, "prompts", "catalog.json")) ? "Prompt catalog exists." : `Run ${labCommand("prompt init")}.` }
@@ -1310,6 +1313,288 @@ async function adoptPrototype() {
   await updateArtifactFiles(folder, metadata);
   await buildPrototypeIndex({ workspace });
   return { ...created, source: metadata.adoptedFrom, next: [labCommand(`verify --id ${created.id} --profile quick`), labCommand("sync")] };
+}
+
+async function manageVaryRound() {
+  if (!args.id) throw new Error("vary requires --id <prototype-id>");
+  const source = await artifactRecord(args.id);
+  if (source.entry.isComparisonHub) throw new Error("vary supports standalone prototypes, not comparison hubs");
+  const actions = ["end", "narrow", "check", "use"].filter((name) => args[name] !== undefined && args[name] !== false);
+  if (actions.length > 1) throw new Error("vary accepts one of --check, --use, --narrow, or --end");
+  const planFile = path.join(source.folder, "plan.json");
+  const existing = await readJson(planFile, null);
+  let result;
+  if (args.end) result = await closeVaryRound(source, existing);
+  else if (args.narrow) result = await narrowVaryRound(source, existing);
+  else if (args.use !== undefined) result = await useVaryPosition(source, existing, args.use);
+  else if (args.check) result = await checkVaryRound(source, existing);
+  else if (existing?.status === "open" && !args.new) result = varyStatus(source, existing);
+  else result = await openVaryRound(source, existing);
+  await buildPrototypeIndex({ workspace });
+  return result;
+}
+
+async function openVaryRound(source, previous) {
+  if (previous?.status === "open") throw new Error(`A design round is already open on ${source.entry.id}`);
+  const count = Math.max(2, Math.min(8, Number(args.n || 4)));
+  const fresh = Boolean(args.new);
+  const question = String(args.question || previous?.question || source.metadata.question || "").trim();
+  const positionsRoot = path.join(source.folder, "positions");
+  await fs.mkdir(positionsRoot, { recursive: true });
+  const stale = await fs.readdir(positionsRoot, { withFileTypes: true }).catch(() => []);
+  for (const entry of stale) {
+    if (/^\d+$/.test(entry.name)) await fs.rm(path.join(positionsRoot, entry.name), { recursive: true, force: true });
+  }
+  const positions = [];
+  for (let n = 1; n <= count; n += 1) {
+    const folder = path.join(positionsRoot, String(n));
+    await copyTree(source.folder, folder, { exclude: varyCopyExclude });
+    if (!(await exists(path.join(folder, "index.html")))) throw new Error("vary needs an index.html on the owner before opening a round");
+    const item = { n, name: !fresh && n === 1 ? "as it was" : `position ${n}` };
+    if (!fresh && n === 1) item.sha256 = await hashTree(folder);
+    positions.push(item);
+  }
+  const plan = {
+    schemaVersion: 1,
+    status: "open",
+    question: question || "What direction should this canvas take?",
+    fresh,
+    current: 1,
+    recommended: null,
+    positions,
+    dropped: previous?.dropped || [],
+    history: previous?.history || []
+  };
+  await writeVaryHost(source.folder, plan);
+  const metadata = { ...source.metadata, mode: "vary", designRound: { status: "open", question: plan.question, current: 1 } };
+  await writeJson(path.join(source.folder, "metadata.json"), metadata);
+  await writeJson(path.join(source.folder, "plan.json"), plan);
+  return {
+    id: source.entry.id,
+    action: "open",
+    status: "open",
+    fresh,
+    question: plan.question,
+    positions: count,
+    folder: toPosix(path.relative(workspace, source.folder)),
+    next: [`Write plan.json angles and costs`, `Build drop-ins in positions/2..${count}/`, labCommand(`vary --id ${source.entry.id} --check`)]
+  };
+}
+
+async function checkVaryRound(source, plan) {
+  const open = requireOpenRound(source, plan);
+  const issues = [];
+  if (!String(open.question || "").trim() || open.question === "What direction should this canvas take?") issues.push({ code: "missing-question", message: "plan.json needs one concrete round question." });
+  const live = livePositions(open);
+  if (live.length < 2) issues.push({ code: "too-few-positions", message: "A round needs at least two live positions." });
+  const angles = [];
+  for (const item of live) {
+    const folder = path.join(source.folder, "positions", String(item.n));
+    if (!(await exists(path.join(folder, "index.html")))) issues.push({ code: "missing-runtime", message: `Position ${item.n} is missing index.html.` });
+    const baseline = !open.fresh && Number(item.n) === 1;
+    if (baseline) {
+      if (!item.name) issues.push({ code: "missing-name", message: "Position 1 needs a name." });
+      if (item.sha256) {
+        const actual = await hashTree(folder);
+        if (actual !== item.sha256) issues.push({ code: "baseline-edited", message: "Position 1 is the frozen original; do not edit it." });
+      }
+      continue;
+    }
+    if (!String(item.name || "").trim() || /^position \d+$/i.test(item.name)) issues.push({ code: "missing-name", message: `Position ${item.n} needs a conversational name.` });
+    if (!String(item.angle || "").trim()) issues.push({ code: "missing-angle", message: `Position ${item.n} needs an angle.` });
+    if (!String(item.cost || "").trim()) issues.push({ code: "missing-cost", message: `Position ${item.n} needs a cost.` });
+    const angle = normalizeAngle(item.angle);
+    if (angle && angles.includes(angle)) issues.push({ code: "duplicate-angle", message: `Positions share the angle "${item.angle}".` });
+    if (angle) angles.push(angle);
+  }
+  return {
+    id: source.entry.id,
+    action: "check",
+    status: issues.length ? "blocked" : "passed",
+    question: open.question,
+    positions: live.map((item) => item.n),
+    issues,
+    next: issues.length ? ["Fix plan.json and position files, then rerun --check"] : [labCommand(`vary --id ${source.entry.id} --use <n>`), `Open prototypes/${source.entry.id}/index.html`]
+  };
+}
+
+async function useVaryPosition(source, plan, token) {
+  const open = requireOpenRound(source, plan);
+  const n = Number(token);
+  const item = livePositions(open).find((entry) => Number(entry.n) === n);
+  if (!item) throw new Error(`Position ${token} is not live on ${source.entry.id}`);
+  open.current = n;
+  open.recommended = n;
+  await writeJson(path.join(source.folder, "plan.json"), open);
+  await writeVaryHost(source.folder, open);
+  const metadata = { ...source.metadata, mode: "vary", designRound: { status: "open", question: open.question, current: n } };
+  await writeJson(path.join(source.folder, "metadata.json"), metadata);
+  return { id: source.entry.id, action: "use", status: "open", current: n, name: item.name, next: [labCommand(`vary --id ${source.entry.id} --end --keep ${n} --why "${item.name}"`)] };
+}
+
+async function narrowVaryRound(source, plan) {
+  const open = requireOpenRound(source, plan);
+  const keep = Number(args.keep || open.current);
+  const winner = livePositions(open).find((item) => Number(item.n) === keep);
+  if (!winner) throw new Error("narrow requires --keep <live-position>");
+  const droppedRoot = path.join(source.folder, "positions", ".dropped");
+  await fs.mkdir(droppedRoot, { recursive: true });
+  const dropped = [];
+  for (const item of livePositions(open)) {
+    if (Number(item.n) === keep) continue;
+    const from = path.join(source.folder, "positions", String(item.n));
+    const stamp = `${slugify(item.name || `position-${item.n}`)}-${Date.now()}`;
+    const to = path.join(droppedRoot, stamp);
+    await fs.rename(from, to);
+    dropped.push({ ...item, droppedAt: new Date().toISOString(), path: `positions/.dropped/${stamp}` });
+  }
+  const nextRoot = path.join(source.folder, "positions", "1");
+  if (path.join(source.folder, "positions", String(keep)) !== nextRoot) {
+    if (await exists(nextRoot)) await fs.rm(nextRoot, { recursive: true, force: true });
+    await fs.rename(path.join(source.folder, "positions", String(keep)), nextRoot);
+  }
+  const frozen = { n: 1, name: winner.name, angle: winner.angle, cost: winner.cost, sha256: await hashTree(nextRoot) };
+  const extras = Math.max(2, Math.min(4, Number(args.n || 3)));
+  const positions = [frozen];
+  for (let n = 2; n <= extras; n += 1) {
+    const folder = path.join(source.folder, "positions", String(n));
+    await copyTree(nextRoot, folder, { exclude: new Set() });
+    positions.push({ n, name: `position ${n}` });
+  }
+  const nextPlan = {
+    ...open,
+    question: String(args.question || open.question),
+    fresh: false,
+    current: 1,
+    recommended: 1,
+    positions,
+    dropped: [...(open.dropped || []), ...dropped]
+  };
+  await writeJson(path.join(source.folder, "plan.json"), nextPlan);
+  await writeVaryHost(source.folder, nextPlan);
+  return {
+    id: source.entry.id,
+    action: "narrow",
+    status: "open",
+    kept: { n: 1, name: frozen.name },
+    dropped: dropped.map((item) => item.name || item.n),
+    next: [`Rewrite positions 2..${extras} on ${frozen.name}`, labCommand(`vary --id ${source.entry.id} --check`)]
+  };
+}
+
+async function closeVaryRound(source, plan) {
+  const open = requireOpenRound(source, plan);
+  const keep = Number(args.keep || open.current);
+  const winner = livePositions(open).find((item) => Number(item.n) === keep);
+  if (!winner) throw new Error("end requires --keep <live-position> or a current position");
+  const from = path.join(source.folder, "positions", String(keep));
+  await copyTree(from, source.folder, { exclude: new Set() });
+  for (const name of ["vary-card.js", "vary-data.js"]) await fs.rm(path.join(source.folder, name), { force: true });
+  const closed = {
+    ...open,
+    status: "closed",
+    current: keep,
+    recommended: keep,
+    why: String(args.why || winner.name || `position ${keep}`),
+    closedAt: new Date().toISOString(),
+    history: [...(open.history || []), { kept: keep, name: winner.name, why: String(args.why || winner.name || ""), at: new Date().toISOString() }]
+  };
+  await writeJson(path.join(source.folder, "plan.json"), closed);
+  const metadata = { ...source.metadata, mode: "single" };
+  delete metadata.designRound;
+  await writeJson(path.join(source.folder, "metadata.json"), metadata);
+  return {
+    id: source.entry.id,
+    action: "end",
+    status: "closed",
+    kept: { n: keep, name: winner.name, why: closed.why },
+    next: [labCommand(`verify --id ${source.entry.id} --profile full --init-review`)]
+  };
+}
+
+function varyStatus(source, plan) {
+  return {
+    id: source.entry.id,
+    action: "status",
+    status: plan.status,
+    question: plan.question,
+    current: plan.current,
+    recommended: plan.recommended,
+    positions: livePositions(plan).map((item) => ({ n: item.n, name: item.name, angle: item.angle || null })),
+    dropped: (plan.dropped || []).map((item) => item.name || item.n),
+    next: [labCommand(`vary --id ${source.entry.id} --check`), labCommand(`vary --id ${source.entry.id} --use <n>`)]
+  };
+}
+
+function requireOpenRound(source, plan) {
+  if (!plan || plan.status !== "open") throw new Error(`No open design round on ${source.entry.id}`);
+  return plan;
+}
+
+function livePositions(plan) {
+  return (plan.positions || []).filter((item) => item && item.n && !item.dropped);
+}
+
+function normalizeAngle(value) {
+  return String(value || "").trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+async function writeVaryHost(folder, plan) {
+  const current = Number(plan.current) || livePositions(plan)[0]?.n || 1;
+  await fs.copyFile(path.join(skillRoot, "assets", "vary-card", "vary-card.js"), path.join(folder, "vary-card.js"));
+  await fs.writeFile(path.join(folder, "vary-data.js"), `window.PROTOTYPE_VARY_DATA = ${JSON.stringify({
+    question: plan.question,
+    current,
+    recommended: plan.recommended || null,
+    positions: livePositions(plan).map((item) => ({ n: item.n, name: item.name, angle: item.angle || "", cost: item.cost || "" }))
+  }, null, 2)};\n`, "utf8");
+  await fs.writeFile(path.join(folder, "index.html"), `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>${escapeHtml(plan.question || "Design round")}</title>
+    <link rel="icon" href="data:," />
+    <style>
+      html, body { margin: 0; height: 100%; background: #000; }
+      #vary-frame { display: block; width: 100%; height: 100%; border: 0; background: #000; }
+      html[data-embed="true"] #vary-card { display: none; }
+    </style>
+  </head>
+  <body>
+    <iframe id="vary-frame" title="Design position" src="./positions/${current}/index.html"></iframe>
+    <div id="vary-card" hidden></div>
+    <script src="./vary-data.js"></script>
+    <script defer src="./vary-card.js"></script>
+  </body>
+</html>
+`);
+}
+
+function escapeHtml(value) {
+  return String(value || "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
+}
+
+async function hashTree(root) {
+  const files = [];
+  async function walk(current) {
+    const entries = await fs.readdir(current, { withFileTypes: true }).catch(() => []);
+    for (const entry of entries.sort((a, b) => a.name.localeCompare(b.name))) {
+      if (entry.name.startsWith(".")) continue;
+      const file = path.join(current, entry.name);
+      if (entry.isDirectory()) await walk(file);
+      else if (entry.isFile()) files.push(file);
+    }
+  }
+  await walk(root);
+  const hash = createHash("sha256");
+  for (const file of files) {
+    hash.update(toPosix(path.relative(root, file)));
+    hash.update("\0");
+    hash.update(await fs.readFile(file));
+    hash.update("\0");
+  }
+  return hash.digest("hex");
 }
 
 async function forkPrototype() {
@@ -1829,6 +2114,7 @@ async function workspaceStatus() {
     if (issue.code === "missing-proof") nextActions.push(labCommand(`verify --id ${issue.id} --profile full --init-review`));
     else if (issue.code === "unknown-model") nextActions.push(labCommand(`record --id ${issue.id} --model <effective-model>`));
     else if (issue.code === "missing-coordinator-review") nextActions.push(labCommand(`review --id ${issue.id} --init`));
+    else if (issue.code === "open-design-round") nextActions.push(labCommand(`vary --id ${issue.id} --check`));
     else nextActions.push(`Open prototypes/${issue.id}/index.html and resolve ${issue.code}.`);
   }
   if (!payload.prototypes.length) nextActions.push(labCommand('quick --title "First prototype" --question "What should this idea prove?"'));
@@ -1844,6 +2130,7 @@ async function workspaceStatus() {
     nextActions: unique(nextActions),
     routes: {
       quick: labCommand('quick --title <title> --question <question> [--profile blank|tool|mobile|canvas|data]'),
+      vary: labCommand('vary --id <id> [--n 4] [--new] [--question <q>]'),
       compare: labCommand('compare --title <title> --variants <id,id> [--modes compare,blind,rank,review]'),
       experiment: labCommand('experiment --spec <json>'),
       ship: labCommand('ship --id <id> [--include-proof]')
@@ -1854,6 +2141,7 @@ async function workspaceStatus() {
       preflight: labCommand("preflight --experiment <id> [--review <json>]"),
       materialize: labCommand("materialize --experiment <id>"),
       create: labCommand("create --title <title> --question <question>"),
+      vary: labCommand("vary --id <id> [--n 4] [--question <q>]"),
       compare: labCommand("compare --title <title> --variants <id,id> --dimension <model|skill|prompt|design>"),
       verify: labCommand("verify --id <id> --profile quick|full"),
       review: labCommand("review --id <hub-id> --init"),
@@ -1940,7 +2228,7 @@ function hubReadme(config, variants) {
 
 function resultSummary(payload) { return { summary: payload.summary, index: "prototypes/index.html" }; }
 function helpText() {
-  return `Prototype Lab\n\nStart from the outcome you want:\n  quick --title <title>                  create one lightweight prototype owner\n  compare --variants <id,id>             compare standalone artifacts\n  experiment --spec <json>               prepare a rigorous benchmark or showcase\n  ship --id <id>                         verify, finalize, and package one owner\n\nDaily commands:\n  init, create, adopt, fork, open, preview, prompt, record, attach-proof\n  verify, finalize, review, sync, status, doctor, pack\n\nAdvanced commands:\n  preflight                              validate directions and authorize hashed build packets\n  materialize                            create final owners from an authorized experiment\n\nRun \`lab help <command>\` or \`lab <command> --help\`.\nCommon option: --workspace <path>`;
+  return `Prototype Lab\n\nStart from the outcome you want:\n  quick --title <title>                  create one lightweight prototype owner\n  vary --id <id>                         open a design round on one canvas\n  compare --variants <id,id>             compare standalone artifacts\n  experiment --spec <json>               prepare a rigorous benchmark or showcase\n  ship --id <id>                         verify, finalize, and package one owner\n\nDaily commands:\n  init, create, adopt, fork, vary, open, preview, prompt, record, attach-proof\n  verify, finalize, review, sync, status, doctor, pack\n\nAdvanced commands:\n  preflight                              validate directions and authorize hashed build packets\n  materialize                            create final owners from an authorized experiment\n\nRun \`lab help <command>\` or \`lab <command> --help\`.\nCommon option: --workspace <path>`;
 }
 
 function commandHelp(name) {
@@ -1949,6 +2237,7 @@ function commandHelp(name) {
     create: `create --title <title> [--question <q>] [--profile blank|tool|mobile|canvas|data] [--from-prompt <id>]\nAllocate a standalone artifact without running an experiment.`,
     adopt: `adopt --path <static-folder> [--title <title>] [--question <q>]\nCopy an existing self-contained static build into a new managed owner.`,
     fork: `fork --id <prototype-id> [--title <title>] [--question <q>]\nCreate a new iteration while resetting proof and execution receipts.`,
+    vary: `vary --id <id> [--n 4] [--new] [--question <q>]\nvary --id <id> --check\nvary --id <id> --use <n>\nvary --id <id> --narrow --keep <n>\nvary --id <id> --end [--keep <n>] [--why <note>]\nOpen a design round on one owner: four structurally different positions, then narrow or keep.`,
     compare: `compare --title <title> --variants <id,id> [--dimension <value>] [--modes compare,blind,rank,iterations,review,archive]\nCreate a managed comparison hub. \`hub\` is an alias.`,
     hub: `hub --title <title> --variants <id,id> [--dimension <value>] [--modes <list>]\nCreate a managed comparison hub.`,
     experiment: `experiment --init --id <id> --intent benchmark|showcase [--models <list>] [--skill <id>] [--from-prompt <id>]\nexperiment --spec <portable-json-file> [--direct-build]\nGenerate an editable spec, then prepare isolated direction or build packets.`,

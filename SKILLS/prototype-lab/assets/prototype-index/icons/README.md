@@ -1,11 +1,7 @@
 # Prototype Lab interface icons
 
-These SVG files are unmodified outline icons from Tabler Icons. The pinned
-version and upstream paths are recorded in `manifest.json`; the upstream MIT
-license is included as `LICENSE.tabler-icons`.
+Unmodified Tabler Icons outline SVGs. Pinned version and upstream paths live in `manifest.json`; upstream MIT license is `LICENSE.tabler-icons`.
 
 Run `pnpm run assets:icons` from the repository root to refresh the pinned set.
-The vendor script also generates `tabler-icons.js` directly from those SVG
-bodies and copies the same pinned set into the comparison hub and tool shell.
-Every surface renders that official geometry inline so `currentColor` works
-under both HTTP and `file://` without changing the original SVG files.
+Vendor script generates `tabler-icons.js` from those SVG bodies and copies the same pinned set into the comparison hub and tool shell.
+Every surface renders that geometry inline so `currentColor` works under HTTP and `file://` without changing original SVG files.

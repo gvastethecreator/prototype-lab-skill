@@ -1,14 +1,14 @@
 # Agent Isolation for Variant Builds
 
-Use this when a request asks for multiple prototypes or variants from one brief, especially when variants compare models, skills, agents, prompts, or execution styles.
+Use when a request asks for multiple prototypes or variants from one brief, especially when variants compare models, skills, agents, prompts, or execution styles.
 
 ## Default Rule
 
-Use one isolated worker per variant whenever a request asks for multiple variants. Treat this as the default execution path, not a stretch goal.
+One isolated worker per variant. Default execution path, not a stretch goal.
 
-The main agent is the coordinator:
+Coordinator:
 
-- freeze the shared brief
+- freeze shared brief
 - define variant ids and criteria
 - dispatch one worker per variant
 - collect worker outputs
@@ -17,7 +17,7 @@ The main agent is the coordinator:
 
 For model/skill capability comparisons, keep `prototype-lab` coordinator-only. Variant workers receive the transport packet, not this skill's interface baseline, taste calibration, workspace memory, or hub conventions.
 
-Do not build all variants in one continuous context when the request is explicitly about comparing different models, skills, or agents. First attempt the best available isolation path. If worker execution is unavailable, record the fallback as `single-agent-fallback` and do not claim independent generation.
+Do not build all variants in one continuous context when comparing different models, skills, or agents. First attempt the best available isolation path. If worker execution is unavailable, record `single-agent-fallback` and do not claim independent generation.
 
 ## Non-Negotiables
 
@@ -31,7 +31,7 @@ Do not build all variants in one continuous context when the request is explicit
 
 ## Isolation Contract
 
-Require the capability first: every independent variant runs in a **fresh worker with no inherited history**. The coordinator must prove that the worker did not receive its transcript, workspace memory, or sibling variants; host flags are evidence for that capability, never the public contract.
+Every independent variant runs in a **fresh worker with no inherited history**. Coordinator must prove the worker did not receive its transcript, workspace memory, or sibling variants; host flags evidence that capability, never the public contract.
 
 Workers receive only:
 
@@ -49,11 +49,9 @@ Workers must not receive:
 - hidden conclusions about which variant should win
 - unrelated workspace context
 
-This keeps the comparison from collapsing into four versions of the coordinator's current mental state.
-
 ## Worker Prompt Shape
 
-Use a generated experiment assignment for capability comparisons. For ordinary isolated builds, use this minimal prompt shape:
+Use a generated experiment assignment for capability comparisons. Ordinary isolated builds use this minimal prompt shape:
 
 ```text
 Shared brief:
@@ -76,7 +74,7 @@ Output:
 - do not edit the final prototype folder unless explicitly assigned that folder
 ```
 
-Keep the shared brief text identical across workers unless prompt variation is the experiment.
+Keep shared brief text identical across workers unless prompt variation is the experiment.
 
 ## Output Locations
 
@@ -86,7 +84,7 @@ Prefer worker outputs under a scratch location outside `prototypes/`, for exampl
 .scratch/prototype-lab/<prototype-slug>/<variant-id>/
 ```
 
-The coordinator can then integrate outputs into:
+Coordinator then integrates outputs into:
 
 ```text
 prototypes/<YYYY>/<MM>/<NNN>-<prototype-slug>/
@@ -96,7 +94,7 @@ Do not let multiple workers edit the same final `index.html`, `styles.css`, `app
 
 ## Worker Receipt
 
-Every independent worker result needs a receipt. Without a receipt, label the variant as fallback or unavailable.
+Every independent worker result needs a receipt. Without one, label the variant fallback or unavailable.
 
 Minimum receipt fields:
 
@@ -120,17 +118,17 @@ Minimum receipt fields:
 - `limitations`
 - `fallbackReason`: `not applicable` for real worker runs
 
-For managed capability preflight, the coordinator copies the generated `dispatch.template.json` to `dispatch.json` and fills it with the actual worker id, agent tool, isolation adapter, sent paths, and context policy. `preflight` checks that record against the assignment/input hashes and condition. The later build receipt cross-links the build dispatch. A worker's own `crossVariantLeakage: false` is self-reported evidence, not proof of clean context. Claim clean-context isolation only when the selected adapter proves no inherited history, the assignment hash matches, no memory input was allowed, and the recorded reads contain no sibling or coordinator-only source.
+For managed capability preflight, coordinator copies generated `dispatch.template.json` to `dispatch.json` and fills actual worker id, agent tool, isolation adapter, sent paths, and context policy. `preflight` checks that record against assignment/input hashes and condition. Later build receipt cross-links the build dispatch. A worker's own `crossVariantLeakage: false` is self-reported evidence, not proof of clean context. Claim clean-context isolation only when the selected adapter proves no inherited history, the assignment hash matches, no memory input was allowed, and recorded reads contain no sibling or coordinator-only source.
 
 ## Dedicated Agent Options
 
-Use the best available isolation mechanism in the current environment:
+Best available isolation mechanism:
 
 - built-in sub-agent or multi-agent tools
 - a dedicated coding-agent CLI in a contained scratch path
 - a separate thread only when the user explicitly asks for user-owned threads
 
-Before using CLI workers, verify the CLI exists with `--help`, avoid secrets, keep outputs under scratch/temp, and do not allow commit, push, branch, or worktree operations unless the user explicitly asked for them.
+Before using CLI workers, check the CLI exists with `--help`; avoid secrets; keep outputs under scratch/temp; no commit, push, branch, or worktree unless the user explicitly asked.
 
 If tool discovery is available, search for multi-agent or sub-agent tooling before falling back. Use one supported adapter and record its evidence:
 
@@ -138,7 +136,7 @@ If tool discovery is available, search for multi-agent or sub-agent tooling befo
 - **Dedicated CLI adapter — `dedicated-cli-clean-session`:** start one new CLI process in a packet-only scratch directory; do not pass a prior transcript or workspace memory, omit `forkTurns`, and record `evidence: "fresh-process-packet-only"`.
 - **Separate-thread adapter — `separate-thread-fresh-context`:** start a new worker thread with no prior conversation, omit `forkTurns`, and record `evidence: "fresh-thread-no-history"`.
 
-Never claim a clean worker merely because an adapter label is present. The receipt must also prove `inheritedHistory: false`, `coordinatorContextExposed: false`, empty memory inputs, and no sibling path in the sent/observed context.
+Never claim a clean worker because an adapter label is present. The receipt must also prove `inheritedHistory: false`, `coordinatorContextExposed: false`, empty memory inputs, and no sibling path in the sent/observed context.
 
 Fallback is allowed only when one of these is true:
 
@@ -148,7 +146,7 @@ Fallback is allowed only when one of these is true:
 - credentials, secrets, GUI state, or destructive side effects would be exposed to workers
 - the user explicitly requests single-agent execution
 
-If no safe worker mechanism exists, continue in one agent only after recording the limitation.
+If no safe worker mechanism exists, continue in one agent after recording the limitation.
 
 ## Integration
 
@@ -161,39 +159,23 @@ When integrating:
 - do not erase worker limitations
 - do not blend all variant ideas into one undifferentiated design
 
-The final prototype may share one shell and one codebase, but the variant ledger must show how each variant was produced.
+Final prototype may share one shell and one codebase, but the variant ledger must show how each variant was produced.
 
 ## Provenance
 
-Record per variant:
+Record Worker Receipt fields per variant, plus:
 
-- `agentMode`: `subagent`, `dedicated-cli`, `separate-thread`, `single-agent-fallback`, or `unavailable`
-- `agentTool`: tool or CLI name when known
-- `workerId`: coordinator dispatch id
-- `isolation`: capability, adapter, no-history assertions, and host-specific evidence
 - `forkTurns`: Codex-only evidence when `isolation.adapter` is `codex-fork-turns-none`; omit it for other adapters
-- `assignmentSha256`: hash of the complete task payload
-- `inputManifestSha256`: hash of shared brief, condition, skills, tools, assets, and context policy
-- `promptId`: shared or variant prompt id
-- `promptVersion`: integer template version used for the run
-- `renderedPromptSha256`: hash printed by the prompt renderer for the exact worker input
-- `outputPath`: scratch path or `not captured`
-- `fallbackReason`: why worker isolation was not used, or `not applicable`
-- `inputScope`: what context the worker received
-- `receivedOtherVariants`: whether another variant was visible to the worker
-- `editedFinalPrototype`: whether the worker edited final prototype files
 - `skills`: skills consulted by the worker
 - `model`: model/settings when known
 - `tokenUsage`: input/output/total if visible, otherwise `unknown`
 - `toolCalls`: captured calls if visible, otherwise `not captured`
-- `contextReads`: every skill/reference/memory/source read outside the assignment
-- `limitations`: unavailable tools, failed worker runs, missing token capture, or manual integration notes
 
-Unknown usage is acceptable. Invented usage is not.
+Unknown usage OK; invented usage is not.
 
 ## Verification
 
-Before handoff, check:
+Before handoff:
 
 - every requested variant has a worker result or an explicit unavailable/fallback entry
 - every fallback entry has `fallbackReason`

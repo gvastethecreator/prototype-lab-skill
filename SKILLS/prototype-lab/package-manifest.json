@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "packageRoot": "SKILLS/prototype-lab",
   "algorithm": "sha256",
-  "packageSha256": "d208a7daf3781f2c1099a44ca260cba0e3c3717c3a2afbe99c0eb6d817756286",
+  "packageSha256": "b320b5c92ed7f6eb165b9deee9e4c92d8820537f70485d029918fd46d84a5c7d",
   "excludedFromDigest": [
     "package-manifest.json"
   ],
@@ -12,8 +12,8 @@
   "files": [
     {
       "path": "agents/openai.yaml",
-      "sha256": "885f8d81d42f5f0846a1008def71cb07aa27b0fb61c5df2f43c9a99a924f3d60",
-      "bytes": 322
+      "sha256": "5f00c6692b1ab102f785338e1088f99fa788b9980095ffd338c15d88d5c2a711",
+      "bytes": 413
     },
     {
       "path": "assets/comparison-hub/hub-data.js",
@@ -297,8 +297,8 @@
     },
     {
       "path": "assets/portable-lab/prompt.template.md",
-      "sha256": "27f86166c1364bc735a411b019b8f4edb238b101040fb17883cbd9ca9a0779ef",
-      "bytes": 512
+      "sha256": "410631a6a177d7b2d8c933e0b2fae0bd1568d645f045c097643e7774153f03ac",
+      "bytes": 463
     },
     {
       "path": "assets/portable-lab/prompt.vars.json",
@@ -322,8 +322,8 @@
     },
     {
       "path": "assets/prompt-library/README.md",
-      "sha256": "ac3c776243c70cbc78a605baea40e153a1a9a7a1f466bbda599bc8323dd18380",
-      "bytes": 1055
+      "sha256": "c81a6f1eb4bdda4d1b2c62dc3138b5042b41e5449285bc998ab2e7d3bca8d267",
+      "bytes": 924
     },
     {
       "path": "assets/prototype-blank/app.js",
@@ -562,8 +562,8 @@
     },
     {
       "path": "assets/prototype-index/icons/README.md",
-      "sha256": "eda0e48be2f63afdc7a56a1ab90db4fb87a65e897c302f02d686b792b18461f6",
-      "bytes": 613
+      "sha256": "3528b2936588788e2d2c6b18a2f839605823924b549be9b32723b934e2ba0d5f",
+      "bytes": 523
     },
     {
       "path": "assets/prototype-index/icons/receipt-2.svg",
@@ -652,8 +652,8 @@
     },
     {
       "path": "assets/prototype-index/README.md",
-      "sha256": "d5efea46c71ec4b289d1d9b8651b9b26e21d18daf1d3063de0609df15b097a99",
-      "bytes": 1044
+      "sha256": "5ad48bbfe5e133218f0668e2c0175282411e3bb469571bdafad1746f4923cbfb",
+      "bytes": 946
     },
     {
       "path": "assets/prototype-mobile/app.js",
@@ -957,8 +957,8 @@
     },
     {
       "path": "assets/prototype-shell/README.md",
-      "sha256": "3833739c5b7f41d858b4ca8549251dd999803bd2c58d4efc9e650ae30853c7fb",
-      "bytes": 676
+      "sha256": "a4ec5d229c61e36f408e59d70c3399776f1ff5c2a7c09a9b6eea1f77c1649470",
+      "bytes": 603
     },
     {
       "path": "assets/prototype-shell/styles.css",
@@ -966,54 +966,64 @@
       "bytes": 6178
     },
     {
+      "path": "assets/vary-card/vary-card.js",
+      "sha256": "c925c9ce88d3f09ecd4307691811a19a6870ddfb83c45c13564458eff031a8a6",
+      "bytes": 4851
+    },
+    {
       "path": "references/agent-isolation.md",
-      "sha256": "2a16f37675c11502b096558638ce80540d2c6a691f3638af314483c6a88ff8cc",
-      "bytes": 10727
+      "sha256": "31a6fe9c12f75156557f20929426bedcb5e96597ac20175f274c8bd5dfd4ddef",
+      "bytes": 9164
     },
     {
       "path": "references/capability-comparisons.md",
-      "sha256": "bffa145aac913b6bc49511c98ddfadaf6dde1cf09196df0376ec864f0235c4e5",
-      "bytes": 15839
+      "sha256": "d04bac988fb8fda2a98a493f162676d8128654017b82d41b02c65abcad18917c",
+      "bytes": 15286
+    },
+    {
+      "path": "references/design-rounds.md",
+      "sha256": "3879eafeb6c606dd32028c448b146971e974ad9dbdd74b0fa613fadeb298c844",
+      "bytes": 4390
     },
     {
       "path": "references/portable-run-pack.md",
-      "sha256": "2625c576fcfb2c6ae3646445c7460fbe20d9620484e9a26b2d8ecf04d0357e06",
-      "bytes": 6029
+      "sha256": "e6e09fa0542bd82f0615cd49c07fa297f4bde45e706a7771b63ef8b52a80a5b5",
+      "bytes": 5707
     },
     {
       "path": "references/product-design-loop.md",
-      "sha256": "146347d8de5fc0880a874446721284af6574ae8041d2c0b513599005b8eca5e8",
-      "bytes": 1996
+      "sha256": "8607634c632d6691871cb4f57ae367336e1d2d390fc0871ea20a584a89cf8beb",
+      "bytes": 2158
     },
     {
       "path": "references/prompt-templates.md",
-      "sha256": "c338822ca712a9a75216b25900d2ccf649f597b6b6606d6dab4970af4e8ae382",
-      "bytes": 5868
+      "sha256": "266d7da4c8f9ab2f95d83320c4959d1229f19aa187cac9d35a0a965928f78c62",
+      "bytes": 5580
     },
     {
       "path": "references/quality-bar.md",
-      "sha256": "8e0a0d6ccb3abfe0cf7a7cf34dac0c90505abe0f3606695e02f0f7c86cb4c491",
-      "bytes": 6772
+      "sha256": "469f0369de061ffa59ddc322d47bc1a3d4a6c3918e49a956933114a39e3597e9",
+      "bytes": 6637
     },
     {
       "path": "references/taste-calibration.md",
-      "sha256": "36058b08b2bd167b52fc2e7f213e7725717454c91a3d81f9ff522264ff57918c",
-      "bytes": 5562
+      "sha256": "230f64840b92f84483abbf4e8c80752493a89c57d9b69d1d76820e7e42d5b204",
+      "bytes": 5550
     },
     {
       "path": "references/variant-comparison.md",
-      "sha256": "4559d29c2c393dad06740f837b9bca3c17bd6c2c7fef1ac55ec4d96aaec021db",
-      "bytes": 14552
+      "sha256": "744749aac9ade157285399379b1e5db886e1dd1cae11e7ac8146a4f46b7d9dda",
+      "bytes": 14028
     },
     {
       "path": "references/workspace-and-hub.md",
-      "sha256": "5ec7b4cfc709debffa3df6b41f5d9eaa557d1f8d9681e01031c82bd58b388c6f",
-      "bytes": 8661
+      "sha256": "064fee63cab125d06176285677794a71c8d102ead393f42075b100fcfc36fc27",
+      "bytes": 8962
     },
     {
       "path": "scripts/build-prototype-index.mjs",
-      "sha256": "770279354d683d5b020bbaa5aded81756a477f8c6fc08e59aa46e005db52fa1a",
-      "bytes": 16941
+      "sha256": "cfe56d1a7f7dc8449b76cbf019f0fd7494e192f462e33069f8642ce439616671",
+      "bytes": 17153
     },
     {
       "path": "scripts/manage-prompt-library.mjs",
@@ -1022,8 +1032,8 @@
     },
     {
       "path": "scripts/manage-prototype-lab.mjs",
-      "sha256": "555b3a1169e631d6117e20331c6752d077d7c0f7a6d3736eea9e8eca510d136f",
-      "bytes": 128054
+      "sha256": "6c91610aa23b6820f5ed36b99fc5b4a88f35b382c782412d5b34c172e310e456",
+      "bytes": 142252
     },
     {
       "path": "scripts/package-comparison-hubs.mjs",
@@ -1047,8 +1057,8 @@
     },
     {
       "path": "scripts/verify-prototype-lab.mjs",
-      "sha256": "a90d189048932f0561e2e28a5610f1b8e10f2c5de8b3615f2838fb2bec1c5b21",
-      "bytes": 17296
+      "sha256": "58ad164fabb76da1086290af46dc5a6f33f62382595b13b45a6ca680020dbe34",
+      "bytes": 17325
     },
     {
       "path": "scripts/worker-isolation.mjs",
@@ -1057,8 +1067,8 @@
     },
     {
       "path": "SKILL.md",
-      "sha256": "a9672b10131fc114e48067e05e16de117852e1e17003cb6c03353b34dfc46ab6",
-      "bytes": 7515
+      "sha256": "52b5e86f5fa50d6fb80d17251d53e1205d20e41194bf947b707035f26e8ef60f",
+      "bytes": 8163
     }
   ]
 }

@@ -1,4 +1,4 @@
 interface:
   display_name: "Prototype Lab"
-  short_description: "Create, compare, review, and ship portable browser prototypes."
-  default_prompt: "Use $prototype-lab to choose the smallest suitable route, create or adopt a portable browser prototype, verify it with evidence, and compare or package it only when useful."
+  short_description: "Create, vary, compare, review, and ship portable browser prototypes."
+  default_prompt: "Use $prototype-lab to choose the smallest suitable route. For several visual takes of one canvas, open a design round with lab vary. Otherwise create or adopt a portable browser prototype, verify it with evidence, and compare or package it only when useful."

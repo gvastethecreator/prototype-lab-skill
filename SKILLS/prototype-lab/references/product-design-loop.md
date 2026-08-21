@@ -1,6 +1,8 @@
 # Product Design Loop
 
-Use this when a browser/UI prototype has no selected visual direction.
+Use when a browser/UI prototype has no selected visual direction.
+
+If the task is several rendered takes of one brief, use a design round: read `design-rounds.md` and run `lab vary`. Skip this shared loop during model/agent/skill comparisons — it leaks one design process into every condition. Use `capability-comparisons.md` instead.
 
 ## Brief
 
@@ -11,15 +13,19 @@ Use `product-design:get-context` to confirm:
 - visual source, desired look, or constraints
 - expected interactivity level
 
-If the user already supplied those details, replay the brief and continue only when the direction is confirmed or safely inferable.
+If already supplied, replay it; continue when direction is confirmed or safely inferable.
 
-Done when the build target can be judged against a specific user path and visual intent.
+Done when build target can be judged against a specific user path and visual intent.
 
-If the user asks to reveal differences between models, agents, or skills, do not run this shared direction loop; it would leak one design process into every condition. Use `capability-comparisons.md` and isolated direction preflight instead.
+## One Build Or A Round
 
-## Three Options
+Build one canvas when the user already picked a direction, or when the question has one defensible answer.
 
-For one standalone artifact, use `product-design:ideate` for exactly three independent directions. Use `imagegen` only when the declared asset policy requires or allows it and raster exploration materially serves the brief.
+Open a round when they asked for alternatives, directions, or "a few takes". Do not describe three options in chat and then build one. Put rendered positions on the page.
+
+## Three-Option Critique
+
+For a single-build artifact with no round, `product-design:ideate` for exactly three independent directions. `imagegen` only when declared asset policy requires or allows it and raster exploration serves the brief.
 
 Each option must vary at least one meaningful axis:
 
@@ -33,25 +39,14 @@ Each option must vary at least one meaningful axis:
 - motion model
 - image/media strategy
 
-Do not create three color swaps of the same layout.
-Do not create three generic landing-page variations when the prototype question is about a tool, workflow, state model, or game feel.
+No three color swaps of same layout, or three generic landing pages, when question is a tool, workflow, state model, or game feel.
 
-For each option, include the prototype read and dials from `references/taste-calibration.md`:
+Each option includes prototype read and dials from `references/taste-calibration.md`: `DESIGN_VARIANCE`, `MOTION_INTENSITY`, `VISUAL_DENSITY`.
 
-- `DESIGN_VARIANCE`
-- `MOTION_INTENSITY`
-- `VISUAL_DENSITY`
-
-Done when all three options are structurally different enough that choosing one changes the implementation.
+Done when choosing one of three structurally different options changes the implementation.
 
 ## Critique Before Build
 
-For each option, name:
+For each option, name strongest fit, likely failure mode, and what to merge or discard. Ask whether to build option 1, 2, 3, a combination, or a `vary` round.
 
-- strongest fit
-- likely failure mode
-- what to merge or discard
-
-Then ask whether to build option 1, option 2, option 3, a combination, or separate prototype views.
-
-Done when one direction or explicit multi-view comparison scope is selected.
+Done when one direction or an explicit multi-position round is selected.

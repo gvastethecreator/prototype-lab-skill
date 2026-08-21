@@ -51,7 +51,9 @@ const requiredFiles = [
   "SKILLS/prototype-lab/assets/prompt-library/README.md",
   "SKILLS/prototype-lab/assets/prompt-library/prompt-meta.json",
   "SKILLS/prototype-lab/assets/prompt-library/creative-test-suite.json",
+  "SKILLS/prototype-lab/assets/vary-card/vary-card.js",
   "SKILLS/prototype-lab/references/product-design-loop.md",
+  "SKILLS/prototype-lab/references/design-rounds.md",
   "SKILLS/prototype-lab/references/capability-comparisons.md",
   "SKILLS/prototype-lab/references/quality-bar.md",
   "SKILLS/prototype-lab/references/taste-calibration.md",
@@ -76,6 +78,7 @@ const requiredFiles = [
   "scripts/verify-prototype-lab.mjs",
   "scripts/test-portable-tools.mjs",
   "scripts/test-lab-daily-workflow.mjs",
+  "scripts/test-vary-round.mjs",
   "scripts/test-hub-ui.mjs",
   "scripts/test-dashboard-ui.mjs",
   "scripts/test-scaffold-ui.mjs",
@@ -181,7 +184,7 @@ async function checkSkillFrontmatter() {
   if (!content.includes("prototypes/prompts/") || !content.includes("scripts/manage-prompt-library.mjs")) {
     errors.push("SKILL.md missing workspace prompt library contract");
   }
-  for (const command of ["quick", "compare", "materialize", "verify", "finalize", "review", "ship"]) {
+  for (const command of ["quick", "vary", "compare", "materialize", "verify", "finalize", "review", "ship"]) {
     if (!new RegExp(`\\b${command}\\b`).test(content)) errors.push(`SKILL.md missing ${command} route`);
   }
   if (!content.includes("scripts/verify-prototype-lab.mjs") && !content.includes("verify --id")) {

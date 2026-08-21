@@ -42,6 +42,7 @@ Then invoke `$prototype-lab` or run the workspace manager directly from the inst
 | Goal | Command |
 | --- | --- |
 | Test one idea | `lab quick` |
+| Several design takes of one canvas | `lab vary` |
 | Compare options | `lab compare` |
 | Benchmark models or skills | `lab experiment` |
 | Verify and package | `lab ship` |
@@ -54,6 +55,7 @@ In this repository:
 pnpm run lab -- help
 pnpm run lab -- init
 pnpm run lab -- quick --title "Dispatch board" --question "Can an operator resolve an incident without losing queue context?" --profile tool
+pnpm run lab -- vary --id 001 --question "How much should the first screen say?" --n 4
 pnpm run lab -- open
 pnpm run lab -- preview --id 001 --open
 pnpm run lab -- verify --id 001 --profile full --init-review

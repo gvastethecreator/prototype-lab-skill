@@ -1,14 +1,14 @@
 # Variant Comparison Labs
 
-Use this when one request asks for multiple prototypes, models, skills, prompts, agents, options, or visual directions that should be reviewed as one experiment.
+Use when one request asks for multiple prototypes, models, skills, prompts, agents, options, or visual directions that should be reviewed as one experiment.
 
-When the user's purpose is to reveal model/agent/skill capability rather than simply compare already-built options, read `capability-comparisons.md` first. Declare `benchmark` or `showcase`, run direction preflight for creative showcases, and keep Prototype Lab coordinator-only.
+When the purpose is to reveal model/agent/skill capability rather than compare already-built options, read `capability-comparisons.md` first. Declare `benchmark` or `showcase`, run direction preflight for creative showcases, and keep Prototype Lab coordinator-only.
 
 ## Default Shape
 
-Build one standalone prototype folder per requested variant when the comparison is about skills, models, agents, execution modes, or independent prototype quality. Add one comparison hub folder that links to or embeds those standalone prototypes and records the shared prompt, criteria, provenance, and proof.
+One standalone prototype folder per requested variant when comparing skills, models, agents, execution modes, or independent prototype quality. Add one comparison hub that links to or embeds those standalone prototypes and records shared prompt, criteria, provenance, and proof.
 
-Use one chronological prototype folder with multiple internal variants only when the user explicitly asks for internal visual options/states rather than separately runnable prototype executions.
+One chronological prototype folder with a design round when the comparison is visual or interaction direction on the same brief. Use `lab vary` and `references/design-rounds.md`. Do not spawn sibling owners plus a hub for four layouts of one canvas.
 
 ## Shared Brief
 
@@ -29,7 +29,7 @@ Freeze these before building:
 
 Do not silently mutate the prompt between variants unless prompt variation is the declared experiment. When repeatability matters, follow `prompt-templates.md` and tie every worker receipt to the exact rendered hash.
 
-For more than one variant, read `agent-isolation.md` before dispatching or building. Use isolated workers by default. If workers are blocked, record the exact fallback reason and still produce the requested variants unless the blocker prevents any build.
+For more than one variant, read `agent-isolation.md` before dispatching or building. Isolated workers by default. If workers are blocked, record the exact fallback reason and still produce the requested variants unless the blocker prevents any build.
 
 ## Variant Ledger
 
@@ -42,9 +42,9 @@ Each variant needs:
 - `model`: actual model used, or requested target when unavailable
 - `skill`: actual skill used, or requested target when unavailable
 - `status`: `actual`, `planned`, `simulated`, `inspired`, or `unavailable`
-- `hypothesis`: what this variant is testing
+- `hypothesis`: what this variant tests
 - `tradeoff`: expected strength or risk
-- `notes`: relevant execution limitation or observation
+- `notes`: execution limitation or observation
 - `prompt`: shared prompt id or variant prompt if prompt variation is the experiment
 - `promptVersion`: integer template version
 - `renderedPromptSha256`: exact rendered prompt hash
@@ -60,22 +60,22 @@ Do not claim a result came from another model, skill, agent, or execution mode u
 Receipt UI:
 
 - Show worker receipts as compact cards in the Info/Provenance drawer.
-- The receipt card header shows variant id plus status.
-- The body shows agent mode, agent tool, input scope, scratch output, and fallback reason in labelled cells.
-- The footer uses chips for isolation checks: isolated input, saw/no other variants, edited/no final files, fallback/no fallback, leakage/no leakage.
+- Header: variant id plus status.
+- Body: agent mode, agent tool, input scope, scratch output, and fallback reason in labelled cells.
+- Footer chips for isolation checks: isolated input, saw/no other variants, edited/no final files, fallback/no fallback, leakage/no leakage.
 - Do not collapse worker receipts into one long sentence; reviewers should audit independence in one glance.
 
 ## Isolated Variant Generation
 
-Use a coordinator/worker pattern:
+Coordinator/worker pattern:
 
-1. The coordinator freezes the shared brief and success criteria. For creative showcases, prepare and approve direction packets before any full build.
-2. The coordinator attempts to dispatch one isolated worker per variant using the best available sub-agent, multi-agent, dedicated CLI, or separate-thread mechanism.
-3. Each worker receives only the shared brief, its own variant assignment, and the output contract in a fresh no-history context. Use the documented host adapter in `agent-isolation.md`; `fork_turns: "none"` is Codex-only evidence. It does not receive Prototype Lab's interface/taste guidance unless that is the tested treatment.
+1. Coordinator freezes the shared brief and success criteria. For creative showcases, prepare and approve direction packets before any full build.
+2. Coordinator attempts to dispatch one isolated worker per variant using the best available sub-agent, multi-agent, dedicated CLI, or separate-thread mechanism.
+3. Each worker receives only the shared brief, its own variant assignment, and the output contract in a fresh no-history context. Host adapter in `agent-isolation.md`; `fork_turns: "none"` is Codex-only evidence. No Prototype Lab interface/taste guidance unless that is the tested treatment.
 4. Workers write to scratch/temp output, not the final prototype files.
-5. The coordinator integrates all results into one comparison shell and records provenance.
+5. Coordinator integrates all results into one comparison shell and records provenance.
 
-If worker tooling is unavailable, continue only after recording `single-agent-fallback` and `fallbackReason`; do not describe the variant as independently generated. A fallback does not remove the obligation to build every requested variant.
+If worker tooling is unavailable, continue only after recording `single-agent-fallback` and `fallbackReason`; do not describe the variant as independently generated. Fallback does not remove the obligation to build every requested variant.
 
 ## Building With Different Skills
 
@@ -86,7 +86,7 @@ When variants use different skills:
 3. Apply only that skill's relevant guidance to that variant.
 4. Prefer a separate worker per skill so the skill context does not leak across variants.
 5. Record the skill name, worker mode, and attribution status in the variant ledger.
-6. Avoid blending all skill guidance into every variant, because that makes the comparison unreadable.
+6. Avoid blending all skill guidance into every variant; that makes the comparison unreadable.
 
 If a requested skill is unavailable, label the variant as `unavailable` or `inspired` and explain the limitation in the drawer and README.
 
@@ -101,7 +101,7 @@ When variants use different models:
 
 ## Interface Pattern
 
-Use these views by default:
+Default views:
 
 - `overview`: shared prompt, comparison criteria, and variant ledger summary.
 - `compare`: all variants together only when they remain legible. When there are many variants, add left/right selectors and compare two at a time using `?view=compare&left=<variant-id>&right=<variant-id>`.
@@ -114,25 +114,19 @@ Keep `?view=<id>&variant=<id>` URL-backed. For pairwise comparison, also keep `l
 
 Use these methods when the comparison needs more than one grid:
 
-Pattern note: public comparison galleries such as `https://www.whichai.dev/` use grouped galleries, pairwise compare URLs, blind guessing, iteration links, and rankings. Adapt those evaluation patterns when they help the prototype decision.
+Public comparison galleries such as `https://www.whichai.dev/` use grouped galleries, pairwise compare URLs, blind guessing, iteration links, and rankings. Adapt those evaluation patterns when they help the prototype decision.
 
-- `gallery`: group variants by model, skill, prompt treatment, or run condition. Useful for broad scans.
-- `pairwise`: two previews in one URL with independent left/right selectors. Use URL params such as `left=<variant-id>&right=<variant-id>` so reviewers can share exact matchups.
-- `blind`: hide source labels until the reviewer guesses or scores. Use this when taste bias toward a model/skill would distort the result.
-- `rankings`: capture ordered picks plus short taste notes. Make rankings clearly subjective unless backed by measured criteria.
-- `iterations`: expose repeated runs as numbered attempts under the same model/skill. Keep the prompt fixed so iteration quality can be compared.
-- `archive`: allow hiding stale or superseded variants without deleting provenance.
-- `orchestrator review`: attach a final evidence-backed assessment after every variant and its proof have been inspected. Keep it separate from worker provenance and subjective user ranking.
+- `gallery`: group by model, skill, prompt treatment, or run condition. Useful for broad scans.
+- `pairwise`: two previews in one URL with independent left/right selectors. URL params such as `left=<variant-id>&right=<variant-id>` so reviewers can share exact matchups.
+- `blind`: hide source labels until the reviewer guesses or scores. Use when taste bias toward a model/skill would distort the result.
+- `rankings`: ordered picks plus short taste notes. Clearly subjective unless backed by measured criteria.
+- `iterations`: numbered attempts under the same model/skill. Keep the prompt fixed so iteration quality can be compared.
+- `archive`: hide stale or superseded variants without deleting provenance.
+- `orchestrator review`: final evidence-backed assessment after every variant and its proof have been inspected. Separate from worker provenance and subjective user ranking.
 
-These are evaluation modes, not decoration. Include only the modes that help the user's decision.
+Evaluation modes, not decoration. Include only modes that help the decision.
 
-Managed hubs expose optional modes through `hub.config.json` or `lab compare --modes compare,blind,rank,iterations,review,archive`:
-
-- Blind mode hides source labels until reveal.
-- Rank mode persists subjective ordering and notes in local browser storage and exports a JSON decision record.
-- Iterations groups lineaged forks without erasing earlier runs.
-- Archive hides stale variants from active comparison while retaining provenance.
-- Review renders the attached orchestrator JSON and links its Markdown report.
+Managed hubs expose optional modes through `hub.config.json` or `lab compare --modes compare,blind,rank,iterations,review,archive`. Rank persists subjective ordering and notes in local browser storage and exports a JSON decision record. Iterations groups lineaged forks without erasing earlier runs. Review renders the attached orchestrator JSON and links its Markdown report.
 
 ## Orchestrator Review
 
@@ -145,7 +139,7 @@ Run `lab review --id <hub-id> --init` after the variants and their browser proof
 - comparative findings
 - caveats and next steps
 
-Do not include hidden chain-of-thought. Record conclusions, observable evidence, uncertainty, and limitations. Attach the completed JSON with `lab review --id <hub-id> --report <json>`; the command writes canonical JSON and Markdown inside the hub and regenerates its Review view.
+Do not include hidden chain-of-thought. Record conclusions, observable evidence, uncertainty, and limitations. Attach completed JSON with `lab review --id <hub-id> --report <json>`; writes canonical JSON and Markdown inside the hub and regenerates its Review view.
 
 The drawer must include a provenance section for:
 
@@ -162,11 +156,11 @@ The drawer must include a provenance section for:
 
 For side-by-side views:
 
-- Use the same frame size/aspect for every variant.
+- Same frame size/aspect for every variant.
 - Keep labels and primary states legible at the comparison scale.
-- Use saturated solid badges for exact model, skill, agent, status, and proof/source labels; avoid bordered metadata boxes inside bordered cards.
-- Use small desaturated emoji-style icons when they improve scan speed for model, skill, agent, date, path, or proof.
-- Keep every comparison card structurally identical: same preview area, same compact header, same badge rail, same notes/action row. Variable metadata should truncate or wrap inside stable zones, not reshape the grid.
+- Saturated solid badges for exact model, skill, agent, status, and proof/source labels; avoid bordered metadata boxes inside bordered cards.
+- Small desaturated emoji-style icons when they improve scan speed for model, skill, agent, date, path, or proof.
+- Every comparison card structurally identical: same preview area, same compact header, same badge rail, same notes/action row. Variable metadata should truncate or wrap inside stable zones, not reshape the grid.
 - Surface date and path as compact metadata. Do not replace useful provenance with a redundant open link.
 - Prefer one meaningful screen per variant over tiny full-app screenshots.
 - Use focus mode for details that cannot survive scaling.
@@ -199,17 +193,17 @@ If the workspace has no prototype landing and the user needs to browse multiple 
 
 The landing is for navigation only:
 
-- render each prototype in a scaled iframe card
-- show title, question, status, category, tags, exact model/skill/agent/proof badges, date, path, and proof count
-- group cards by day/week/month/year from the top toolbar and keep newest groups above older groups
-- preserve the gallery grid inside each group; grouping should add section headers, not turn cards into a vertical list
-- open previews in the same window by default so reviewers can navigate with browser back/forward
+- scaled iframe card per prototype
+- title, question, status, category, tags, exact model/skill/agent/proof badges, date, path, proof count
+- group cards by day/week/month/year from the top toolbar; newest groups above older
+- preserve the gallery grid inside each group; grouping adds section headers, not a vertical list
+- open previews in the same window by default so reviewers can use browser back/forward
 - link directly to the prototype folder's `index.html`
 - deep-link to the comparison hub with left/right dropdowns when a hub exists
-- use a rounded main grid surface and subtle card surfaces instead of containers inside containers
-- keep dropdowns compact and labelled as A/B selectors; avoid same-vs-same pairs unless the reviewer explicitly needs that stress case
+- rounded main grid surface and subtle card surfaces; no containers inside containers
+- dropdowns compact and labelled as A/B selectors; avoid same-vs-same pairs unless the reviewer explicitly needs that stress case
 - hide nonessential or dead prototype controls in iframe previews through embed mode
-- avoid shared code imported by prototypes
+- no shared code imported by prototypes
 - follow any existing workspace index if one already exists
 
 ## Example

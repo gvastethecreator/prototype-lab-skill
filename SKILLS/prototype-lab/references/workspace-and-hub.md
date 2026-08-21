@@ -10,7 +10,7 @@ Resolve the script from the installed skill folder:
 node <skill-root>/scripts/manage-prototype-lab.mjs <command> --workspace <workspace>
 ```
 
-Repository-local development can use the shorter npm wrapper:
+Repo-local shorter wrapper:
 
 ```text
 pnpm run lab -- <command>
@@ -22,6 +22,7 @@ Commands:
 | --- | --- | --- |
 | `init` | Install the workspace hub and seed reusable prompts | none; add `--empty` for a blank library |
 | `quick` | Create the smallest daily prototype owner | `--title`; preferably `--question` |
+| `vary` | Open, lint, switch, narrow, or close a design round on one owner | `--id`; then `--check`, `--use <n>`, `--narrow --keep <n>`, or `--end` |
 | `adopt` | Copy an existing self-contained static build into a managed owner | `--path`; optionally `--title`, `--question` |
 | `fork` | Create a linked iteration with clean runs and proof | `--id`; optionally `--title` |
 | `experiment` | Generate a spec or prepare isolated comparison packets | `--init ...` or `--spec <json>` |
@@ -42,7 +43,7 @@ Commands:
 | `pack` | Create a portable static folder and ZIP | `--id`; optionally `--include-proof` |
 | `ship` | Finalize with full evidence, then package | `--id`; optionally `--include-proof` |
 
-Use `lab help <command>` for focused help. Prompt-library operations are available as `lab prompt list|pick|save|seed|init`.
+`lab help <command>` for focused help. Prompt-library ops: `lab prompt list|pick|save|seed|init`.
 
 ## Ownership
 
@@ -53,8 +54,10 @@ prototypes/
   prompts/                    versioned reusable input library
   <YYYY>/<MM>/<NNN>-artifact/
     metadata.json             artifact source of truth
-    index.html                artifact runtime
+    plan.json                 open design-round source of truth
+    index.html                artifact runtime, or vary host while a round is open
     styles.css / app.js       artifact runtime
+    positions/<n>/            complete drop-in takes for a design round
     prompts/ runs/ proof/     local evidence and provenance
   <YYYY>/<MM>/<NNN>-hub/
     hub.config.json           editable comparison source of truth
@@ -63,7 +66,7 @@ prototypes/
     index.html hub.css hub.js generated
 ```
 
-Do not edit generated hub files to change variants or criteria. Those changes disappear on `sync`. Edit `hub.config.json`.
+Do not edit generated hub files to change variants or criteria — `sync` replaces them. Edit `hub.config.json`.
 
 ## Creating A Standalone Artifact
 
@@ -73,17 +76,21 @@ lab create --title "Dispatch board" --question "..." --prompt midnight-dispatch-
 lab create --title "Open creative site" --question "..." --scaffold blank --condition baseline --model model-a --reasoning high
 lab create --title "Compact operator tool" --question "..." --scaffold tool
 lab quick --title "Fast interaction test" --question "Can the user recover?" --profile mobile
+lab vary --id 001 --question "How much should the first screen say?" --n 4
+lab vary --id 001 --check
+lab vary --id 001 --use 3
+lab vary --id 001 --end --keep 3 --why "the ledger"
 lab adopt --path dist --title "Existing static build" --question "Is it portable?"
 lab fork --id 001 --title "Compact iteration"
 ```
 
-The manager scans the active month, allocates the next chronological number, copies a scaffold, creates local ownership folders, and optionally freezes the prompt template, variables, rendered version, and hash into the artifact. `blank` is the neutral default; `tool` is opt-in.
+Manager scans the active month, allocates the next chronological number, copies a scaffold, creates local ownership folders, and optionally freezes prompt template, variables, rendered version, and hash into the artifact. `blank` is the neutral default; `tool` is opt-in.
 
 For model/agent/skill capability comparisons, prepare and approve the experiment before creating artifact owners. See `capability-comparisons.md`.
 
-The initial status is `draft` when a question is supplied and `needs-brief` when it is omitted. Change to `active` only after the artifact and factual attribution exist.
+Initial status is `draft` when a question is supplied and `needs-brief` when it is omitted. Change to `active` only after the artifact and factual attribution exist.
 
-Profiles are routing hints, not visual themes: `blank`, compact `tool`, neutral `mobile`, responsive 2D/WebGL-ready `canvas`, `data`, and imported static output. Keep the final runtime host-neutral regardless of profile.
+Profiles are routing hints, not visual themes: `blank`, compact `tool`, neutral `mobile`, responsive 2D/WebGL-ready `canvas`, `data`, imported static output. Final runtime stays host-neutral regardless of profile.
 
 ## Creating A Managed Hub
 
@@ -92,8 +99,7 @@ lab hub --title "Dispatch model comparison" --variants 001,002 --dimension model
 lab compare --title "Dispatch design review" --variants 001,002 --dimension design --modes compare,blind,rank,iterations,review
 ```
 
-The manager resolves unique short ids, links standalone artifacts, creates `hub.config.json`, and derives the runtime and metadata. It refuses to replace an unmanaged folder.
-When every selected artifact records the same decision question, the hub inherits it automatically; pass `--question` only to override or clarify it.
+Manager resolves unique short ids, links standalone artifacts, creates `hub.config.json`, and derives runtime and metadata. Refuses to replace an unmanaged folder. When every selected artifact records the same decision question, the hub inherits it; `--question` only to override or clarify.
 
 Editable fields:
 
@@ -115,28 +121,27 @@ Editable fields:
 }
 ```
 
-After editing, run `lab sync`. The hub provides overview, exact URL-backed A/B comparison, focus, and provenance views.
+After editing, run `lab sync`. Hub provides overview, exact URL-backed A/B comparison, focus, and provenance views.
 
-New hubs include the orchestrator Review view by default. Optional modes add blind source reveal, subjective browser-local ranking with JSON export, linked iterations, and archived variants. Set `archived: true` or `iteration` on a variant override in `hub.config.json`.
+New hubs include orchestrator Review by default. Optional modes: blind source reveal, subjective browser-local ranking with JSON export, linked iterations, archived variants. Set `archived: true` or `iteration` on a variant override in `hub.config.json`.
 
-Generate the orchestrator report template with `lab review --id <hub> --init`. After inspecting every final variant and its proof, attach a completed JSON with `lab review --id <hub> --report <json>`. The command also writes a readable Markdown report under `reviews/` and enables the hub Review view.
+`lab review --id <hub> --init` generates the orchestrator report template. After inspecting every final variant and its proof, attach completed JSON with `lab review --id <hub> --report <json>`. Writes Markdown under `reviews/` and enables the hub Review view.
 
 ## Workspace Hub
 
-Open `prototypes/index.html` directly. It is a static management surface, not a runtime dependency of artifacts.
+Open `prototypes/index.html` directly. Static management surface, not a runtime dependency of artifacts.
 
 - **Library**: search and browse chronological artifact previews.
 - **Comparisons**: select a hub, inspect members, and open an exact A/B URL.
 - **Prompts**: inspect active reusable inputs and rendered versions.
-- **Receipts**: inspect the factual execution trail, verification, isolation,
-  usage, hashes, and limitations recorded for each task.
+- **Receipts**: inspect the factual execution trail, verification, isolation, usage, hashes, and limitations recorded for each task.
 - **Health**: find missing decisions, model attribution, proof, or broken hub links; copy canonical commands.
 
 `status` also scans `.scratch/prototype-lab/*/experiment.json` and returns exact commands to resume preflight or materialize authorized builds. `doctor` answers whether the tool can run; `status` answers whether the workspace is ready.
 
-Use `open` for self-contained artifacts that work under `file://`. Use `preview --id <id> --open` when ES modules, fetch, media, or browser security require an HTTP origin. Preview binds only to `127.0.0.1`; stop it with Ctrl+C. `--check --port 0` starts an ephemeral server, requests the target once, and shuts it down for diagnostics.
+Use `open` for self-contained artifacts that work under `file://`. Use `preview --id <id> --open` when ES modules, fetch, media, or browser security require an HTTP origin. Preview binds only to `127.0.0.1`; stop with Ctrl+C. `--check --port 0` starts an ephemeral server, requests the target once, and shuts it down for diagnostics.
 
-The hub cannot execute shell commands from the browser. Run copied commands through Codex or a terminal, then refresh after `lab sync`.
+Hub cannot execute shell commands from the browser. Run copied commands through Codex or a terminal, then refresh after `lab sync`.
 
 ## Legacy And Recovery
 

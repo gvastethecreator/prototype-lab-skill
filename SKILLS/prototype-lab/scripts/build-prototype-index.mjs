@@ -106,7 +106,7 @@ export async function buildPrototypeIndex({ workspace = process.cwd() } = {}) {
 async function findMetadataFiles(root, current, output = []) {
   const entries = await fs.readdir(current, { withFileTypes: true }).catch(() => []);
   for (const entry of entries.sort((a, b) => a.name.localeCompare(b.name))) {
-    if (entry.name.startsWith(".") || entry.name === "proof") continue;
+    if (entry.name.startsWith(".") || entry.name === "proof" || entry.name === "positions") continue;
     if (current === root && entry.isDirectory() && entry.name === "prompts") continue;
     const absolute = path.join(current, entry.name);
     if (entry.isDirectory()) await findMetadataFiles(root, absolute, output);
@@ -265,6 +265,7 @@ function healthIssues(entry) {
   if (entry.proof === 0) issues.push({ code: "missing-proof", severity: "warning", message: "Add browser or screenshot proof." });
   if (entry.isComparisonHub && entry.runCount < 2) issues.push({ code: "hub-no-variants", severity: "error", message: "Link at least two standalone variants." });
   if (entry.isComparisonHub && entry.views.includes("review") && !entry._metadata?.reviews?.length) issues.push({ code: "missing-coordinator-review", severity: "warning", message: "Attach the orchestrator's evidence-backed comparison review." });
+  if (entry._metadata?.designRound?.status === "open") issues.push({ code: "open-design-round", severity: "info", message: "Finish or end the open design round before shipping." });
   const comparisonDimension = String(entry._metadata?.comparisonDimension || entry._metadata?.variantStrategy || "");
   if (entry.isComparisonHub && /model|skill|agent|reasoning/i.test(comparisonDimension)) {
     const runs = Array.isArray(entry._metadata?.provenance?.agentRuns) ? entry._metadata.provenance.agentRuns : [];

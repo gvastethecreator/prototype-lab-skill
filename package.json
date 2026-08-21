@@ -29,12 +29,13 @@
     "prompts:save": "node scripts/manage-prompt-library.mjs save",
     "test:portable": "node scripts/test-portable-tools.mjs",
     "test:daily": "node scripts/test-lab-daily-workflow.mjs",
+    "test:vary": "node scripts/test-vary-round.mjs",
     "test:ui": "node scripts/test-hub-ui.mjs",
     "test:dashboard": "node scripts/test-dashboard-ui.mjs",
     "test:scaffolds": "node scripts/test-scaffold-ui.mjs",
     "package:manifest": "node scripts/verify-published-package.mjs --check",
     "package:manifest:write": "node scripts/verify-published-package.mjs --write",
-    "validate": "node scripts/validate-skill-pack.mjs && node scripts/verify-published-package.mjs --check && node scripts/test-portable-tools.mjs && node scripts/test-lab-daily-workflow.mjs",
-    "check": "node scripts/validate-skill-pack.mjs && node scripts/verify-published-package.mjs --check && node scripts/test-portable-tools.mjs && node scripts/test-lab-daily-workflow.mjs"
+    "validate": "node scripts/validate-skill-pack.mjs && node scripts/verify-published-package.mjs --check && node scripts/test-portable-tools.mjs && node scripts/test-lab-daily-workflow.mjs && node scripts/test-vary-round.mjs",
+    "check": "node scripts/validate-skill-pack.mjs && node scripts/verify-published-package.mjs --check && node scripts/test-portable-tools.mjs && node scripts/test-lab-daily-workflow.mjs && node scripts/test-vary-round.mjs"
   }
 }

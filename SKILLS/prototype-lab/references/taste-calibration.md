@@ -1,21 +1,21 @@
 # Prototype Taste Calibration
 
-Use this when one standalone prototype needs visual calibration or polish. Do not load it into baseline workers during a model/skill capability comparison; use `capability-comparisons.md` and keep the coordinator visually neutral.
+Visual calibration or polish for one standalone prototype. Do not load into baseline workers during a model/skill capability comparison; use `capability-comparisons.md` and keep the coordinator visually neutral.
 
 Upstream source: `https://github.com/Leonxlnx/taste-skill` (MIT). Keep this paraphrased and local.
 
 ## Prototype Read
 
-Before building or improving a prototype, lock one short read:
+Lock one short read:
 
 `Reading this as: <prototype kind> for <decision/user>, testing <question>, with <visual language>, under <shell/system constraints>.`
 
 Include:
 
-- Question: what decision the prototype must answer.
-- User path: the path a reviewer should exercise.
+- Question: decision the prototype must answer.
+- User path: path a reviewer should exercise.
 - Prototype kind: flow, component, interaction model, visual direction, game/tool, data state, or comparison.
-- Register split: the workspace/comparison hub stays product/tool; the standalone prototype owns its complete register and does not inherit hub styling.
+- Register split: workspace/comparison hub stays product/tool; the standalone prototype owns its complete register and does not inherit hub styling.
 - Constraints: standalone shell, viewport targets, debug visibility, controls, local assets, accessibility, metadata, and proof artifacts.
 
 ## Dials
@@ -34,7 +34,7 @@ Defaults:
 - Data/debug prototype: variance `1-3`, motion `1-3`, density `7-10`.
 - Comparison lab: variance follows the declared experiment, motion `1-4` unless motion is being compared, density `7-10` for the compare view and `4-7` for focus view.
 
-The comparison hub remains compact and quiet. The standalone variant may be page-based, immersive, editorial, product, game-like, or experimental according to its declared layout policy.
+Comparison hub stays compact and quiet. Standalone variant may be page-based, immersive, editorial, product, game-like, or experimental per its declared layout policy.
 
 ## Comparison Read
 
@@ -43,7 +43,9 @@ For multi-variant labs, write one shared read and one short variant read per opt
 - Shared read: `Reading this as: comparison prototype for <reviewer>, testing <same prompt> across <model/skill/prompt/design dimension>, judged by <criteria>.`
 - Variant read: `<variant-id>: using <actual source/status>, expected to improve <hypothesis>, risking <tradeoff>.`
 
-Keep all variants comparable: same state, same frame, same amount of content, and visible source labels. Let the focus view carry detail that the compare view cannot fit.
+Keep all variants comparable: same state, same frame, same amount of content, visible source labels. Let the focus view carry detail the compare view cannot fit.
+
+For several rendered takes of one canvas, freeze the shared read, then run a design round from `design-rounds.md` instead of three chat-only options.
 
 ## Three-Option Direction
 
@@ -86,13 +88,13 @@ Rules:
 
 Flag:
 
-- Prototype canvas looks like a generic SaaS landing page unrelated to the question.
-- Debug controls are decorative or nonfunctional.
-- Tiny labels, pills, fake metadata, or status strips create fake sophistication.
-- Three-card grids, nested cards, glow/glass, and huge radii appear by reflex.
-- Motion is claimed but not implemented, or implemented but irrelevant to the hypothesis.
-- Visual direction hides the state the prototype is supposed to test.
-- The first viewport is crowded enough that the test path is unclear.
+- Generic SaaS landing unrelated to the question.
+- Debug controls decorative or nonfunctional.
+- Tiny labels, pills, fake metadata, or status strips creating fake sophistication.
+- Three-card grids, nested cards, glow/glass, and huge radii by reflex.
+- Motion claimed but not implemented, or implemented but irrelevant to the hypothesis.
+- Visual direction hiding the state the prototype is supposed to test.
+- First viewport crowded enough that the test path is unclear.
 
 Prefer:
 
@@ -105,8 +107,8 @@ Prefer:
 ## Preflight
 
 - Prototype read exists.
-- Dials are set for the canvas when visual quality matters.
-- The artifact follows its declared layout policy; do not add a top toolbar, drawer, or full-screen stage unless the product direction needs one.
+- Dials set for the canvas when visual quality matters.
+- Artifact follows its declared layout policy; do not add a top toolbar, drawer, or full-screen stage unless the product direction needs one.
 - Every visible control either works or is marked as a noninteractive test case.
 - State coverage matches the hypothesis: empty/error/loading/permission/long content when relevant.
 - Visual proof exists in the prototype's local `proof/` folder.

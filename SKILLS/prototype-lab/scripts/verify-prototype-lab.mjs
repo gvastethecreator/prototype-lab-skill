@@ -243,7 +243,7 @@ async function listFiles(root, current = root, output = []) {
   const entries = await fs.readdir(current, { withFileTypes: true }).catch(() => []);
   for (const entry of entries) {
     const file = path.join(current, entry.name);
-    if (entry.isSymbolicLink()) continue;
+    if (entry.isSymbolicLink() || entry.name === ".dropped") continue;
     if (entry.isDirectory()) await listFiles(root, file, output);
     else if (entry.isFile()) output.push(file);
   }

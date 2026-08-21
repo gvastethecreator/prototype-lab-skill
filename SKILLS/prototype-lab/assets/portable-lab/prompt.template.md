@@ -26,7 +26,6 @@
 
 ## Provenance contract
 
-Record the exact model route and settings when visible, skills consulted, agent
-mode/tool, output path, token usage when exposed, relevant tool calls, known
-limitations, and whether any other variant was visible. Use `unknown` or `not
-captured` instead of guessing.
+Model route/settings when visible, skills consulted, agent mode/tool, output
+path, token usage when exposed, tool calls, limitations, and whether another
+variant was visible. `unknown` or `not captured`; never guess.

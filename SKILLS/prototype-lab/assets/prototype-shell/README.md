@@ -1,8 +1,8 @@
 # Standalone Artifact Scaffold
 
-`manage-prototype-lab.mjs create` copies this scaffold into the next chronological artifact folder and generates `artifact-data.js`, `metadata.json`, and the artifact README from the supplied title, question, model, and optional prompt-library entry.
+`manage-prototype-lab.mjs create` copies this scaffold into next chronological artifact folder and generates `artifact-data.js`, `metadata.json`, and artifact README from title, question, model, and optional prompt-library entry.
 
-The scaffold is intentionally neutral. Replace the canvas with the actual product experience; do not retain fake variants or example provenance. Keep runtime files local and preserve these owner folders:
+Intentionally neutral. Replace the canvas with actual product experience; drop fake variants and example provenance. Keep runtime files local; preserve these owner folders:
 
 ```text
 assets/
@@ -11,4 +11,4 @@ runs/
 proof/
 ```
 
-Before handoff, update factual metadata, exercise the real user path, add browser/screenshot proof, run workspace `sync`, and inspect `status`.
+Handoff: update factual metadata, exercise the real user path, add browser/screenshot proof, run `sync`, inspect `status`.
